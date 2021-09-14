@@ -1,0 +1,41 @@
+{
+    "tabnine.experimentalAutoImports": true,
+    "workbench.editorAssociations": {
+        "*.ipynb": "jupyter-notebook"
+    },
+    "editor.largeFileOptimizations": false,
+    "editor.fontFamily": "'JetBrainsMono Nerd Font', 'Droid Sans Mono', 'monospace', 'Droid Sans Fallback'",
+    "[json]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[html]": {
+        "editor.defaultFormatter": "vscode.html-language-features"
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+    "python.formatting.provider": "black",
+    "terminal.integrated.shell.osx": "/bin/zsh",
+    "terminal.integrated.fontFamily": "'JetBrainsMono Medium Nerd Font', 'MesloLGS NF', 'Hack Nerd Font', 'SourceCodePro+Powerline+Awesome Regular', 'Droid Sans Mono', 'monospace', 'Droid Sans Fallback'",
+    "terminal.integrated.rendererType": "dom",
+    "terminal.integrated.fontSize": 18,
+    "terminal.integrated.lineHeight": 1,
+    "terminal.integrated.letterSpacing": 2,
+    "editor.fontSize": 18,
+    "terminal.external.linuxExec": "truecolor",
+    "auto-rename-tag.activationOnLanguage": [
+        "html",
+        "xml",
+        "php",
+        "javascript"
+    ],
+    "workbench.iconTheme": "material-icon-theme",
+    "editor.linkedEditing": true,
+    "workbench.colorTheme": "Dracula",
+    "notebook.cellToolbarLocation": {
+        "default": "right",
+        "jupyter-notebook": "left"
+    },
+    "editor.inlineSuggest.enabled": true,
+    "redhat.telemetry.enabled": true
+}
