@@ -5,7 +5,7 @@
 sudo apt-get update -y && sudo apt-get -y upgrade && sudo apt-get dist-upgrade -y
 sudo apt install curl -y
 
-# Yüklemek İçin: `curl https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/debian_kur.sh | bash`
+# Yüklemek İçin: `curl https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/WSL.sh | bash`
 
 # temel
 sudo apt install wget -y
