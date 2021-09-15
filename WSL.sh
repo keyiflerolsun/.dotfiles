@@ -44,15 +44,6 @@ sudo systemctl start docker.service
 sudo systemctl enable docker.service
 sudo usermod -aG docker $USER
 
-# cockpit project
-sudo apt install cockpit
-sudo systemctl start cockpit
-
-# aaPanel
-wget -O install.sh http://www.aapanel.com/script/install-ubuntu_6.0_en.sh && sudo bash install.sh aapanel
-rm -rf install.sh
-# bash /etc/init.d/bt default
-
 # keyif
 rm -rf ~/.zshrc && wget https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/.zshrc
 echo "KekikAkademi" > /etc/hostname
