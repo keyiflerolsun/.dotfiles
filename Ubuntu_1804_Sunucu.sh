@@ -2,7 +2,7 @@
 
 # Ubuntu Kurulum Paketi
 
-# Yüklemek İçin: `curl https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/debian_kur.sh | bash`
+# Yüklemek İçin: `curl https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/Ubuntu_1804_Sunucu.sh | bash`
 
 # Ubuntu Repo Yükseltme
 wget https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/Ubuntu_20-04_Sources.list
