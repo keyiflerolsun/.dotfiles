@@ -50,6 +50,14 @@ sudo usermod -aG docker $USER
 sudo apt install cockpit
 sudo systemctl start cockpit
 
+# certbot for letsencrypt
+pip install cffi
+sudo add-apt-repository ppa:certbot/certbot
+sudo apt-get install python3-certbot-nginx
+## sudo micro /usr/bin/add-apt-repository       # to python 3.6
+# sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
+# letsencrypt certonly -a webroot --webroot-path=/var/www/yourdomain.com/html/ -d yourdomain.com -d www.yourdomain.com
+
 # aaPanel
 wget -O install.sh http://www.aapanel.com/script/install-ubuntu_6.0_en.sh && sudo bash install.sh aapanel
 rm -rf install.sh
