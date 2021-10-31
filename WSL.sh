@@ -15,7 +15,9 @@ sudo apt install python3-dev -y
 sudo apt install python3-pip -y
 sudo apt install htop -y
 pip3 install --upgrade pip
- # »» https://sourceforge.net/projects/xming/?source=typ_redirect
+
+# for tkinter;
+    # »» https://sourceforge.net/projects/xming/?source=typ_redirect
 sudo apt install python3-tk -y
 echo "export DISPLAY=:0;" >> ~/.bashrc
 
