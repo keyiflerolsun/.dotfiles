@@ -15,6 +15,9 @@ sudo apt install python3-dev -y
 sudo apt install python3-pip -y
 sudo apt install htop -y
 pip3 install --upgrade pip
+ # »» https://sourceforge.net/projects/xming/?source=typ_redirect
+sudo apt install python3-tk -y
+echo "export DISPLAY=:0;" >> ~/.bashrc
 
 # zsh
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
@@ -57,5 +60,6 @@ sudo chsh -s $(which zsh) && zsh
 git config --global user.email "keyiflerolsun@gmail.com"
 git config --global user.name "keyiflerolsun"
 git config --global credential.helper "cache --timeout=3600"
+echo "export DISPLAY=:0;" >> ~/.zshrc
 
 # usermod -aG sudo keyiflerolsun
