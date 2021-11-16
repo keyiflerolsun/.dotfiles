@@ -13,6 +13,9 @@ sudo pacman -S filezilla simplescreenrecorder -y
 sudo pacman -S snapd vlc libreoffice-still -y
 pacaur -S realvnc-vnc-viewer teamviewer ruby-colorls -y
 
+# Conky
+sudo pacman -S conky conky-manager -y
+
 # MongoDB
 pacaur -S mongodb-bin mongodb-compass -y
 
