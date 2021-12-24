@@ -50,6 +50,7 @@ sudo apt install screenfetch neofetch tmux -y
 wget https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/.tmux.conf
 sudo apt install jq ffmpeg -y
 chsh -s $(which zsh) && zsh
+ulimit -n 4096
 git config --global user.email "keyiflerolsun@gmail.com"
 git config --global user.name "keyiflerolsun"
-git config --global credential.helper "cache --timeout=3600"
+git config --global credential.helper "cache --timeout=36000"
