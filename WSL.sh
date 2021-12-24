@@ -2,10 +2,9 @@
 
 # WSL Debian Temel Kurulum Paketi
 
-sudo apt-get update -y && sudo apt-get -y upgrade && sudo apt-get dist-upgrade -y
-sudo apt install curl -y
-
 # Yüklemek İçin: `curl https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/WSL.sh | bash`
+
+sudo apt-get update -y && sudo apt-get -y upgrade && sudo apt-get dist-upgrade -y
 
 # temel
 sudo apt install wget -y
