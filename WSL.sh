@@ -59,9 +59,10 @@ wget https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/.tmux.conf
 sudo apt install jq -y
 sudo apt install ffmpeg -y
 sudo chsh -s $(which zsh) && zsh
+ulimit -n 4096
 git config --global user.email "keyiflerolsun@gmail.com"
 git config --global user.name "keyiflerolsun"
-git config --global credential.helper "cache --timeout=3600"
+git config --global credential.helper "cache --timeout=36000"
 echo "export DISPLAY=:0;" >> ~/.zshrc
 
 # usermod -aG sudo keyiflerolsun
