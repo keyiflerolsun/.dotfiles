@@ -1,0 +1,15 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\wt]
+@="Windows Terminal"
+"Icon"="%LOCALAPPDATA%\\Microsoft\\WindowsApps\\terminal.ico"
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\wt\command]
+@="wt.exe -d ."
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\console]
+@="CMD"
+"Icon"="%LOCALAPPDATA%\\Microsoft\\WindowsApps\\console.ico"
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\console\command]
+@="cmd.exe"
