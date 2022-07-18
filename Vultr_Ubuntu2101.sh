@@ -33,9 +33,9 @@ sudo apt install libncurses5-dev -y
 sudo gem install colorls
 
 # certbot for letsencrypt
-pip install cffi
-sudo add-apt-repository ppa:certbot/certbot
-sudo apt-get install python3-certbot-nginx
+# pip install cffi
+# sudo add-apt-repository ppa:certbot/certbot
+# sudo apt-get install python3-certbot-nginx
 
 ## micro /etc/nginx/nginx.conf
 ## sudo certbot --nginx -d plusbinance.com
