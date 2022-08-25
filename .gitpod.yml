@@ -2,13 +2,18 @@ vscode:
   extensions:
     - aaron-bond.better-comments
     - adpyke.codesnap
+    - af4jm.vscode-m3u
+    - bitwisecook.tcl
     - dracula-theme.theme-dracula
     - esbenp.prettier-vscode
+    - ex-codes.pine-script-syntax-highlighter
     - formulahendry.auto-close-tag
     - formulahendry.auto-rename-tag
+    - foxundermoon.shell-format
     - GitHub.copilot
     - gitpod.gitpod-desktop
     - JuanBlanco.solidity
+    - kejun.devtoys
     - KevinRose.vsc-python-indent
     - laktak.hjson
     - magicstack.MagicPython
@@ -26,6 +31,7 @@ vscode:
     - ms-vscode.live-server
     - ms-vsliveshare.vsliveshare
     - NoahSyn10.pydoctestbtn
+    - Okteto.remote-kubernetes
     - PKief.material-icon-theme
     - rangav.vscode-thunder-client
     - ritwickdey.LiveServer
