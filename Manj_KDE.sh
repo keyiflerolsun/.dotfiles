@@ -33,7 +33,7 @@ pip install pip-review
 pip-review --local --interactive
 
 # VS-Code Eklentiler
-curl https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/extensions.txt | xargs -L 1 code --install-extension
+curl https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/.vscode/extensions.txt | xargs -L 1 code --install-extension
 
 # zsh Eklentiler
 git clone https://github.com/zsh-users/zsh-completions ${ZSH_CUSTOM:=~/.oh-my-zsh/custom}/plugins/zsh-completions
