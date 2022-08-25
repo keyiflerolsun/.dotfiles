@@ -30,6 +30,7 @@ yay -S extra/flatpak && flatpak install spotify
 sudo -H pip install --upgrade youtube-dl
 
 # Sistemde Kurulu Bütün Python Paketlerini Güncellemek
+python3 -m pip install --upgrade pip
 pip install pip-review
 pip-review --local --interactive
 
