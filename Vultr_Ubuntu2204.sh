@@ -39,10 +39,13 @@ sudo apt install build-essential -y
 sudo apt install libncurses5-dev -y
 sudo gem install colorls
 
-# certbot for letsencrypt
-# pip install cffi
-# sudo add-apt-repository ppa:certbot/certbot
-# sudo apt-get install python3-certbot-nginx
+# nginx - certbot for letsencrypt | » https://nginxproxymanager.com/guide/#quick-setup «
+# sudo apt install nginx certbot python3-certbot-nginx
+# sudo systemctl start nginx
+# sudo nginx -t
+# sudo systemctl reload nginx
+# sudo ufw allow 'Nginx Full'
+# sudo certbot --nginx
 
 ## micro /etc/nginx/nginx.conf
 ## sudo certbot --nginx -d plusbinance.com
