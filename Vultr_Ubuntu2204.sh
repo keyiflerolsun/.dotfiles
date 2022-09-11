@@ -53,7 +53,7 @@ sudo gem install colorls
 rm -rf ~/.zshrc && wget https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/.zshrc
 # echo "KekikAkademi" > /etc/hostname
 sudo timedatectl set-timezone Europe/Istanbul
-sudo apt install screenfetch neofetch tmux -y
+sudo apt install screenfetch neofetch tmux tmuxinator docker docker-compose -y
 wget https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/.tmux.conf
 sudo apt install jq ffmpeg -y
 chsh -s $(which zsh) && zsh
