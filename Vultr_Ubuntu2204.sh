@@ -2,16 +2,18 @@
 
 # Ubuntu Kurulum Paketi
 
-# Yüklemek İçin: `curl https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/Vultr_Ubuntu2101.sh | bash`
-
-# temel
+# Sunucu Güncellemesi ve ZSH Kurulumu Ardından Reboot!
 sudo apt-get update -y && sudo apt-get -y upgrade && sudo apt-get dist-upgrade -y
 sudo apt install wget git zsh htop -y
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+# Yüklemek İçin: `curl https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/Vultr_Ubuntu2204.sh | bash`
+
+# temel
 sudo apt install python3-dev python3-pip python3-scrapy python3-pandas -y
 pip3 install --upgrade pip
 
 # zsh
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 git clone https://github.com/zsh-users/zsh-completions ${ZSH_CUSTOM:=~/.oh-my-zsh/custom}/plugins/zsh-completions
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
