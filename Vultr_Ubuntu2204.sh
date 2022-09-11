@@ -12,6 +12,8 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/too
 # temel
 sudo apt install python3-dev python3-pip python3-scrapy python3-pandas -y
 pip3 install --upgrade pip
+pip3 install -U setuptools
+pip3 install -U wheel
 
 # zsh
 git clone https://github.com/zsh-users/zsh-completions ${ZSH_CUSTOM:=~/.oh-my-zsh/custom}/plugins/zsh-completions
@@ -21,6 +23,9 @@ git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-m
 # thefuck
 pip3 install thefuck
 sudo apt install thefuck -y
+
+# vizex
+pip3 install vizex
 
 # micro
 curl https://getmic.ro | bash
