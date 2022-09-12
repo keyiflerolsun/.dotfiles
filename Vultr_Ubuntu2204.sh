@@ -4,12 +4,12 @@
 
 # Sunucu Güncellemesi ve ZSH Kurulumu Ardından Reboot!
 sudo apt-get update -y && sudo apt-get -y upgrade && sudo apt-get dist-upgrade -y
-sudo apt install wget git zsh htop -y
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
 # Yüklemek İçin: `curl https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/Vultr_Ubuntu2204.sh | bash`
 
 # temel
+sudo apt install wget git zsh htop -y
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 sudo apt install python3-dev python3-pip python3-scrapy python3-pandas -y
 pip3 install --upgrade pip
 pip3 install -U setuptools
@@ -59,8 +59,8 @@ sudo timedatectl set-timezone Europe/Istanbul
 sudo apt install screenfetch neofetch tmux tmuxinator docker docker-compose -y
 wget https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/.tmux.conf
 sudo apt install jq ffmpeg -y
-chsh -s $(which zsh) && zsh
 ulimit -n 4096
 git config --global user.email "keyiflerolsun@gmail.com"
 git config --global user.name "keyiflerolsun"
 git config --global credential.helper "cache --timeout=36000"
+chsh -s $(which zsh) && zsh
