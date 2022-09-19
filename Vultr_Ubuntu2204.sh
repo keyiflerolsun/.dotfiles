@@ -4,6 +4,7 @@
 
 # Sunucu Güncellemesi ve ZSH Kurulumu Ardından Reboot!
 sudo apt-get update -y && sudo apt-get -y upgrade && sudo apt-get dist-upgrade -y
+sudo apt install language-pack-tr-base -y
 
 # Yüklemek İçin: `curl https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/Vultr_Ubuntu2204.sh | bash`
 
