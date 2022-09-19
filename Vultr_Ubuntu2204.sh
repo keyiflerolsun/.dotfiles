@@ -8,7 +8,7 @@ sudo apt-get update -y && sudo apt-get -y upgrade && sudo apt-get dist-upgrade -
 # Yüklemek İçin: `curl https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/Vultr_Ubuntu2204.sh | bash`
 
 # temel
-sudo apt-get install language-pack-tr-base -y
+sudo apt install language-pack-tr-base -y
 sudo apt install wget git zsh htop -y
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 sudo apt install python3-dev python3-pip python3-scrapy python3-pandas -y
