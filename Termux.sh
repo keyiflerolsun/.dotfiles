@@ -6,7 +6,7 @@
 
 apt update -y && apt install curl -y
 
-# Yüklemek İçin: `curl https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/Vultr_Ubuntu2101.sh | bash`
+# Yüklemek İçin: `curl https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/Termux.sh | bash`
 
 # temel
 apt update -y && sudo apt upgrade -y
