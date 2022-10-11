@@ -2,9 +2,9 @@
 
 # Termux Kurulum Paketi
 
-# ! Elle Curl Yükleyin
+# ! F-Droid üzerinden indirdikten sonra elle yükseltin ve kurulum komutunu girin!
 
-apt update -y && apt upgrade -y && apt install curl -y
+apt update -y && apt upgrade -y
 
 # Yüklemek İçin: `curl https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/Termux.sh | bash`
 
