@@ -12,7 +12,7 @@ sudo pacman -S brave-browser remmina thefuck micro easyeffects pipewire pacaur s
 sudo pacman -S filezilla simplescreenrecorder -y
 sudo pacman -S snapd vlc libreoffice-still -y
 sudo pacman -S tmux okteto ngrok docker docker-compose wine android-tools rust npm ruby -y
-pacaur -S realvnc-vnc-viewer teamviewer ruby-colorls tmuxinator vizex -y
+pacaur -S realvnc-vnc-viewer teamviewer ruby-colorls tmuxinator -y
 
 # Conky
 sudo pacman -S conky conky-manager -y
