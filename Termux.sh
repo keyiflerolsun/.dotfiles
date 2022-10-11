@@ -1,6 +1,10 @@
 #!/bin/sh
 
-# Ubuntu Kurulum Paketi
+# Termux Kurulum Paketi
+
+# ! Elle Curl Yükleyin
+
+apt update -y && apt install curl -y
 
 # Yüklemek İçin: `curl https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/Vultr_Ubuntu2101.sh | bash`
 
