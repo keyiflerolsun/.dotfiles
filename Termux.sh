@@ -4,12 +4,12 @@
 
 # ! Elle Curl Yükleyin
 
-apt update -y && apt install curl -y
+apt update -y && apt upgrade -y && apt install curl -y
 
 # Yüklemek İçin: `curl https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/Termux.sh | bash`
 
 # temel
-apt update -y && sudo apt upgrade -y
+apt update -y && apt upgrade -y
 apt install wget curl git zsh htop micro -y
 apt install openssl openssh -y
 apt install ruby rust python -y
