@@ -8,7 +8,7 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/too
 sudo pacman -S yay pacui latte-dock xdg-desktop-portal-gtk telegram-desktop -y
 pacaur -S python-devtools -y
 sudo pacman -S python-pip python-pipreqs python-flask python-numpy python-pandas scrapy opencv -y
-sudo pacman -S brave-browser remmina thefuck micro pulseeffects pacaur screenfetch neofetch -y
+sudo pacman -S brave-browser remmina thefuck micro easyeffects pipewire pacaur screenfetch neofetch -y
 sudo pacman -S filezilla simplescreenrecorder -y
 sudo pacman -S snapd vlc libreoffice-still -y
 sudo pacman -S tmux okteto ngrok docker docker-compose wine android-tools rust npm ruby -y
