@@ -41,15 +41,15 @@ TEXT
 ${goto 210}${color0}${font Zekton:style=bold:size=13}${voffset 40}${exec whoami}
 ${voffset -45}${font Zekton:style=Bold:size=12}${color}${goto 90}${uptime}
 ${goto 90}${color1}${font Zekton:style=Bold:size=12}${color1}${sysname}${color}${font}
-${font Chinacat:size=12}${offset 70}${voffset 45}${time %B %d, %Y} ${goto 248}${font Zekton:style=bold:size=11}${acpitemp} 
-${goto 248}${font Zekton:style=bold:size=11}°C
-${voffset -11}${goto 65}${color3}${font Zekton:style=bold:size=30}${time %H:%M}${font}${color1}${goto 220}${font Zekton:style=Bold:size=11}CPU
+${font Chinacat:size=12}${offset 70}${voffset 60}${time %B %d, %Y} ${voffset -15}${goto 255}${font Zekton:style=bold:size=11}${acpitemp} 
+${goto 255}${font Zekton:style=bold:size=11}°C
+${voffset 10}${goto 65}${color3}${font Zekton:style=bold:size=30}${time %H:%M}${font}${color1}${goto 220}${font Zekton:style=Bold:size=11}CPU
 ${goto 220}${font Zekton:style=Bold:size=11}${color1}${cpu cpu1}%
 ${voffset 30}${goto 82}/home 
 ${goto 82}${font Zekton:style=Bold:size=10}${fs_used /home}
-${voffset 35}${goto 25}${font Zekton:style=Bold:size=10}/dev/sda${goto 113}/dev/sdb${font Zekton:style=Bold:size=11}${color1}${goto 217}RAM
-${goto 30}${font Zekton:style=Bold:size=9}${diskio /dev/sda}${goto 120}${diskio /dev/sdb} ${goto 220}${font Zekton:style=Bold:size=11}${memperc}%
-${voffset 16}${font Zekton:style=Bold:size=11}${goto 83}ROOT${goto 175}SWAP
+${voffset 40}${goto 35}${font Zekton:style=Bold:size=10}/dev/sda${goto 120}/dev/sdb${font Zekton:style=Bold:size=11}${color1}${goto 217}RAM
+${goto 40}${font Zekton:style=Bold:size=9}${diskio /dev/sda}${goto 125}${diskio /dev/sdb} ${goto 220}${font Zekton:style=Bold:size=11}${memperc}%
+${voffset 30}${font Zekton:style=Bold:size=11}${goto 83}ROOT${goto 175}SWAP
 ${font Zekton:style=Bold:size=9}${goto 83}${fs_used /}${goto 175}${swapperc}%
 ${font Zekton:style=Bold:size=10}${voffset 40}${goto 50}kernel${goto 130} ${kernel}
 ${font Zekton:style=Bold:size=10}${goto 50}machine${goto 130}${machine}

@@ -1,0 +1,74 @@
+# Use powerline
+USE_POWERLINE="true"
+# Source manjaro-zsh-configuration
+if [[ -e /usr/share/zsh/manjaro-zsh-config ]]; then
+  source /usr/share/zsh/manjaro-zsh-config
+fi
+# Use manjaro zsh prompt
+if [[ -e /usr/share/zsh/manjaro-zsh-prompt ]]; then
+  source /usr/share/zsh/manjaro-zsh-prompt
+fi
+
+unsetopt correct_all
+DISABLE_CORRECTION="true"
+
+#--------------------------------------------------------------------------------------#
+
+plugins=(
+  git
+  sudo
+  web-search
+  python
+  pip
+  thefuck
+  history-substring-search
+  colored-man-pages
+  zsh-autosuggestions
+  zsh-syntax-highlighting
+)
+
+#--------------------------------------------------------------------------------------#
+## http://patorjk.com/software/taag/#p=display&f=Stop&t=Kekik%20Akademi
+clear
+echo '\n'
+echo '\t\t\e[32m _    _      _     _ _               _              _             _ '
+echo '\t\t\e[32m| |  / )    | |   (_) |         /\  | |            | |           (_)'
+echo '\t\t\e[32m| | / / ____| |  _ _| |  _     /  \ | |  _ ____  _ | | ____ ____  _ '
+echo '\t\t\e[32m| |< < / _  ) | / ) | | / )   / /\ \| | / ) _  |/ || |/ _  )    \| |'
+echo '\t\t\e[32m| | \ ( (/ /| |< (| | |< (   | |__| | |< ( ( | ( (_| ( (/ /| | | | |'
+echo '\t\t\e[32m|_|  \_)____)_| \_)_|_| \_)  |______|_| \_)_||_|\____|\____)_|_|_|_|'
+echo '\n'
+#--------------------------------------------------------------------------------------#
+
+## keyiflerolsun
+alias p="python3"
+alias c="clear"
+alias vnc='vncviewer'
+alias tw='sudo teamviewer --daemon enable && systemctl enable teamviewerd && systemctl start teamviewerd && teamviewer'
+alias rdp='remmina'
+alias j='jsonVer(){ cat "$@" | jq; unset -f jsonVer; }; jsonVer'
+
+
+## thefuck
+eval $(thefuck --alias)
+path+=(
+    $(ruby -e 'puts File.join(Gem.user_dir, "bin")')
+)
+
+## youtube-dl
+alias yt='youtube-dl -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio" --merge-output-format mp4'
+alias mp3='youtube-dl -x --embed-thumbnail --audio-format mp3'
+
+## colorls
+# source $(dirname $(gem which colorls))/tab_complete.sh
+alias lc='colorls -lA --sd'
+alias l='colorls'
+alias lsd='colorls --sd'
+alias ltree='colorls --tree --sd'
+
+## x11 VNC Server
+alias vnc_basla='x11vnc -nap -wait 50 -noxdamage -rfbauth $HOME/.vnc/passwd -display :0 -nocursor -forever -o $HOME/.vnc/x11vnc.log -bg; echo -e "\n\tVNC Server Başlatıldı.."'
+alias vnc_bitir='x11vnc -R stop'
+
+## GPG_KEY
+export GPG_TTY=$(tty)

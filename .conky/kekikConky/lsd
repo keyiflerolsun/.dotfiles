@@ -33,16 +33,16 @@ own_window_argb_visual true     # for Transparency
 own_window_argb_value 0         # for Transparency
 
 TEXT
-${goto 185}${color0}${font Zekton:style=bold:size=12}${voffset 10}${exec whoami}
-${font}${color}${goto 60}${uptime}
+${goto 175}${color0}${font Zekton:style=bold:size=12}${voffset 30}${exec whoami}
+${voffset -20}${font}${color}${goto 60}${uptime}
 ${goto 85}${color1}${font Zekton:style=Bold:size=9}${color1}${sysname}${color}${font}
-${voffset 80}${goto 20}${font Zekton:style=bold:size=30}${time %H:%M}${font}${goto 175}${font Zekton:style=Bold:size=9}CPU 
-${goto 175}${font Zekton:style=Bold:size=9}${color1}${cpu cpu0}%
-${voffset 40}${goto 35}/home${color1}${goto 128}SWAP
-${goto 38}${font Zekton:style=Bold:size=9}${fs_used /home}${goto 134}${swapperc}${font Zekton:style=Bold:size=9}${color1}${font}%
+${voffset 95}${goto 20}${font Zekton:style=bold:size=30}${time %H:%M}${font}${goto 180}${font Zekton:style=Bold:size=9}CPU 
+${goto 180}${font Zekton:style=Bold:size=9}${color1}${cpu cpu0}%
+${voffset 45}${goto 45}/home${color1}${goto 130}SWAP
+${goto 45}${font Zekton:style=Bold:size=9}${fs_used /home}${goto 140}${swapperc}${font Zekton:style=Bold:size=9}${color1}${font}%
 ${font Zekton:style=Bold:size=9}${font}
-${voffset 10}${goto 90}${font Zekton:style=Bold:size=9}RAM
-${goto 90}${font Zekton:style=Bold:size=9}${memperc}%
+${voffset 22}${goto 93}${font Zekton:style=Bold:size=9}RAM
+${goto 93}${font Zekton:style=Bold:size=9}${memperc}%
 
 ${image ./lsd.png -p 10,0}
 

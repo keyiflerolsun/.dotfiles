@@ -1,15 +1,16 @@
 {
-    "terminal.integrated.shell.osx": "/bin/zsh",
+    "terminal.integrated.defaultProfile.linux": "zsh",
+    "terminal.integrated.defaultProfile.osx": "zsh",
     "terminal.integrated.fontFamily": "'JetBrainsMono Medium Nerd Font', 'MesloLGS NF', 'Hack Nerd Font', 'SourceCodePro+Powerline+Awesome Regular', 'Droid Sans Mono', 'monospace', 'Droid Sans Fallback'",
     "terminal.integrated.rendererType": "dom",
-    "terminal.integrated.fontSize": 18,
+    "terminal.integrated.fontSize": 16,
     "terminal.integrated.lineHeight": 1,
-    "terminal.integrated.letterSpacing": 2,
+    // "terminal.integrated.letterSpacing": 2,
     "terminal.external.linuxExec": "truecolor",
 
     "editor.bracketPairColorization.enabled": true,
     "editor.guides.bracketPairs":"active",
-    "editor.fontSize": 18,
+    "editor.fontSize": 16,
     "editor.largeFileOptimizations": false,
     "editor.fontFamily": "'JetBrainsMono Nerd Font', 'Droid Sans Mono', 'monospace', 'Droid Sans Fallback'",
     "editor.linkedEditing": true,
@@ -27,7 +28,7 @@
     "liveServer.settings.donotVerifyTags": true,
 
     "github.copilot.enable": {
-        "*": false,
+        "*": true,
         "yaml": true,
         "plaintext": true,
         "markdown": true,
@@ -67,5 +68,6 @@
     ],
 
     "tabnine.experimentalAutoImports": true,
-    // "sourcery.token": "XXXX"
+    "sourcery.token": "XXX",
+    "sonarlint.ls.javaHome": "/usr/lib/jvm/java-19-jdk/",
 }
