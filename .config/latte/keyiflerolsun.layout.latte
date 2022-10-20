@@ -258,6 +258,10 @@ plugin=org.kde.plasma.mediacontroller_plus
 [Containments][103][Applets][107][Configuration]
 PreloadWeight=0
 
+[Containments][103][ConfigDialog]
+DialogHeight=540
+DialogWidth=720
+
 [Containments][15]
 activityId=
 byPassWM=false
@@ -345,6 +349,19 @@ xeUrlA=https://api.binance.com/api/v3/ticker/price?symbol=USDTTRY
 [Containments][15][Applets][135]
 immutability=1
 plugin=org.kde.plasma.minimizeall
+
+[Containments][15][Applets][142]
+immutability=1
+plugin=org.kde.plasma.weather
+
+[Containments][15][Applets][142][Configuration]
+PreloadWeight=70
+source=wettercom|weather|Gönen, Bal?kesir, TR|TR0746574;Gönen
+updateInterval=30
+
+[Containments][15][Applets][142][Configuration][ConfigDialog]
+DialogHeight=540
+DialogWidth=720
 
 [Containments][15][Applets][56]
 immutability=1
@@ -464,14 +481,14 @@ PreloadWeight=0
 advanced=false
 alignment=10
 alignmentUpgraded=true
-appletOrder=80;120;73;122;121;75;82;95;78;56;92;135;91
+appletOrder=80;120;73;122;121;142;75;82;95;78;56;92;135;91
 appletShadowsEnabled=false
 autoSizeEnabled=false
 dragActiveWindowEnabled=true
 iconSize=24
 inConfigureAppletsMode=true
 lengthExtMargin=5
-lockedZoomApplets=120;73;122;121;75;82;95;78;56;92;135;91
+lockedZoomApplets=120;73;122;121;142;75;82;95;78;56;92;135;91
 minLength=90
 panelShadows=false
 panelSize=100
@@ -483,7 +500,7 @@ shadowSize=45
 shadows=All
 shadowsUpgraded=true
 showGlow=false
-splitterPosition=3
+splitterPosition=4
 splitterPosition2=5
 tasksUpgraded=true
 thickMargin=15
@@ -783,8 +800,8 @@ DialogHeight=540
 DialogWidth=720
 
 [Containments][17][General]
-extraItems=org.kde.plasma.mediacontroller_plus,org.kde.plasma.bluetooth,org.kde.plasma.networkmanagement,org.kde.kdeconnect,org.kde.plasma.keyboardindicator,org.kde.plasma.battery,org.kde.plasma.notifications,org.kde.plasma.nightcolorcontrol,org.kde.plasma.mediacontroller,org.kde.kscreen,org.kde.plasma.keyboardlayout,org.kde.plasma.manage-inputmethod
-hiddenItems=MSM Notifier for Plasma5,org.kde.plasma.mediacontroller,org.kde.plasma.mediacontroller_plus,org.kde.plasma.battery,org.kde.plasma.networkmanagement,Pamac Updates,chrome_status_icon_1,Paket Yöneticisi,TelegramDesktop,Yakuake,matray,org.kde.plasma.nightcolorcontrol,org.kde.kscreen
+extraItems=org.kde.plasma.mediacontroller_plus,org.kde.plasma.bluetooth,org.kde.plasma.networkmanagement,org.kde.kdeconnect,org.kde.plasma.keyboardindicator,org.kde.plasma.battery,org.kde.plasma.notifications,org.kde.plasma.nightcolorcontrol,org.kde.plasma.mediacontroller,org.kde.kscreen,org.kde.plasma.keyboardlayout,org.kde.plasma.manage-inputmethod,Yeni bildirim yok
+hiddenItems=MSM Notifier for Plasma5,org.kde.plasma.mediacontroller,org.kde.plasma.mediacontroller_plus,org.kde.plasma.battery,org.kde.plasma.networkmanagement,Pamac Updates,chrome_status_icon_1,Paket Yöneticisi,TelegramDesktop,Yakuake,matray,org.kde.plasma.nightcolorcontrol,org.kde.kscreen,Yeni bildirim yok
 knownItems=org.kde.plasma.mediacontroller_plus,org.kde.plasma.bluetooth,org.kde.plasma.volume,org.kde.plasma.networkmanagement,org.kde.kdeconnect,org.kde.plasma.keyboardindicator,org.kde.plasma.battery,org.kde.plasma.clipboard,org.kde.plasma.devicenotifier,org.kde.plasma.mediacontroller,org.kde.plasma.notifications,org.kde.plasma.nightcolorcontrol,org.kde.plasma.keyboardlayout,org.kde.plasma.manage-inputmethod
 
 [Containments][18]
@@ -887,8 +904,8 @@ DialogHeight=540
 DialogWidth=720
 
 [Containments][18][General]
-extraItems=org.kde.plasma.mediacontroller_plus,org.kde.plasma.bluetooth,org.kde.plasma.networkmanagement,org.kde.kdeconnect,org.kde.plasma.keyboardindicator,org.kde.plasma.battery,org.kde.plasma.notifications,org.kde.plasma.nightcolorcontrol,org.kde.plasma.mediacontroller,org.kde.kscreen,org.kde.plasma.keyboardlayout,org.kde.plasma.manage-inputmethod
-hiddenItems=MSM Notifier for Plasma5,org.kde.plasma.mediacontroller,org.kde.plasma.mediacontroller_plus,org.kde.plasma.battery,org.kde.plasma.networkmanagement,Pamac Updates,chrome_status_icon_1,Paket Yöneticisi,TelegramDesktop,Yakuake,matray,org.kde.plasma.nightcolorcontrol,org.kde.kscreen
+extraItems=org.kde.plasma.mediacontroller_plus,org.kde.plasma.bluetooth,org.kde.plasma.networkmanagement,org.kde.kdeconnect,org.kde.plasma.keyboardindicator,org.kde.plasma.battery,org.kde.plasma.notifications,org.kde.plasma.nightcolorcontrol,org.kde.plasma.mediacontroller,org.kde.kscreen,org.kde.plasma.keyboardlayout,org.kde.plasma.manage-inputmethod,Yeni bildirim yok
+hiddenItems=MSM Notifier for Plasma5,org.kde.plasma.mediacontroller,org.kde.plasma.mediacontroller_plus,org.kde.plasma.battery,org.kde.plasma.networkmanagement,Pamac Updates,chrome_status_icon_1,Paket Yöneticisi,TelegramDesktop,Yakuake,matray,org.kde.plasma.nightcolorcontrol,org.kde.kscreen,Yeni bildirim yok
 knownItems=org.kde.plasma.mediacontroller_plus,org.kde.plasma.bluetooth,org.kde.plasma.volume,org.kde.plasma.networkmanagement,org.kde.kdeconnect,org.kde.plasma.keyboardindicator,org.kde.plasma.battery,org.kde.plasma.clipboard,org.kde.plasma.devicenotifier,org.kde.plasma.mediacontroller,org.kde.plasma.notifications,org.kde.plasma.nightcolorcontrol,org.kde.plasma.keyboardlayout,org.kde.plasma.manage-inputmethod
 
 [Containments][19]
@@ -919,7 +936,7 @@ immutability=1
 plugin=org.kde.plasma.kickoff
 
 [Containments][19][Applets][125][Configuration]
-PreloadWeight=97
+PreloadWeight=100
 
 [Containments][19][Applets][125][Configuration][ConfigDialog]
 DialogHeight=540
@@ -935,6 +952,28 @@ immutability=1
 plugin=org.kde.plasma.minimizeall
 
 [Containments][19][Applets][134][Configuration][ConfigDialog]
+DialogHeight=540
+DialogWidth=720
+
+[Containments][19][Applets][141]
+immutability=1
+plugin=org.kde.plasma.weather
+
+[Containments][19][Applets][141][Configuration]
+PreloadWeight=90
+pressureUnit=5022
+showHumidityInTooltip=true
+showPressureInTooltip=true
+showTemperatureInCompactMode=false
+showTemperatureInTooltip=true
+showWindInTooltip=true
+source=wettercom|weather|Gönen, Bal?kesir, TR|TR0746574;Gönen
+speedUnit=9001
+temperatureUnit=6001
+updateInterval=30
+visibilityUnit=2007
+
+[Containments][19][Applets][141][Configuration][ConfigDialog]
 DialogHeight=540
 DialogWidth=720
 
@@ -1015,7 +1054,7 @@ immutability=1
 plugin=org.kde.plasma.systemtray
 
 [Containments][19][Applets][94][Configuration]
-PreloadWeight=34
+PreloadWeight=39
 SystrayContainmentId=18
 
 [Containments][19][Applets][96]
@@ -1104,14 +1143,14 @@ PreloadWeight=0
 advanced=false
 alignment=10
 alignmentUpgraded=true
-appletOrder=125;99;88;98;96;87;85;83;97;94;84;134;93
+appletOrder=125;99;88;98;96;141;87;85;83;97;94;84;134;93
 appletShadowsEnabled=false
 autoSizeEnabled=false
 dragActiveWindowEnabled=true
 iconSize=28
 inConfigureAppletsMode=true
 lengthExtMargin=5
-lockedZoomApplets=125;99;88;98;96;87;85;83;97;94;84;134;93
+lockedZoomApplets=125;99;88;98;96;141;87;85;83;97;94;84;134;93
 minLength=90
 panelShadows=false
 panelSize=100
@@ -1123,7 +1162,7 @@ shadowSize=45
 shadows=All
 shadowsUpgraded=true
 showGlow=false
-splitterPosition=3
+splitterPosition=4
 splitterPosition2=5
 tasksUpgraded=true
 thickMargin=15
@@ -1204,7 +1243,7 @@ shadows=All
 shadowsUpgraded=true
 showGlow=false
 splitterPosition=2
-splitterPosition2=4
+splitterPosition2=3
 tasksUpgraded=true
 thickMargin=4
 titleTooltips=false
@@ -1255,7 +1294,7 @@ immutability=1
 plugin=org.kde.plasma.notifications
 
 [Containments][21][Applets][133][Configuration]
-PreloadWeight=42
+PreloadWeight=52
 
 [Containments][21][ConfigDialog]
 DialogHeight=600
@@ -1288,7 +1327,7 @@ shadows=All
 shadowsUpgraded=true
 showGlow=false
 splitterPosition=2
-splitterPosition2=4
+splitterPosition2=3
 tasksUpgraded=true
 thickMargin=4
 titleTooltips=false
@@ -1313,13 +1352,6 @@ layoutId=
 location=6
 plugin=org.kde.plasma.private.grouping
 wallpaperplugin=org.kde.image
-
-[Containments][22][Applets][104]
-immutability=1
-plugin=org.kde.plasma.mediacontroller_plus
-
-[Containments][22][Applets][104][Configuration]
-PreloadWeight=0
 
 [Containments][22][Applets][106]
 immutability=1
@@ -1376,6 +1408,36 @@ uptime=164,239,49
 highPrioritySensorIds=["cpu/cpu.*/usage"]
 lowPrioritySensorIds=[]
 totalSensors=["cpu/all/usage"]
+
+[Containments][22][Applets][140]
+immutability=1
+plugin=org.kde.plasma.systemmonitor
+
+[Containments][22][Applets][140][Configuration][Appearance]
+chartFace=org.kde.ksysguard.piechart
+title=Ağ hızı
+
+[Containments][22][Applets][140][Configuration][ConfigDialog]
+DialogHeight=540
+DialogWidth=720
+
+[Containments][22][Applets][140][Configuration][FaceGrid][Appearance]
+chartFace=org.kde.ksysguard.linechart
+showTitle=false
+
+[Containments][22][Applets][140][Configuration][FaceGrid][SensorColors]
+network/all/download=68,71,90
+network/all/upload=90,87,68
+
+[Containments][22][Applets][140][Configuration][FaceGrid][Sensors]
+highPrioritySensorIds=["network/all/upload"]
+
+[Containments][22][Applets][140][Configuration][SensorColors]
+network/all/download=68,71,90
+network/all/upload=90,87,68
+
+[Containments][22][Applets][140][Configuration][Sensors]
+highPrioritySensorIds=["network/all/download","network/all/upload"]
 
 [LayoutSettings]
 background=
