@@ -36,9 +36,9 @@ default_color 7c809c
 
 minimum_size 0 0
 TEXT
-${voffset 10}${color 7c809c}${font Zekton:pixelsize=60}${time %H:%M}${font}${voffset -40}${offset 10}${color ffb86c}${font Zekton:pixelsize=19}${time %d} ${voffset 0}${color 7c809c}${font Zekton:pixelsize=16}${time  %B} ${time %Y}${font}${voffset 14}${font Zekton:pixelsize=31}${offset -50}${time %A}${font}
+${voffset 0}${offset 15}${color 7c809c}${font Zekton:pixelsize=80}${time %H:%M}${font}${voffset -40}${offset 10}${color ffb86c}${font Zekton:pixelsize=21}${time %d} ${voffset 0}${color 7c809c}${font Zekton:pixelsize=18}${time  %B} ${time %Y}${font}${voffset 14}${font Zekton:pixelsize=31}${offset -90}${time %A}${font}
 
-            ${voffset 1}${offset 12}${font Zekton:pixelsize=12}${color ffb86c}SSD ${offset 9}$color${fs_free /} / ${fs_size /}${offset 30}${color ffb86c}RAM ${offset 9}$color$mem / $memmax${offset 30}${color ffb86c}CPU ${offset 9}$color${cpu cpu0}%
+                            ${voffset 0}${offset -75}${font Zekton:pixelsize=12}${color ffb86c}SSD ${offset 9}$color${fs_free /} / ${fs_size /}${offset 30}${color ffb86c}RAM ${offset 9}$color$mem / $memmax${offset 30}${color ffb86c}CPU ${offset 9}$color${cpu cpu0}%
 
 
 
