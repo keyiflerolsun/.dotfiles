@@ -54,6 +54,15 @@ sudo gem install colorls
 ## sudo nginx -t && sudo nginx -s reload
 ## sudo service nginx restart
 
+# Swap Alanı Oluştur (3M » 3GB)
+sudo dd if=/dev/zero of=/swap bs=1024 count=3M
+sudo chmod 600 /swap
+# sudo chown root:root /swap
+sudo mkswap /swap
+sudo swapon /swap
+sudo sh -c "echo '/swap swap swap defaults 0 0' >> /etc/fstab"
+free
+
 # keyiflerolsun
 rm -rf ~/.zshrc && wget https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/.zshrc
 # echo "KekikAkademi" > /etc/hostname
