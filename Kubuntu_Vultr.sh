@@ -53,6 +53,7 @@ sudo dpkg -i google-chrome-stable_current_amd64.deb
 
 ## Dil Sorunu » https://forum.debian.org.tr/index.php?topic=4712.0
 ## https://scribe.privacydev.net/@woeterman_94/xrdp-how-to-change-keyboard-layout-d657c8a87965
+setxkbmap tr
 xrdp-genkeymap km-041F.ini
 sudo mv km-041F.ini /etc/xrdp
 sudo chown root:root /etc/xrdp/km-041F.ini
