@@ -1,13 +1,13 @@
 #!/bin/sh -e
 
 # https://linuxize.com/post/how-to-install-xrdp-on-ubuntu-20-04/
-# https://www.hiroom2.com/ubuntu-2004-xrdp-kde-en
-
 sudo apt install kubuntu-desktop xrdp -y
 sudo adduser xrdp ssl-cert
 sudo systemctl restart xrdp
 sudo ufw allow 3389
 
+
+# https://www.hiroom2.com/ubuntu-2004-xrdp-kde-en
 sudo sed -e 's/^new_cursors=true/new_cursors=false/g' \
      -i /etc/xrdp/xrdp.ini
 sudo systemctl enable xrdp
@@ -47,7 +47,7 @@ sudo systemctl restart polkit
 sudo systemctl restart xrdp
 
 
-
+# https://itsfoss.com/install-chrome-ubuntu/
 wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 sudo dpkg -i google-chrome-stable_current_amd64.deb
 
