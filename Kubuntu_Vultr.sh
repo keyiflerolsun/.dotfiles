@@ -1,13 +1,13 @@
 #!/bin/sh -e
 
-# https://linuxize.com/post/how-to-install-xrdp-on-ubuntu-20-04/
+## https://linuxize.com/post/how-to-install-xrdp-on-ubuntu-20-04/
 sudo apt install kubuntu-desktop xrdp -y
 sudo adduser xrdp ssl-cert
 sudo systemctl restart xrdp
 sudo ufw allow 3389
 
 
-# https://www.hiroom2.com/ubuntu-2004-xrdp-kde-en
+## https://www.hiroom2.com/ubuntu-2004-xrdp-kde-en
 sudo sed -e 's/^new_cursors=true/new_cursors=false/g' \
      -i /etc/xrdp/xrdp.ini
 sudo systemctl enable xrdp
@@ -47,8 +47,13 @@ sudo systemctl restart polkit
 sudo systemctl restart xrdp
 
 
-# https://itsfoss.com/install-chrome-ubuntu/
+## https://itsfoss.com/install-chrome-ubuntu/
 wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 sudo dpkg -i google-chrome-stable_current_amd64.deb
 
 ## Dil Sorunu » https://forum.debian.org.tr/index.php?topic=4712.0
+## https://scribe.privacydev.net/@woeterman_94/xrdp-how-to-change-keyboard-layout-d657c8a87965
+xrdp-genkeymap km-041F.ini
+sudo mv km-041F.ini /etc/xrdp
+sudo chown root:root /etc/xrdp/km-041F.ini
+sudo service xrdp restart
