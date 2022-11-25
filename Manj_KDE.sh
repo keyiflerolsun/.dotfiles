@@ -48,7 +48,9 @@ sudo ln -s /var/lib/snapd/snap /snap
 sudo snap install code --classic
 
 # ? Spotify
-pamac install flatpak libpamac-flatpak-plugin --no-confirm && flatpak install spotify
+pamac install flatpak libpamac-flatpak-plugin --no-confirm
+flatpak install spotify
+flatpak install flathub io.github.mimbrero.WhatsAppDesktop
 # yay -S extra/flatpak && flatpak install spotify
 
 
