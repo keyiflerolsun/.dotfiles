@@ -48,7 +48,8 @@ sudo ln -s /var/lib/snapd/snap /snap
 sudo snap install code --classic
 
 # ? Spotify
-yay -S extra/flatpak && flatpak install spotify
+pamac install flatpak libpamac-flatpak-plugin --no-confirm && flatpak install spotify
+# yay -S extra/flatpak && flatpak install spotify
 
 
 # ? youtube-dl
