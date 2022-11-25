@@ -19,9 +19,10 @@ sudo pacman -Ru --nodeps pulseaudio pulseaudio-equalizer pulseaudio-jack pulseau
 
 
 # ? Genel KDE
-sudo pacman -S yay pacui latte-dock xdg-desktop-portal-gtk telegram-desktop libxcrypt-compat -y
+sudo pacman -S yay pacui xdg-desktop-portal-gtk telegram-desktop libxcrypt-compat -y
 sudo pacman -S optimus-manager
 pacaur -S optimus-manager-qt
+pacaur -S latte-dock-git
 sudo pacman -S python-pip python-pipreqs python-flask python-numpy python-pandas scrapy opencv -y
 pacaur -S python-devtools authy -y
 pacaur -S realvnc-vnc-viewer teamviewer ruby-colorls tmuxinator -y
