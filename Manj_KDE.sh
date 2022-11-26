@@ -9,13 +9,13 @@ git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-m
 
 
 # ? PipeWire
-sudo pacman -Ru --nodeps pulseaudio pulseaudio-equalizer pulseaudio-jack pulseaudio-lirc pulseaudio-rtp pulseaudio-zeroconf pulseaudio-bluetooth pulseaudio-pa pulseaudio-alsa pulseaudio-ctl manjaro-pulse && sudo pacman -S manjaro-pipewire easyeffects pipewire
-# sudo pacman -R manjaro-pulse
-# sudo pacman -R pulseaudio-alsa pulseaudio-bluetooth pulseaudio-ctl pulseaudio-zeroconf
-# sudo pacman -R plasma-pa
-# sudo pacman -R pulseaudio
-# sudo pacman -S manjaro-pipewire
-# sudo pacman -S plasma-pa easyeffects pipewire
+# sudo pacman -Ru --nodeps pulseaudio pulseaudio-equalizer pulseaudio-jack pulseaudio-lirc pulseaudio-rtp pulseaudio-zeroconf pulseaudio-bluetooth pulseaudio-pa pulseaudio-alsa pulseaudio-ctl manjaro-pulse && sudo pacman -S manjaro-pipewire easyeffects pipewire
+sudo pacman -R manjaro-pulse
+sudo pacman -R pulseaudio-alsa pulseaudio-bluetooth pulseaudio-ctl pulseaudio-zeroconf
+sudo pacman -R plasma-pa
+sudo pacman -R pulseaudio
+sudo pacman -S manjaro-pipewire
+sudo pacman -S plasma-pa easyeffects pipewire lsp-plugins
 
 
 # ? Genel KDE
