@@ -43,13 +43,13 @@ sudo pacman -S docker docker-compose -y
 # sudo usermod -aG docker $USER
 
 # ? Visual Studio Code
-sudo pacman -S snapd -y
+sudo pacman -S snapd libpamac-snap-plugin -y
 sudo systemctl enable --now snapd.socket
 sudo ln -s /var/lib/snapd/snap /snap
 sudo snap install code --classic
 
 # ? Spotify
-pamac install flatpak libpamac-flatpak-plugin --no-confirm
+sudo pacman -S flatpak libpamac-flatpak-plugin -y
 flatpak install spotify
 flatpak install flathub io.github.mimbrero.WhatsAppDesktop
 # yay -S extra/flatpak && flatpak install spotify
