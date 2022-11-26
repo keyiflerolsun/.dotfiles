@@ -28,7 +28,7 @@ export CFLAGS="-Wno-deprecated-declarations -Wno-unreachable-code"
 pip install pandas
 pip3 install -U KekikSpatula
 export CARGO_BUILD_TARGET=aarch64-linux-android
-pip3 install -U scrapy
+pip3 install -U scrapy yt-dlp
 
 # zsh
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended

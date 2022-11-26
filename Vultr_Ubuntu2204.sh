@@ -29,6 +29,9 @@ sudo apt install thefuck -y
 # vizex
 pip3 install vizex
 
+# yt-dlp
+sudo -H pip install --upgrade yt-dlp
+
 # micro
 curl https://getmic.ro | bash
 sudo mv micro /usr/local/bin

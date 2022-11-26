@@ -69,12 +69,12 @@ ZSH_THEME="agnoster"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
-        git
-        sudo
-        web-search
-        python
-        pip
-        thefuck
+    git
+    sudo
+    web-search
+    python
+    pip
+    thefuck
 	history-substring-search
 	colored-man-pages
 	zsh-autosuggestions
@@ -139,8 +139,8 @@ path+=(
 )
 
 ## youtube-dl
-alias yt='youtube-dl -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio" --merge-output-format mp4'
-alias mp3='youtube-dl -x --embed-thumbnail --audio-format mp3'
+alias yt='yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio" --merge-output-format mp4'
+alias mp3='yt-dlp -x --embed-thumbnail --audio-format mp3'
 
 ## colorls
 source $(dirname $(gem which colorls))/tab_complete.sh
