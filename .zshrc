@@ -142,6 +142,9 @@ path+=(
 alias yt='yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio" --merge-output-format mp4'
 alias mp3='yt-dlp -x --embed-thumbnail --audio-format mp3'
 
+## mkv2mp4
+alias mkv2mp4='mkv2mp4(){ ffmpeg -v quiet -stats -i "$@" -codec copy -strict -2 "${@%%.*}.mp4" }; mkv2mp4'
+
 ## colorls
 source $(dirname $(gem which colorls))/tab_complete.sh
 alias lc='colorls -lA --sd'
