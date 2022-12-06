@@ -130,7 +130,8 @@ alias vnc='vncviewer'
 alias tw='sudo teamviewer --daemon enable && systemctl enable teamviewerd && systemctl start teamviewerd && teamviewer'
 alias rdp='remmina'
 alias j='jsonVer(){ cat "$@" | jq; unset -f jsonVer; }; jsonVer'
-
+alias yenile='killall latte-dock && killall plasmashell && kstart plasmashell >/dev/null 2>&1 && latte-dock & disown'
+alias ara='ara(){ find / -type f -name "$@" -print 2>/dev/null }; ara'
 
 ## thefuck
 eval $(thefuck --alias)
