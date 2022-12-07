@@ -9,13 +9,23 @@ docker run -d -p 8000:8000 -p 9000:9000 --name=portainer --restart=always -v /va
 
 
 # MongoDB Ayağa Kaldırma
-sudo docker-compose up -d
-sudo docker-compose down -v
+docker-compose up -d
+docker-compose down -v
+
+# Yeniden derleme
+docker-compose build
+
+
 
 # Robot Ayağa Kaldırma
-sudo docker build . -t minirobot
+docker build . -t minirobot
 
-sudo docker run minirobot
+docker run minirobot
+
+
+# Boştaki akavaları silmek
+docker system prune -a
+
 
 # Diğer Docker Akavaları
 docker images
@@ -54,7 +64,7 @@ b74bbc5019ae   wordpress-installer_mysql        mysql:5.7
 2. İstediğiniz konteynırın içine girin
 
 ```sh
-sudo docker container exec -it b77eac5ae3a9 bash
+docker container exec -it b77eac5ae3a9 bash
 
 root@b77eac5ae3a9:/var/www/html# 
 ```
