@@ -6,7 +6,7 @@ docker run -d -p 8000:8000 -p 9000:9000 --name=portainer --restart=always -v /va
 
 
 # MongoDB
-docker run -d -p 27017:27017 --name=mongodb --restart=on-failure mongo:latest --auth
+docker run -d -p 27017:27017 --name=mongodb --restart=unless-stopped mongo:latest --auth
 
 docker exec -it mongodb mongosh
 
