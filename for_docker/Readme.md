@@ -4,8 +4,21 @@
 # Portainer Kurulumu
 docker run -d -p 8000:8000 -p 9000:9000 --name=portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:latest
 
+
 # MongoDB
-docker run -d -p 27017:27017 --name mongodb mongo:latest
+docker run -d -p 27017:27017 --name=mongodb --restart=on-failure mongo:latest --auth
+
+docker exec -it mongodb mongosh
+
+>> use admin
+>> db.createUser({
+    user: "keyiflerolsun",
+    pwd: "sifre",
+    roles: ["root", "dbAdminAnyDatabase", "clusterAdmin", {role: "dbOwner", db:"admin"}]
+})
+
+docker restart mongodb
+
 
 # Nginx Proxy Manager
 # https://nginxproxymanager.com/guide/#quick-setup
