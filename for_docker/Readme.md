@@ -1,29 +1,37 @@
 # Dockerfile Yenir Mi?
 
+## Portainer
 ```bash
-# Portainer Kurulumu
-docker run -d -p 8000:8000 -p 9000:9000 --name=portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:latest
+docker run -d --name=portainer --restart=always -p 8000:8000 -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:latest
+```
 
-
-# MongoDB
-docker run -d -p 27017:27017 --name=mongodb --restart=unless-stopped mongo:latest --auth
-
+## MongoDB
+```bash
+docker run -d --name=mongodb --restart=unless-stopped -p 27017:27017 mongo:latest --auth
 docker exec -it mongodb mongosh
+```
 
->> use admin
->> db.createUser({
+```mongosh
+use admin
+db.createUser({
     user: "keyiflerolsun",
     pwd: "sifre",
     roles: ["root", "dbAdminAnyDatabase", "clusterAdmin", {role: "dbOwner", db:"admin"}]
 })
+```
 
+```bash
 docker restart mongodb
+```
 
-
-# Nginx Proxy Manager
+## Nginx Proxy Manager
+```bash
 # https://nginxproxymanager.com/guide/#quick-setup
+docker run -d --name=nginx-proxy-manager --restart=unless-stopped -p 80:80 -p 81:81 -p 443:443 -v /root/nginx-proxy-manager/data:/data -v /root/nginx-proxy-manager/letsencrypt:/etc/letsencrypt jc21/nginx-proxy-manager:latest
+```
 
-
+## Diğer
+```bash
 # MongoDB Ayağa Kaldırma
 docker-compose up -d
 docker-compose down -v
