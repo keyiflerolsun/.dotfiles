@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ? Genel
-sudo pacman -S yay pacui libxcrypt-compat optimus-manager -y
+sudo pacman -S yay pacui libxcrypt-compat optimus-manager gnome-disk-utility -y
 sudo pacman -S python-pip python-pipreqs python-flask python-numpy python-pandas scrapy opencv -y
 sudo pacman -S brave-browser thefuck micro screenfetch neofetch -y
 sudo pacman -S remmina libvncserver freerdp -y
