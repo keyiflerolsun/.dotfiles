@@ -20,7 +20,7 @@ plugins=(
 source $ZSH/oh-my-zsh.sh
 
 #--------------------------------------------------------------------------------------#
-## http://patorjk.com/software/taag/#p=display&f=Stop&t=Kekik%20Akademi
+# * http://patorjk.com/software/taag/#p=display&f=Stop&t=Kekik%20Akademi
 clear
 echo "\n"
 echo "\t\t\e[32m _    _      _     _ _               _              _             _ "
@@ -32,7 +32,7 @@ echo "\t\t\e[32m|_|  \_)____)_| \_)_|_| \_)  |______|_| \_)_||_|\____|\____)_|_|
 echo "\n"                                                                    
 #--------------------------------------------------------------------------------------#
 
-## keyiflerolsun
+# * keyiflerolsun
 alias p="python3"
 alias c="clear"
 alias vnc="vncviewer"
@@ -44,37 +44,37 @@ alias ara='ara(){ find / -type f -name "$@" -print 2>/dev/null }; ara'
 alias md2pdf='md2pdf(){ pandoc -o "${@%%.*}.pdf" --template pdf_theme --listings --pdf-engine=xelatex --toc "$@"; unset -f md2pdf; }; md2pdf'
 
 
-## thefuck
+# * thefuck
 eval $(thefuck --alias)
 path+=(
     $(ruby -e 'puts File.join(Gem.user_dir, "bin")')
 )
 
-## youtube-dl
+# * youtube-dl
 alias yt='yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio" --merge-output-format mp4'
 alias mp3="yt-dlp -x --embed-thumbnail --audio-format mp3"
 
-## mkv2mp4
+# * mkv2mp4
 alias mkv2mp4='mkv2mp4(){ ffmpeg -v quiet -stats -i "$@" -c copy -c:a aac -movflags +faststart "${@%%.*}.mp4" }; mkv2mp4'
 
-## colorls
+# * colorls
 source $(dirname $(gem which colorls))/tab_complete.sh
 alias lc="colorls -lA --sd"
 alias l="colorls"
 alias lsd="colorls --sd"
 alias ltree="colorls --tree --sd"
 
-## x11 VNC Server
+# * x11 VNC Server
 alias vnc_basla='x11vnc -nap -wait 50 -noxdamage -rfbauth $HOME/.vnc/passwd -display :0 -nocursor -forever -o $HOME/.vnc/x11vnc.log -bg; echo -e "\n\tVNC Server Başlatıldı.."'
 alias vnc_bitir="x11vnc -R stop"
 
-## GPG_KEY
+# * GPG_KEY
 export GPG_TTY=$(tty)
 
-## aaPanel
+# * aaPanel
 alias aa_ver="bash /etc/init.d/bt default"
 
-## TR dil ayarları
+# * TR dil ayarları
 # export LC_ALL=tr_TR.UTF-8
 # export LANG=tr_TR.UTF-8
 # alias tmux="tmux -u"
