@@ -43,6 +43,8 @@ alias yenile="killall latte-dock && killall plasmashell && kstart plasmashell >/
 alias ara='ara(){ find / -type f -name "$@" -print 2>/dev/null }; ara'
 alias md2pdf='md2pdf(){ pandoc -o "${@%%.*}.pdf" --template pdf_theme --listings --pdf-engine=xelatex --toc "$@"; unset -f md2pdf; }; md2pdf'
 
+# ! Thinkpad TrackPoint
+# xinput --set-prop "Elan TrackPoint" "libinput Accel Speed" -0.7
 
 # * thefuck
 eval $(thefuck --alias)
