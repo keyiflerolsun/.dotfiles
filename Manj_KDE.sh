@@ -63,6 +63,10 @@ sudo usermod -aG docker $USER
 # docker run -d --name=portainer --restart=always -p 8000:8000 -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:latest
 # docker run -d --name=mongodb --restart=unless-stopped -p 27017:27017 mongo:latest --auth
 
+# ? Markdown » PDF
+sudo pacman -S pandoc texlive-latexextra texlive-fontsextra -y
+wget -O /usr/share/pandoc/data/templates/pdf_theme.latex https://raw.githubusercontent.com/Wandmalfarbe/pandoc-latex-template/master/eisvogel.tex
+
 
 # ? Swap Alanı Oluştur (16M » 16GB)
 sudo dd if=/dev/zero of=/swap bs=1024 count=16M
