@@ -1,4 +1,5 @@
 #!/bin/sh
+# Bu araç @keyiflerolsun tarafından | @KekikAkademi için yazılmıştır.
 
 # WSL Debian Temel Kurulum Paketi
 

@@ -1,4 +1,5 @@
 #!/bin/sh -e
+# Bu araç @keyiflerolsun tarafından | @KekikAkademi için yazılmıştır.
 
 ## https://linuxize.com/post/how-to-install-xrdp-on-ubuntu-20-04/
 sudo apt install kubuntu-desktop xrdp -y
