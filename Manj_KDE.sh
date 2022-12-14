@@ -45,10 +45,9 @@ sudo ln -s /var/lib/snapd/snap /snap
 sudo snap install code --classic
 sudo snap install authy
 
-# ? Flatpak » Telegram - Spotify - PulseEffects - Anydesk - MongoDB - VLC - WhatsApp
+# ? Flatpak » Spotify - PulseEffects - Anydesk - MongoDB - VLC - WhatsApp
 # yay -S extra/flatpak && flatpak install spotify
 sudo pacman -S flatpak libpamac-flatpak-plugin -y
-flatpak install flathub org.telegram.desktop
 flatpak install flathub com.spotify.Client
 flatpak install flathub com.github.wwmm.pulseeffects
 flatpak install flathub com.anydesk.Anydesk
