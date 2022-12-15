@@ -43,6 +43,7 @@ rm -rf ~/.zshrc && wget -O ~/.zshrc https://raw.githubusercontent.com/keyiflerol
 # ? Snap » Visual Studio Code - Authy
 sudo pacman -S snapd libpamac-snap-plugin -y
 sudo systemctl enable --now snapd.socket
+sudo systemctl enable --now snapd.apparmor
 sudo ln -s /var/lib/snapd/snap /snap
 sudo snap install code --classic
 sudo snap install authy
