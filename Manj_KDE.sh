@@ -9,6 +9,7 @@ sudo pacman -S remmina libvncserver freerdp -y
 sudo pacman -S filezilla simplescreenrecorder -y
 sudo pacman -S tmux android-tools rust npm ruby jdk-openjdk -y
 sudo pacman -S jq ffmpeg -y
+gem install colorls
 
 # ? Batarya Optimizasyonu
 sudo pacman -S tlp -y
@@ -18,6 +19,7 @@ sudo tlp-stat -s
 # ? Aur
 pacaur -S optimus-manager-qt -y
 pacaur -S latte-dock-git -y
+pacaur -S teamviewer -y
 
 # ? Python
 pip3 install --upgrade pip
@@ -54,6 +56,7 @@ flatpak install flathub com.anydesk.Anydesk
 flatpak install flathub com.mongodb.Compass
 flatpak install flathub org.videolan.VLC
 flatpak install flathub io.github.mimbrero.WhatsAppDesktop
+flatpak install flathub com.github.sdv43.whaler
 
 # ? Docker
 sudo pacman -S docker docker-compose -y
@@ -65,7 +68,7 @@ sudo usermod -aG docker $USER
 
 # ? Markdown » PDF
 sudo pacman -S pandoc texlive-latexextra texlive-fontsextra -y
-wget -O /usr/share/pandoc/data/templates/pdf_theme.latex https://raw.githubusercontent.com/Wandmalfarbe/pandoc-latex-template/master/eisvogel.tex
+sudo wget -O /usr/share/pandoc/data/templates/pdf_theme.latex https://raw.githubusercontent.com/Wandmalfarbe/pandoc-latex-template/master/eisvogel.tex
 
 
 # ? Swap Alanı Oluştur (16M » 16GB)
