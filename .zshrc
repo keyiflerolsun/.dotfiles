@@ -39,7 +39,7 @@ alias vnc="vncviewer"
 alias tw="sudo teamviewer --daemon enable && systemctl enable teamviewerd && systemctl start teamviewerd && teamviewer"
 alias rdp="remmina"
 alias j='jsonVer(){ cat "$@" | jq; unset -f jsonVer; }; jsonVer'
-alias yenile="killall latte-dock && killall plasmashell && kstart plasmashell >/dev/null 2>&1 && latte-dock & disown"
+alias yenile="killall latte-dock && killall plasmashell && rm ~/.cache/icon-cache.kcache && kstart plasmashell >/dev/null 2>&1 && latte-dock & disown"
 alias ara='ara(){ find / -type f -name "$@" -print 2>/dev/null }; ara'
 alias md2pdf='md2pdf(){ pandoc -o "${@%%.*}.pdf" --template pdf_theme --listings --pdf-engine=xelatex --toc "$@"; unset -f md2pdf; }; md2pdf'
 
