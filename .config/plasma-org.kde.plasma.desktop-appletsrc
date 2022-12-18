@@ -220,13 +220,6 @@ totalSensors=["memory/physical/usedPercent"]
 DialogHeight=540
 DialogWidth=720
 
-[Containments][25][General]
-ToolBoxButtonState=topcenter
-ToolBoxButtonX=434
-ToolBoxButtonY=42
-positions={"1920x1080":["5"\\,"17"\\,"desktop:/Epey_API"\\,"0"\\,"5"\\,"desktop:/OttoGokhan"\\,"0"\\,"4"\\,"desktop:/BulkMedya"\\,"0"\\,"6"\\,"desktop:/RecepBasoglu"\\,"0"\\,"1"\\,"desktop:/keyifShill"\\,"4"\\,"0"\\,"desktop:/KekikAlgo"\\,"0"\\,"0"\\,"desktop:/EczanemRobot"\\,"0"\\,"3"\\,"desktop:/DalleRobot"\\,"0"\\,"2"]\\,"1600x900":[]}
-sortMode=-1
-
 [Containments][25][Wallpaper][org.kde.image][General]
 Image=/home/keyiflerolsun/.local/share/wallpapers/WhiteSur/
 SlidePaths=/home/keyiflerolsun/.local/share/wallpapers/,/usr/share/wallpapers/
