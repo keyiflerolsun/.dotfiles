@@ -1,24 +1,27 @@
 # Bu araç @keyiflerolsun tarafından | @KekikAkademi için yazılmıştır.
 
-# Docker Python İmajı
-FROM python:3.9.6-slim-buster
+# * Docker İmajı
+FROM python:3.10.8-slim-buster
 
-WORKDIR /opt/app/KekikRobot
-COPY ./ /opt/app/KekikRobot/
+# * Zaman Dilimi
+ENV TZ="Europe/Istanbul"
 
-# Gerekli Paketlerin Yüklenmesi
-RUN apt-get -y update && \
-    apt-get install --no-install-recommends -y \
-    ffmpeg \
-    opus-tools \
-    && \
-    rm -rf /var/lib/apt/lists/*
+# * Çalışma Alanı
+WORKDIR /usr/src/UrunAPI_PY
+COPY ./ /usr/src/UrunAPI_PY
 
-# Pip Güncellemesi ve Kütüphane Kurulumları
-RUN python3.9 -m pip install -U pip
+# ? Sistem Kurulumları
+# RUN apt-get -y update && \
+#     apt-get -y upgrade && \
+#     apt-get install git -y
 
-RUN python3.9 -m pip install --upgrade pip && \
-    python3.9 -m pip install --no-cache-dir -Ur requirements.txt
+# ? Gereksiz Dosyaların Silinmesi
+# RUN rm -rf /var/lib/apt/lists/*
 
-# Botun Başlatılması
-CMD ["python3.9", "basla.py"]
+# * Gerekli Paketlerin Yüklenmesi
+RUN python3 -m pip install --upgrade pip && \
+    python3 -m pip install --no-cache-dir -U setuptools wheel && \
+    python3 -m pip install --no-cache-dir -Ur requirements.txt
+
+# * Python Çalıştırılması
+CMD ["python3", "basla.py"]
