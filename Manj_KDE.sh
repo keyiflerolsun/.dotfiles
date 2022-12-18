@@ -8,6 +8,7 @@ sudo pacman -S brave-browser thefuck micro screenfetch neofetch xorg-xinput -y
 sudo pacman -S remmina libvncserver freerdp -y
 sudo pacman -S filezilla simplescreenrecorder -y
 sudo pacman -S tmux android-tools rust npm ruby jdk-openjdk -y
+sudo pacman -S kvantum-manjaro -y
 sudo pacman -S jq ffmpeg -y
 gem install colorls
 
@@ -48,7 +49,7 @@ sudo ln -s /var/lib/snapd/snap /snap
 sudo snap install code --classic
 sudo snap install authy
 
-# ? Flatpak » Spotify - PulseEffects - Anydesk - MongoDB - VLC - WhatsApp
+# ? Flatpak » Spotify - PulseEffects - Anydesk - MongoDB - VLC - WhatsApp - Whaler - qBittorrent
 # yay -S extra/flatpak && flatpak install spotify
 sudo pacman -S flatpak libpamac-flatpak-plugin -y
 flatpak install flathub com.spotify.Client
@@ -58,6 +59,7 @@ flatpak install flathub com.mongodb.Compass
 flatpak install flathub org.videolan.VLC
 flatpak install flathub io.github.mimbrero.WhatsAppDesktop
 flatpak install flathub com.github.sdv43.whaler
+flatpak install flathub org.qbittorrent.qBittorrent
 
 # ? Docker
 sudo pacman -S docker docker-compose -y
