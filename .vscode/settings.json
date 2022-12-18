@@ -59,6 +59,9 @@
     "[python]": {
         "editor.defaultFormatter": "ms-python.python"
     },
+    "[dockercompose]": {
+        "editor.defaultFormatter": "ms-azuretools.vscode-docker"
+    },
 
     "auto-rename-tag.activationOnLanguage": [
         "html",
@@ -68,6 +71,7 @@
     ],
 
     "tabnine.experimentalAutoImports": true,
-    "sourcery.token": "XXX",
-    "sonarlint.ls.javaHome": "/usr/lib/jvm/java-19-jdk/",
+    "sourcery.token": "1111111111111111111111",
+    "sonarlint.ls.javaHome": "/usr/lib/jvm/java-19-openjdk/",
+    "sonarlint.pathToNodeExecutable": "/bin/node"
 }
