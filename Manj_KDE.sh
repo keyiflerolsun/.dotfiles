@@ -8,7 +8,7 @@ sudo pacman -S brave-browser thefuck micro screenfetch neofetch xorg-xinput -y
 sudo pacman -S remmina libvncserver freerdp -y
 sudo pacman -S filezilla simplescreenrecorder -y
 sudo pacman -S tmux android-tools rust npm ruby jdk-openjdk -y
-sudo pacman -S kvantum-manjaro -y
+sudo pacman -S kvantum-manjaro chromium smplayer -y
 sudo pacman -S jq ffmpeg -y
 gem install colorls
 
