@@ -8,7 +8,7 @@ RightButton;NoModifier=org.kde.contextmenu
 
 [Containments][24]
 ItemGeometries-1600x900=Applet-49:1392,32,192,64,0;Applet-50:1392,96,192,64,0;Applet-48:1392,160,192,64,0;
-ItemGeometries-1920x1080=
+ItemGeometries-1920x1080=Applet-49:1072,32,192,64,0;Applet-50:1072,96,192,64,0;Applet-48:1072,160,192,64,0;
 ItemGeometriesHorizontal=Applet-49:1392,32,192,64,0;Applet-50:1392,96,192,64,0;Applet-48:1392,160,192,64,0;
 activityId=5a04cb83-2d65-444b-94c2-07d80107921c
 formfactor=0
@@ -469,14 +469,11 @@ immutability=1
 plugin=org.kde.plasma.volume
 
 [Containments][33][Applets][38][Configuration]
-PreloadWeight=99
+PreloadWeight=100
 
 [Containments][33][Applets][38][Configuration][ConfigDialog]
 DialogHeight=540
 DialogWidth=720
-
-[Containments][33][Applets][38][Configuration][General]
-currentTab=streams
 
 [Containments][33][Applets][39]
 immutability=1
@@ -490,7 +487,7 @@ immutability=1
 plugin=org.kde.plasma.notifications
 
 [Containments][33][Applets][40][Configuration]
-PreloadWeight=98
+PreloadWeight=100
 
 [Containments][33][Applets][41]
 immutability=1
