@@ -52,10 +52,16 @@ sudo systemctl restart xrdp
 wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 sudo dpkg -i google-chrome-stable_current_amd64.deb
 
-## Dil Sorunu » https://forum.debian.org.tr/index.php?topic=4712.0
+
+# * Yavaşlık Sorunu
+## https://superuser.com/questions/1539900/slow-ubuntu-remote-desktop-using-xrdp
+## https://askubuntu.com/questions/1283709/xrdp-and-xfce4-ubuntu-18-04-unusable
+## https://github.com/neutrinolabs/xrdp/discussions/2136
+
+# * Dil Sorunu » https://forum.debian.org.tr/index.php?topic=4712.0
 ## https://scribe.privacydev.net/@woeterman_94/xrdp-how-to-change-keyboard-layout-d657c8a87965
-setxkbmap tr
-xrdp-genkeymap km-041F.ini
-sudo mv km-041F.ini /etc/xrdp
-sudo chown root:root /etc/xrdp/km-041F.ini
-sudo service xrdp restart
+# setxkbmap tr
+# xrdp-genkeymap km-041F.ini
+# sudo mv km-041F.ini /etc/xrdp
+# sudo chown root:root /etc/xrdp/km-041F.ini
+# sudo service xrdp restart
