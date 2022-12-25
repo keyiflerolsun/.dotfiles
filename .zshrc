@@ -36,6 +36,7 @@ echo "\n"
 alias p="python3"
 alias c="clear"
 alias vnc="vncviewer"
+alias localip="nmcli device show | grep IP4.ADDRESS | head -1 | awk '{print $2}' | rev | cut -c 4- | rev"
 alias tw="sudo teamviewer --daemon enable && systemctl enable teamviewerd && systemctl start teamviewerd && teamviewer"
 alias rdp="remmina"
 alias j='jsonVer(){ cat "$@" | jq; unset -f jsonVer; }; jsonVer'
