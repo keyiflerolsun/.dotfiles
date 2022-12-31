@@ -54,6 +54,7 @@ sudo snap install authy
 sudo pacman -S flatpak libpamac-flatpak-plugin -y
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 flatpak remote-add --if-not-exists flathub-beta https://flathub.org/beta-repo/flathub-beta.flatpakrepo
+flatpak update && flatpak upgrade
 flatpak install flathub com.spotify.Client
 flatpak install flathub com.github.wwmm.pulseeffects
 flatpak install flathub com.anydesk.Anydesk
