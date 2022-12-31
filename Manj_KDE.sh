@@ -52,6 +52,8 @@ sudo snap install authy
 # ? Flatpak » Spotify - PulseEffects - Anydesk - MongoDB - VLC - WhatsApp - Whaler - qBittorrent
 # yay -S extra/flatpak && flatpak install spotify
 sudo pacman -S flatpak libpamac-flatpak-plugin -y
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+flatpak remote-add --if-not-exists flathub-beta https://flathub.org/beta-repo/flathub-beta.flatpakrepo
 flatpak install flathub com.spotify.Client
 flatpak install flathub com.github.wwmm.pulseeffects
 flatpak install flathub com.anydesk.Anydesk
