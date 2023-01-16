@@ -65,3 +65,28 @@ sudo usermod -aG docker $USER
 # docker run -d --name=portainer --restart=always -p 8000:8000 -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:latest
 # docker run -d --name=mongodb --restart=unless-stopped -p 27017:27017 mongo:latest --auth
 # docker run -d --name=nginx-proxy-manager --restart=unless-stopped -p 80:80 -p 81:81 -p 443:443 -v /root/nginx-proxy-manager/data:/data -v /root/nginx-proxy-manager/letsencrypt:/etc/letsencrypt jc21/nginx-proxy-manager:latest
+
+# ? too many open files hatası çözümü
+cat >>/etc/security/limits.conf <<EOF
+
+# ! "too many open files" hatası için
+root      soft    nofile  100000
+root      hard    nofile  100000
+ubuntu    soft    nofile  100000
+ubuntu    hard    nofile  100000
+
+EOF
+
+cat >>/etc/sysctl.conf <<EOF
+
+# ! "too many open files" hatası için
+fs.file-max = 2097152
+
+EOF
+
+cat >>/etc/pam.d/commmon_session <<EOF
+
+# ! "too many open files" hatası için
+session required pam_limits.so
+
+EOF
