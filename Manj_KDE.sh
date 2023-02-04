@@ -10,6 +10,7 @@ sudo pacman -S filezilla simplescreenrecorder -y
 sudo pacman -S tmux android-tools rust npm ruby jdk-openjdk -y
 sudo pacman -S kvantum chromium smplayer -y
 sudo pacman -S jq ffmpeg sweeper -y
+sudo pacman -S bind traceroute -y
 gem install colorls
 
 # ? Batarya Optimizasyonu
