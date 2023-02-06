@@ -52,6 +52,8 @@ sudo systemctl restart xrdp
 wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 sudo dpkg -i google-chrome-stable_current_amd64.deb
 
+# * Oto Kilitlenme Devredışı Bırakma
+## https://www.simplified.guide/kde/lock-screen-configure
 
 # * Yavaşlık Sorunu
 ## https://superuser.com/questions/1539900/slow-ubuntu-remote-desktop-using-xrdp
