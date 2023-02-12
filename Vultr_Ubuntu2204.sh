@@ -90,3 +90,11 @@ cat >>/etc/pam.d/commmon_session <<EOF
 session required pam_limits.so
 
 EOF
+
+
+cat >>~/.zshrc <<EOF
+
+# ! "too many open files" hatası için
+ulimit -n 32768
+
+EOF
