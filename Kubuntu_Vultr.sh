@@ -1,6 +1,8 @@
 #!/bin/sh -e
 # Bu araç @keyiflerolsun tarafından | @KekikAkademi için yazılmıştır.
 
+# `curl https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/Kubuntu_Vultr.sh | bash`
+
 ## https://linuxize.com/post/how-to-install-xrdp-on-ubuntu-20-04/
 sudo apt install kubuntu-desktop xrdp -y
 sudo adduser xrdp ssl-cert
