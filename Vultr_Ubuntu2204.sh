@@ -21,7 +21,7 @@ sudo timedatectl set-timezone Europe/Istanbul
 # ? Python
 pip3 install --upgrade pip
 pip3 install -U setuptools wheel
-pip3 install -U yt-dlp vizex Kekik KekikSpatula SelSik thefuck
+pip3 install -U yt-dlp vizex Kekik SelSik thefuck
 
 # ? ZSH
 sudo apt install zsh -y
