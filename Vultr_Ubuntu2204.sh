@@ -57,8 +57,13 @@ sudo gem install colorls
 # sudo sh -c "echo '/swap swap swap defaults 0 0' >> /etc/fstab"
 # free
 
-# ? Docker
-sudo apt install docker docker-compose -y
+# ? Docker Son Sürüm » https://docs.docker.com/engine/install/ubuntu/#set-up-the-repository
+sudo apt-get install ca-certificates curl gnupg lsb-release -y
+sudo mkdir -m 0755 -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update -y
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
 sudo systemctl start docker.service
 sudo systemctl enable docker.service
 sudo usermod -aG docker $USER
@@ -76,14 +81,11 @@ EOF
 systemctl restart docker
 
 ip6tables -t nat -A POSTROUTING -s fd00::/80 ! -o docker0 -j MASQUERADE
+sudo apt-get install iptables-persistent -y
+sudo iptables-save > /etc/iptables/rules.v4
+sudo ip6tables-save > /etc/iptables/rules.v6
 
-cat >>~/.zshrc <<EOF
-
-# ! docker IPv6
-ip6tables -t nat -A POSTROUTING -s fd00::/80 ! -o docker0 -j MASQUERADE
-
-EOF
-
+## * https://github.com/keyiflerolsun/docker-compose_Yenir_Mi
 # docker run -d --name=portainer --restart=always -p 8000:8000 -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:latest
 # docker run -d --name=mongodb --restart=unless-stopped -p 27017:27017 mongo:latest --auth
 # docker run -d --name=nginx-proxy-manager --restart=unless-stopped -p 80:80 -p 81:81 -p 443:443 -v /root/nginx-proxy-manager/data:/data -v /root/nginx-proxy-manager/letsencrypt:/etc/letsencrypt jc21/nginx-proxy-manager:latest
