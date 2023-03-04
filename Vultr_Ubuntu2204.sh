@@ -79,7 +79,9 @@ EOF
 
 systemctl restart docker
 
-sudo ufw route allow from fd00::/80 out on !docker0
+sudo ufw allow in on docker0 from fd00::/80
+sudo ufw route allow out on docker0 from fd00::/80 to any
+sudo ufw reload
 
 #ip6tables -t nat -A POSTROUTING -s fd00::/80 ! -o docker0 -j MASQUERADE
 #sudo apt-get install iptables-persistent -y
@@ -128,4 +130,5 @@ EOF
 git config --global user.email "keyiflerolsun@gmail.com"
 git config --global user.name "keyiflerolsun"
 git config --global credential.helper "cache --timeout=36000"
-chsh -s $(which zsh) && zshchsh -s $(which zsh) && zsh
+chsh -s $(which zsh)
+zsh
