@@ -30,7 +30,6 @@ git clone https://github.com/zsh-users/zsh-completions ${ZSH_CUSTOM:=~/.oh-my-zs
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 rm -rf ~/.zshrc && wget -O ~/.zshrc https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/.zshrc
-# chsh -s $(which zsh) && zsh
 
 # ? TMUX
 sudo apt install tmux tmuxinator -y
@@ -122,3 +121,9 @@ cat >>~/.zshrc <<EOF
 ulimit -n 32768
 
 EOF
+
+# * keyiflerolsun
+git config --global user.email "keyiflerolsun@gmail.com"
+git config --global user.name "keyiflerolsun"
+git config --global credential.helper "cache --timeout=36000"
+chsh -s $(which zsh) && zshchsh -s $(which zsh) && zsh
