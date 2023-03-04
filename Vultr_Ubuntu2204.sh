@@ -62,6 +62,27 @@ sudo apt install docker docker-compose -y
 sudo systemctl start docker.service
 sudo systemctl enable docker.service
 sudo usermod -aG docker $USER
+
+cat >>/etc/docker/daemon.json <<EOF
+
+{
+  "ipv6": true,
+  "fixed-cidr-v6": "fd00::/80"
+}
+
+EOF
+
+systemctl restart docker
+
+ip6tables -t nat -A POSTROUTING -s fd00::/80 ! -o docker0 -j MASQUERADE
+
+cat >>~/.zshrc <<EOF
+
+# ! docker IPv6
+ip6tables -t nat -A POSTROUTING -s fd00::/80 ! -o docker0 -j MASQUERADE
+
+EOF
+
 # docker run -d --name=portainer --restart=always -p 8000:8000 -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:latest
 # docker run -d --name=mongodb --restart=unless-stopped -p 27017:27017 mongo:latest --auth
 # docker run -d --name=nginx-proxy-manager --restart=unless-stopped -p 80:80 -p 81:81 -p 443:443 -v /root/nginx-proxy-manager/data:/data -v /root/nginx-proxy-manager/letsencrypt:/etc/letsencrypt jc21/nginx-proxy-manager:latest
