@@ -84,6 +84,9 @@ sudo apt-get install iptables-persistent -y
 sudo iptables-save > /etc/iptables/rules.v4
 sudo ip6tables-save > /etc/iptables/rules.v6
 
+sudo apt remove ufw -y
+sudo apt purge ufw -y
+
 ## * https://github.com/keyiflerolsun/docker-compose_Yenir_Mi
 # docker run -d --name=portainer --restart=always -p 8000:8000 -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:latest
 # docker run -d --name=mongodb --restart=unless-stopped -p 27017:27017 mongo:latest --auth
