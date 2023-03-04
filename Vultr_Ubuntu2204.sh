@@ -79,8 +79,7 @@ EOF
 
 systemctl restart docker
 
-# sudo ip6tables -t nat -A POSTROUTING -s fd00::/80 ! -o docker0 -j MASQUERADE
-sudo ip6tables -t nat -A POSTROUTING -s fd00::/80 ! -o docker0 -j MASQUERADE -p tcp -m conntrack --ctstate NEW -m comment --comment "Docker NAT IPv6 traffic" -j ACCEPT
+sudo ip6tables -t nat -A POSTROUTING -s fd00::/80 ! -o docker0 -j MASQUERADE
 
 sudo apt-get install iptables-persistent -y
 sudo iptables-save > /etc/iptables/rules.v4
