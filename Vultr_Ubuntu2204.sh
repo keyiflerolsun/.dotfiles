@@ -77,7 +77,7 @@ cat >>/etc/docker/daemon.json <<EOF
 
 EOF
 
-systemctl restart docker
+# systemctl restart docker
 
 # sudo ip6tables -t nat -A POSTROUTING -s fd00::/80 ! -o docker0 -j MASQUERADE
 # sudo apt-get install iptables-persistent -y
