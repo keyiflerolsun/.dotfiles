@@ -60,6 +60,12 @@ sudo dpkg -i google-chrome-stable_current_amd64.deb
 # * Yavaşlık Sorunu
 ## https://superuser.com/questions/1539900/slow-ubuntu-remote-desktop-using-xrdp
 ## https://askubuntu.com/questions/1283709/xrdp-and-xfce4-ubuntu-18-04-unusable
+sed -i "s/max_bpp.*/max_bpp=128/" /etc/xrdp/xrdp.ini
+sed -i "/max_bpp/a use_compression=yes" /etc/xrdp/xrdp.ini
+sed -i "s/#xserverbpp.*/xserverbpp=128/" /etc/xrdp/xrdp.ini
+sed -i "s/crypt_level.*/crypt_level=none/" /etc/xrdp/xrdp.ini
+
+systemctl restart xrdp.service
 ## https://github.com/neutrinolabs/xrdp/discussions/2136
 
 # * Dil Sorunu » https://forum.debian.org.tr/index.php?topic=4712.0
