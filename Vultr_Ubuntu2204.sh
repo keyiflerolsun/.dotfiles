@@ -129,4 +129,4 @@ git config --global user.email "keyiflerolsun@gmail.com"
 git config --global user.name "keyiflerolsun"
 git config --global credential.helper "cache --timeout=36000"
 chsh -s $(which zsh)
-zsh
+reboot
