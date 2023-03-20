@@ -79,7 +79,7 @@ systemctl restart xrdp.service
 
 # * keyif
 # Siyah Arka Plan
-# qdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "var allDesktops = desktops();print (allDesktops);for (i=0;i<allDesktops.length;i++) {d = allDesktops[i];d.wallpaperPlugin = 'org.kde.color';d.currentConfigGroup = Array('Wallpaper', 'org.kde.color', 'General');d.writeConfig('Color', '0,0,0');}"
+qdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "var allDesktops = desktops();print (allDesktops);for (i=0;i<allDesktops.length;i++) {d = allDesktops[i];d.wallpaperPlugin = 'org.kde.color';d.currentConfigGroup = Array('Wallpaper', 'org.kde.color', 'General');d.writeConfig('Color', '0,0,0');}"
 
 # Breath Dark Tema
 # kwriteconfig5 --file ~/.config/kdeglobals --group "General" --key "ColorScheme" "breath2-dark"
