@@ -79,13 +79,12 @@ systemctl restart xrdp.service
 
 # * keyif
 # Siyah Arka Plan
-qdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "var allDesktops = desktops();print (allDesktops);for (i=0;i<allDesktops.length;i++) {d = allDesktops[i];d.wallpaperPlugin = 'org.kde.color';d.currentConfigGroup = Array('Wallpaper', 'org.kde.color', 'General');d.writeConfig('Color', '0,0,0');}"
+# qdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "var allDesktops = desktops();print (allDesktops);for (i=0;i<allDesktops.length;i++) {d = allDesktops[i];d.wallpaperPlugin = 'org.kde.color';d.currentConfigGroup = Array('Wallpaper', 'org.kde.color', 'General');d.writeConfig('Color', '0,0,0');}"
 
 # Breath Dark Tema
-kwriteconfig5 --file ~/.config/kdeglobals --group "General" --key "ColorScheme" "breath2-dark"
-kwriteconfig5 --file ~/.config/kdeglobals --group "General" --key "WidgetStyle" "kvantum"
-kwriteconfig5 --file ~/.config/kdeglobals --group "General" --key "GtkTheme" "Breeze-Dark"
+# kwriteconfig5 --file ~/.config/kdeglobals --group "General" --key "ColorScheme" "breath2-dark"
+# kwriteconfig5 --file ~/.config/kdeglobals --group "General" --key "WidgetStyle" "kvantum"
+# kwriteconfig5 --file ~/.config/kdeglobals --group "General" --key "GtkTheme" "Breeze-Dark"
 
 # Plazma Yenile
-dbus-send --session --type=method_call --dest=org.kde.PlasmaShell /PlasmaShell org.kde.PlasmaShell.reconfigure
-reboot
+# dbus-send --session --type=method_call --dest=org.kde.PlasmaShell /PlasmaShell org.kde.PlasmaShell.reconfigure
