@@ -11,7 +11,6 @@ sudo pacman -S tmux android-tools rust npm ruby jdk-openjdk -y
 sudo pacman -S kvantum chromium smplayer -y
 sudo pacman -S jq ffmpeg sweeper -y
 sudo pacman -S bind traceroute -y
-sudo pacman -S ntfs-3g -y
 gem install colorls
 
 # ? Batarya Optimizasyonu
