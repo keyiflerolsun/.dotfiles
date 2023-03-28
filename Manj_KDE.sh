@@ -65,6 +65,11 @@ flatpak install flathub io.github.mimbrero.WhatsAppDesktop
 flatpak install flathub com.github.sdv43.whaler
 flatpak install flathub org.qbittorrent.qBittorrent
 
+# ? SSH
+sudo pacman -S openssh -y
+sudo systemctl enable sshd.service
+sudo systemctl start sshd.service
+
 # ? Docker
 sudo pacman -S docker docker-compose -y
 sudo systemctl start docker.service
