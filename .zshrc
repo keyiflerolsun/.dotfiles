@@ -40,7 +40,7 @@ alias localip="nmcli device show | grep IP4.ADDRESS | head -1 | awk '{print $2}'
 alias tw="sudo teamviewer --daemon enable && systemctl enable teamviewerd && systemctl start teamviewerd && teamviewer"
 alias rdp="remmina"
 alias j='jsonVer(){ cat "$@" | jq; unset -f jsonVer; }; jsonVer'
-alias yenile="killall latte-dock && killall plasmashell && rm ~/.cache/icon-cache.kcache && kstart plasmashell >/dev/null 2>&1 && latte-dock & disown"
+alias yenile="killall -q latte-dock && killall -q plasmashell && rm ~/.cache/icon-cache.kcache && nohup kstart plasmashell >/dev/null 2>&1 & nohup latte-dock >/dev/null 2>&1 &"
 alias ara='ara(){ find / -type f -name "$@" -print 2>/dev/null }; ara'
 alias md2pdf='md2pdf(){ pandoc -o "${@%%.*}.pdf" --template pdf_theme --listings --pdf-engine=xelatex --toc "$@"; unset -f md2pdf; }; md2pdf'
 
