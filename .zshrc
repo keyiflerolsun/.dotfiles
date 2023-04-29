@@ -65,10 +65,10 @@ alias mkv2mp4='mkv2mp4(){ ffmpeg -v quiet -stats -i "$@" -c copy -c:a aac -movfl
 
 # * colorls
 source $(dirname $(gem which colorls))/tab_complete.sh
-alias lc="colorls -lA --sd"
-alias l="colorls"
-alias lsd="colorls --sd"
-alias ltree="colorls --tree --sd"
+alias lc="colorls -lA --sd --gs"
+alias l="colorls --gs"
+alias lsd="colorls --sd --gs"
+alias ltree="colorls --tree --sd --gs"
 
 # * x11 VNC Server
 alias vnc_basla='x11vnc -nap -wait 50 -noxdamage -rfbauth $HOME/.vnc/passwd -display :0 -nocursor -forever -o $HOME/.vnc/x11vnc.log -bg; echo -e "\n\tVNC Server Başlatıldı.."'
