@@ -23,13 +23,13 @@ pkg install build-essential clang make pkg-config -y
 pkg install libffi libxslt libxml2 libcrypt -y
 pkg install libgmp libmpc libmpfr -y
 pkg install libjpeg-turbo libpng -y
-pip3 install -U Kekik KekikTaban
+pip3 install -U Kekik
 MATHLIB=m pip install numpy
 export CFLAGS="-Wno-deprecated-declarations -Wno-unreachable-code"
 pip install pandas
 pip3 install -U KekikSpatula
 export CARGO_BUILD_TARGET=aarch64-linux-android
-pip3 install -U scrapy yt-dlp
+pip3 install -U scrapy yt-dlp bpython
 
 # zsh
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended

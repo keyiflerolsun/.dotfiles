@@ -26,7 +26,8 @@ pacaur -S teamviewer -y
 # ? Python
 pip3 install --upgrade pip
 pip3 install -U setuptools wheel
-pip3 install -U yt-dlp vizex Kekik KekikSpatula SelSik thefuck
+pip3 install -U yt-dlp vizex Kekik SelSik thefuck
+pip3 install -U bpython imgdupes imgcat
 sudo -H pip install --upgrade yt-dlp
 
 # ? Github
