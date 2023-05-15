@@ -77,7 +77,7 @@ sudo systemctl start docker.service
 sudo systemctl enable docker.service
 sudo usermod -aG docker $USER
 # docker run -d --name=portainer --restart=always -p 8000:8000 -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:latest
-# docker run -d --name=mongodb --restart=unless-stopped -p 27017:27017 mongo:latest --auth
+# docker run -d --name mongodb --restart unless-stopped -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME=keyiflerolsun -e MONGO_INITDB_ROOT_PASSWORD=sifre mongo:latest --auth
 
 # ? Markdown » PDF
 sudo pacman -S pandoc texlive-latexextra texlive-fontsextra -y

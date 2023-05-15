@@ -21,6 +21,9 @@
     "workbench.iconTheme": "material-icon-theme",
     "workbench.colorTheme": "Dracula",
 
+    // "python.analysis.inlayHints.functionReturnTypes": true,
+    // "python.analysis.inlayHints.variableTypes": true,
+
     "explorer.confirmDelete": false,
 
     "security.workspace.trust.untrustedFiles": "open",
@@ -57,10 +60,14 @@
         "editor.defaultFormatter": "vscode.typescript-language-features"
     },
     "[python]": {
-        "editor.defaultFormatter": "ms-python.python"
+        "editor.defaultFormatter": "ms-python.python",
+        "editor.formatOnType": true
     },
     "[dockercompose]": {
         "editor.defaultFormatter": "ms-azuretools.vscode-docker"
+    },
+    "[solidity]": {
+        "editor.defaultFormatter": "NomicFoundation.hardhat-solidity"
     },
 
     "auto-rename-tag.activationOnLanguage": [
@@ -72,6 +79,21 @@
 
     "tabnine.experimentalAutoImports": true,
     "sourcery.token": "1111111111111111111111",
-    "sonarlint.ls.javaHome": "/usr/lib/jvm/java-19-openjdk/",
-    "sonarlint.pathToNodeExecutable": "/bin/node"
+    "sonarlint.ls.javaHome": "/usr/lib/jvm/java-20-openjdk/",
+    "sonarlint.pathToNodeExecutable": "/bin/node",
+
+    "git.autofetch": true,
+    "files.exclude": {
+        "**/.DS_Store": true,
+        "**/.git": true,
+        "**/.hg": true,
+        "**/.svn": true,
+        "**/CVS": true,
+        "**/Thumbs.db": true
+    },
+    "git.openRepositoryInParentFolders": "always",
+
+    "solidity.telemetry": false,
+    "workbench.colorCustomizations": {},
+    "docwriter.language": "Turkish"
 }
