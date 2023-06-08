@@ -19,9 +19,10 @@ systemctl enable tlp.service
 sudo tlp-stat -s
 
 # ? Aur
-pacaur -S optimus-manager-qt -y
-pacaur -S latte-dock-git -y
-pacaur -S teamviewer -y
+yay -S optimus-manager-qt --noconfirm
+yay -S latte-dock-git --noconfirm
+yay -S teamviewer --noconfirm
+yay -S mkinitcpio-firmware --noconfirm
 
 # ? Python
 pip3 install --upgrade pip
