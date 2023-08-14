@@ -3,6 +3,8 @@
 
 # Ubuntu Kurulum Paketi
 
+# sudo sed -i "s/#\$nrconf{restart} = 'i';/\$nrconf{restart} = 'a';/" /etc/needrestart/needrestart.conf
+
 # Sunucu Güncellemesi ve ZSH Kurulumu Ardından Reboot!
 sudo apt-get update -y && sudo apt-get -y upgrade && sudo apt-get dist-upgrade -y
 sudo apt install language-pack-tr-base -y
