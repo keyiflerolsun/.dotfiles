@@ -23,8 +23,8 @@ pkg install build-essential clang make pkg-config -y
 pkg install libffi libxslt libxml2 libcrypt -y
 pkg install libgmp libmpc libmpfr -y
 pkg install libjpeg-turbo libpng -y
+pkg install python-numpy opencv-python python-cryptography -y
 pip3 install -U Kekik
-MATHLIB=m pip install numpy
 export CFLAGS="-Wno-deprecated-declarations -Wno-unreachable-code"
 pip install pandas
 pip3 install -U KekikSpatula
