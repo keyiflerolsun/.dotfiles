@@ -4,12 +4,14 @@
 # ? Genel
 sudo pacman -S yay pacui libxcrypt-compat webkit2gtk xdg-desktop-portal telegram-desktop optimus-manager gnome-disk-utility -y
 sudo pacman -S python-pip python-pipreqs python-flask python-numpy python-pandas scrapy opencv tk -y
+sudo pacman -S manjaro-tools-base-git manjaro-tools-pkg-git manjaro-tools-yaml-git make gcc gcc-libs -y
 sudo pacman -S brave-browser thefuck micro screenfetch neofetch xorg-xinput -y
 sudo pacman -S remmina libvncserver freerdp -y
-sudo pacman -S filezilla simplescreenrecorder -y
+sudo pacman -S filezilla -y
 sudo pacman -S tmux android-tools rust npm ruby jdk-openjdk -y
 sudo pacman -S kvantum chromium smplayer -y
 sudo pacman -S jq ffmpeg sweeper -y
+sudo pacman -S leptonica tesseract tesseract-data-eng -y
 sudo pacman -S bind traceroute refind refind-drivers -y
 gem install colorls
 
@@ -23,6 +25,7 @@ yay -S optimus-manager-qt --noconfirm
 yay -S latte-dock-git --noconfirm
 yay -S teamviewer --noconfirm
 yay -S mkinitcpio-firmware --noconfirm
+yay -S python-orderedset --noconfirm
 
 # ? Python
 pip3 install --upgrade pip
