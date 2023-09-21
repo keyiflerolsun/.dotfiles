@@ -28,11 +28,11 @@ yay -S mkinitcpio-firmware --noconfirm
 yay -S python-orderedset --noconfirm
 
 # ? Python
-pip3 install --upgrade pip
-pip3 install -U setuptools wheel
-pip3 install -U yt-dlp vizex Kekik SelSik thefuck
-pip3 install -U bpython imgdupes imgcat
-sudo -H pip install --upgrade yt-dlp
+pip3 install --break-system-packages -U pip
+pip3 install --break-system-packages -U setuptools wheel
+pip3 install --break-system-packages -U yt-dlp vizex Kekik SelSik thefuck
+pip3 install --break-system-packages -U bpython imgdupes imgcat
+pip3 install --break-system-packages -U frida frida-tools mitmproxy
 
 # ? Github
 git config --global user.email "keyiflerolsun@gmail.com"
