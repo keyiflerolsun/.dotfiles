@@ -21,6 +21,7 @@ systemctl enable tlp.service
 sudo tlp-stat -s
 
 # ? Aur
+yay -S simplescreenrecorder --noconfirm
 yay -S optimus-manager-qt --noconfirm
 yay -S latte-dock-git --noconfirm
 yay -S teamviewer --noconfirm
