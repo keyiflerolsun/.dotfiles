@@ -3,7 +3,6 @@
 
 # ? Genel
 sudo sed -i '/^# Misc options/a Color\nILoveCandy\nParallelDownloads = 6' /etc/pacman.conf
-
 sudo pacman -S yay pacui libxcrypt-compat webkit2gtk xdg-desktop-portal telegram-desktop optimus-manager gnome-disk-utility -y
 sudo pacman -S python-pip python-pipreqs python-flask python-numpy python-pandas scrapy opencv tk -y
 sudo pacman -S manjaro-tools-base-git manjaro-tools-pkg-git manjaro-tools-yaml-git make gcc gcc-libs -y
