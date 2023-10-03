@@ -8,7 +8,7 @@ sudo pacman -S python-pip python-pipreqs python-flask python-numpy python-pandas
 sudo pacman -S base-devel manjaro-tools-base-git manjaro-tools-pkg-git manjaro-tools-yaml-git make gcc gcc-libs -y
 sudo pacman -S brave-browser thefuck micro screenfetch neofetch xorg-xinput -y
 sudo pacman -S remmina libvncserver freerdp -y
-sudo pacman -S filezilla -y
+sudo pacman -S intel-media-driver filezilla -y
 sudo pacman -S tmux android-tools rust npm ruby jdk-openjdk -y
 sudo pacman -S kvantum chromium smplayer -y
 sudo pacman -S jq ffmpeg sweeper -y
