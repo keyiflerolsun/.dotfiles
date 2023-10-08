@@ -28,6 +28,7 @@ yay -S latte-dock-git --noconfirm
 yay -S teamviewer --noconfirm
 yay -S mkinitcpio-firmware --noconfirm
 yay -S python-orderedset --noconfirm
+yay -S visual-studio-code-bin --noconfirm
 
 # ? Python
 pip3 install --break-system-packages -U pip
@@ -54,7 +55,6 @@ sudo pacman -S snapd libpamac-snap-plugin -y
 sudo systemctl enable --now snapd.socket
 sudo systemctl enable --now snapd.apparmor
 sudo ln -s /var/lib/snapd/snap /snap
-sudo snap install code --classic
 sudo snap install authy
 
 # ? Flatpak » Spotify - PulseEffects - Anydesk - MongoDB - VLC - WhatsApp - Whaler - qBittorrent
