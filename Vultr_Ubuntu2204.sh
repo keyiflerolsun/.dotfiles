@@ -21,10 +21,10 @@ sudo timedatectl set-timezone Europe/Istanbul
 # ulimit -n 4096
 
 # ? Python
-pip3 install --upgrade pip
-pip3 install -U setuptools wheel
-pip3 install -U yt-dlp vizex Kekik SelSik thefuck
-pip3 install -U bpython imgdupes imgcat
+sudo pip3 install --upgrade pip
+sudo pip3 install -U setuptools wheel
+sudo pip3 install -U yt-dlp vizex Kekik SelSik thefuck
+sudo pip3 install -U bpython imgdupes imgcat
 
 # ? ZSH
 sudo apt install zsh -y
@@ -71,7 +71,7 @@ sudo systemctl start docker.service
 sudo usermod -aG docker $USER
 
 ## * Docker IPv6 -- https://medium.com/@skleeschulte/how-to-enable-ipv6-for-docker-containers-on-ubuntu-18-04-c68394a219a2
-cat >>/etc/docker/daemon.json <<EOF
+sudo cat >>/etc/docker/daemon.json <<EOF
 
 {
   "ipv6": true,
@@ -95,7 +95,7 @@ EOF
 # docker run -d --name=nginx-proxy-manager --restart=unless-stopped -p 80:80 -p 81:81 -p 443:443 -v /root/nginx-proxy-manager/data:/data -v /root/nginx-proxy-manager/letsencrypt:/etc/letsencrypt jc21/nginx-proxy-manager:latest
 
 # ? too many open files hatası çözümü
-cat >>/etc/security/limits.conf <<EOF
+sudo cat >>/etc/security/limits.conf <<EOF
 
 # ! "too many open files" hatası için
 root      soft    nofile  100000
@@ -105,14 +105,14 @@ ubuntu    hard    nofile  100000
 
 EOF
 
-cat >>/etc/sysctl.conf <<EOF
+sudo cat >>/etc/sysctl.conf <<EOF
 
 # ! "too many open files" hatası için
 fs.file-max = 2097152
 
 EOF
 
-cat >>/etc/pam.d/commmon_session <<EOF
+sudo cat >>/etc/pam.d/commmon_session <<EOF
 
 # ! "too many open files" hatası için
 session required pam_limits.so
@@ -120,7 +120,7 @@ session required pam_limits.so
 EOF
 
 
-cat >>~/.zshrc <<EOF
+sudo cat >>~/.zshrc <<EOF
 
 # ! "too many open files" hatası için
 ulimit -n 32768
@@ -131,5 +131,5 @@ EOF
 git config --global user.email "keyiflerolsun@gmail.com"
 git config --global user.name "keyiflerolsun"
 git config --global credential.helper "cache --timeout=36000"
-chsh -s $(which zsh)
-reboot
+sudo chsh -s $(which zsh)
+sudo reboot
