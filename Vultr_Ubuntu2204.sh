@@ -95,7 +95,7 @@ EOF
 # docker run -d --name=nginx-proxy-manager --restart=unless-stopped -p 80:80 -p 81:81 -p 443:443 -v /root/nginx-proxy-manager/data:/data -v /root/nginx-proxy-manager/letsencrypt:/etc/letsencrypt jc21/nginx-proxy-manager:latest
 
 # ? too many open files hatası çözümü
-sudo cat >>/etc/security/limits.conf <<EOF
+cat >>/etc/security/limits.conf <<EOF
 
 # ! "too many open files" hatası için
 root      soft    nofile  100000
@@ -105,14 +105,14 @@ ubuntu    hard    nofile  100000
 
 EOF
 
-sudo cat >>/etc/sysctl.conf <<EOF
+cat >>/etc/sysctl.conf <<EOF
 
 # ! "too many open files" hatası için
 fs.file-max = 2097152
 
 EOF
 
-sudo cat >>/etc/pam.d/commmon_session <<EOF
+cat >>/etc/pam.d/commmon_session <<EOF
 
 # ! "too many open files" hatası için
 session required pam_limits.so
@@ -120,7 +120,7 @@ session required pam_limits.so
 EOF
 
 
-sudo cat >>~/.zshrc <<EOF
+cat >>~/.zshrc <<EOF
 
 # ! "too many open files" hatası için
 ulimit -n 32768
