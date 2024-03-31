@@ -10,6 +10,7 @@ sudo apt-get update -y && sudo apt-get -y upgrade && sudo apt-get dist-upgrade -
 sudo apt install language-pack-tr-base -y
 sed -i -e 's/# tr_TR.UTF-8 UTF-8/tr_TR.UTF-8 UTF-8/' /etc/locale.gen
 dpkg-reconfigure --frontend=noninteractive locales
+# sudo apt install avahi-daemon -y && sudo systemctl enable avahi-daemon && sudo systemctl start avahi-daemon
 
 # Yüklemek İçin: `curl https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/Vultr_Ubuntu2204.sh | bash`
 
