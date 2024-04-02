@@ -78,7 +78,6 @@ sudo usermod -aG docker $USER
 cat >>/etc/docker/daemon.json <<EOF
 
 {
-  "data-root": "/data/docker/",
   "log-driver": "json-file",
   "log-opts": { "max-size": "10m", "max-file": "2" },
   "ipv6": true,
@@ -91,7 +90,6 @@ cat >>/etc/docker/daemon.json <<EOF
     { "base": "fd00::/64", "size": 64 }
   ]
 }
-
 
 EOF
 
