@@ -83,12 +83,7 @@ cat >>/etc/docker/daemon.json <<EOF
   "ipv6": true,
   "fixed-cidr-v6": "fd00::/64",
   "experimental": true,
-  "ip6tables": true,
-  "default-address-pools": [
-    { "base": "172.17.0.0/16", "size": 24 },
-    { "base": "192.168.0.0/16", "size": 24 },
-    { "base": "fd00::/64", "size": 64 }
-  ]
+  "ip6tables": true
 }
 
 EOF
