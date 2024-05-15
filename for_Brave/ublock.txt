@@ -1,0 +1,58 @@
+{
+  "timeStamp": 1715761429163,
+  "version": "1.57.0",
+  "userSettings": {
+    "cloudStorageEnabled": true,
+    "externalLists": "https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt\nhttps://github.com/AdguardTeam/FiltersRegistry/raw/master/filters/filter_11_Mobile/filter.txt\nhttps://github.com/AdguardTeam/FiltersRegistry/raw/master/filters/filter_13_Turkish/filter.txt\nhttps://github.com/bkrucarci/turk-adlist/raw/master/filters/I-Do-Not-Want-Your-Mobile-App.txt\nhttps://github.com/bkrucarci/turk-adlist/raw/master/filters/turkish_generic_content_blocker.txt\nhttps://github.com/notracking/hosts-blocklists/raw/master/hostnames.txt\nhttps://github.com/tigthor/NSA-CIA-Blocklist/raw/main/HOSTS/HOSTS\nhttps://hblock.molinero.dev/hosts_adblock.txt\nhttps://o0.pages.dev/Lite/adblock.txt\nhttps://perflyst.github.io/PiHoleBlocklist/SmartTV.txt",
+    "importedLists": [
+      "https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt",
+      "https://github.com/AdguardTeam/FiltersRegistry/raw/master/filters/filter_11_Mobile/filter.txt",
+      "https://github.com/AdguardTeam/FiltersRegistry/raw/master/filters/filter_13_Turkish/filter.txt",
+      "https://github.com/bkrucarci/turk-adlist/raw/master/filters/I-Do-Not-Want-Your-Mobile-App.txt",
+      "https://github.com/bkrucarci/turk-adlist/raw/master/filters/turkish_generic_content_blocker.txt",
+      "https://github.com/notracking/hosts-blocklists/raw/master/hostnames.txt",
+      "https://github.com/tigthor/NSA-CIA-Blocklist/raw/main/HOSTS/HOSTS",
+      "https://hblock.molinero.dev/hosts_adblock.txt",
+      "https://o0.pages.dev/Lite/adblock.txt",
+      "https://perflyst.github.io/PiHoleBlocklist/SmartTV.txt"
+    ]
+  },
+  "selectedFilterLists": [
+    "user-filters",
+    "ublock-filters",
+    "ublock-badware",
+    "ublock-privacy",
+    "ublock-quick-fixes",
+    "ublock-unbreak",
+    "easylist",
+    "easyprivacy",
+    "urlhaus-1",
+    "plowe-0",
+    "TUR-0",
+    "https://github.com/bkrucarci/turk-adlist/raw/master/filters/I-Do-Not-Want-Your-Mobile-App.txt",
+    "https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt",
+    "https://o0.pages.dev/Lite/adblock.txt",
+    "https://github.com/AdguardTeam/FiltersRegistry/raw/master/filters/filter_11_Mobile/filter.txt",
+    "https://github.com/AdguardTeam/FiltersRegistry/raw/master/filters/filter_13_Turkish/filter.txt",
+    "https://github.com/notracking/hosts-blocklists/raw/master/hostnames.txt",
+    "https://github.com/tigthor/NSA-CIA-Blocklist/raw/main/HOSTS/HOSTS",
+    "https://hblock.molinero.dev/hosts_adblock.txt",
+    "https://perflyst.github.io/PiHoleBlocklist/SmartTV.txt",
+    "https://github.com/bkrucarci/turk-adlist/raw/master/filters/turkish_generic_content_blocker.txt"
+  ],
+  "hiddenSettings": {},
+  "whitelist": [
+    "about-scheme",
+    "chrome-extension-scheme",
+    "chrome-scheme",
+    "edge-scheme",
+    "moz-extension-scheme",
+    "opera-scheme",
+    "vivaldi-scheme",
+    "wyciwyg-scheme"
+  ],
+  "dynamicFilteringString": "behind-the-scene * * noop\nbehind-the-scene * inline-script noop\nbehind-the-scene * 1p-script noop\nbehind-the-scene * 3p-script noop\nbehind-the-scene * 3p-frame noop\nbehind-the-scene * image noop\nbehind-the-scene * 3p noop",
+  "urlFilteringString": "",
+  "hostnameSwitchesString": "no-large-media: behind-the-scene false",
+  "userFilters": "! 2022-03-24 https://www.r10.net\nr10.net##[href*=\"ticimax.com\"]\nr10.net##[href*=\"jetteknoloji.com\"]\n||cdn.r10.net/editor/3713/3758817470.gif$image\n||cdn.r10.net/editor/27818/2549053017.gif$image\n||idrydigital.com/upload/banner1.gif$image\n||cdn.r10.net/editor/3713/1230360301.gif$image\n||cdn.r10.net/editor/27818/1648465821.gif$image\n||cdn.r10.net/editor/100103/771510958.gif$image\n||cdn.r10.net/editor/51273/3005339574.gif$image\n||cdn.r10.net/r10/i/sosyalmarket/1.gif$image\n||cdn.r10.net/editor/113687/4136891095.gif$image\n||cdn.r10.net/editor/3713/1758547484.gif$image\n||cdn.r10.net/editor/27818/2636925725.gif$image\nr10.net##[href*=\"vallet.com.tr\"]\n\n! 2022-04-02 https://github.com\ngithub.com##.octotree-pr-tree__promo\n\n! 2022-04-20 https://investing.com\ninvesting.com##[class^='billboard_top_block']\ninvesting.com##[class^='billboard_wrapper']\ninvesting.com##[class^='dfpAdUnitContainer']\ninvesting.com##[class^='adBlock-popup_popup']\ninvesting.com##[class^='earAdvWrapper']\n\n! 2022-04-29 https://walletinvestor.com\nwalletinvestor.com##[href^=\"https://walletinvestor.com/u/\"]\nwalletinvestor.com##span:has-text(/^Join our VIP Community/)\nwalletinvestor.com##[src^=\"https://walletinvestor.com/static/frontend/images/ebookv3/\"]\nwalletinvestor.com##.forecast-premium-functions\n\n! 2022-04-29 https://stockinvest.us\nstockinvest.us##.announcement.text-center\nstockinvest.us##.trial-color-bg.contestBar.text-center\nstockinvest.us##.col-lg-12.col-xl-3\nstockinvest.us##.col-lg-12.col-xl-9 > .mr-5.ml-5.mb-25.mt-10.bold.text-center.color-green.h3\nstockinvest.us##p:has-text(/Remember To Visit Our/)\nstockinvest.us##.hidden-sm-down.site-action\nstockinvest.us##[src=\"^https://www.youtube.com/embed/\"]\nstockinvest.us##.col-md-12 > .hidden-md-down\nstockinvest.us##.announce-announcement.text-center\nstockinvest.us##.announce-discount.trial-color-bg.text-center\nstockinvest.us##div.overflow-hidden:nth-of-type(3)\nstockinvest.us##div.overflow-hidden:nth-of-type(4)\nstockinvest.us###bottom-right-popup\nstockinvest.us##div.overflow-hidden:nth-of-type(5)\n\n! 2022-05-13 https://bscscan.com\nbscscan.com###ContentPlaceHolder1_divSummary > .justify-content-center.d-flex\nbscscan.com##section.container-xxl:nth-of-type(2)\n||bscscan.com/images/gen/tgcasino_321x101.gif$image\n||bscscan.com/images/gen/tgcasino_321x101.gif$image\n||bscscan.com/images/gen/bcgame310823_321x101b.png$image\n||bscscan.com/images/gen/bcgame310823_321x101b.png$image\n||bscscan.com/images/gen/bcgame250823_321x101b.gif$image\n||bscscan.com/images/gen/blank-321x101.png$image\n\n! 2022-08-21 https://www.anycodings.com\nwww.anycodings.com###myblock\n\n! 2022-10-06 https://mail.yandex.com.tr\nmail.yandex.com.tr##div[data-key=\"box=infoline-box\"]+div\nmail.yandex.com.tr##.ns-view-id-100.ns-view-pmnellfcj\nmail.yandex.com.tr##.DisableAdsButton__button--kP1ry.Button2_size_xs.Button2_view_default.Button2\n\n! 2022-10-15 https://telegramchannels.me\ntelegramchannels.me##div[class*='is-half-desktop']\ntelegramchannels.me##div[class*='card is-climad  has-background-link-light']\ntelegramchannels.me###btm-pr\n\n! 2022-10-18 https://coinmooner.com\ncoinmooner.com##.popupMooner\ncoinmooner.com##.Mooners_mooners__SkYXZ\n\n! 2022-10-19 https://isrug.app\n||isrug.app/your-message-*0.jpg$image\n\n! 2022-12-15 https://cracked.io\n||static.cracked.io/uploads/image_*.gif$image\n||static.cracked.io/*.gif$image\n\n! 2023-09-23 https://www.photopea.com\n||www.photopea.com/img/pp_wide.png$image\n||www.photopea.com/img/pp_wide.png$image"
+}

@@ -4,7 +4,7 @@
 # ? Genel
 sudo sed -i '/^# Misc options/a Color\nILoveCandy\nParallelDownloads = 6' /etc/pacman.conf
 sudo pacman -S yay pacui libxcrypt-compat webkit2gtk xdg-desktop-portal telegram-desktop optimus-manager gnome-disk-utility -y
-sudo pacman -S python-pip python-pipreqs python-flask python-numpy python-pandas scrapy opencv tk -y
+sudo pacman -S python-pip python-flask python-numpy python-pandas scrapy opencv tk -y
 sudo pacman -S base-devel manjaro-tools-base-git manjaro-tools-pkg-git manjaro-tools-yaml-git make gcc gcc-libs -y
 sudo pacman -S brave-browser thefuck micro screenfetch neofetch xorg-xinput -y
 sudo pacman -S remmina libvncserver freerdp -y
@@ -26,15 +26,15 @@ yay -S simplescreenrecorder-git --noconfirm
 yay -S optimus-manager-qt --noconfirm
 yay -S latte-dock-git --noconfirm
 yay -S teamviewer --noconfirm
-yay -S mkinitcpio-firmware --noconfirm
 yay -S python-orderedset --noconfirm
 yay -S visual-studio-code-bin --noconfirm
+# yay -S mkinitcpio-firmware --noconfirm
 
 # ? Python
 pip3 install --break-system-packages -U pip
 pip3 install --break-system-packages -U setuptools wheel
 pip3 install --break-system-packages -U yt-dlp vizex Kekik SelSik thefuck
-pip3 install --break-system-packages -U bpython imgdupes imgcat
+pip3 install --break-system-packages -U bpython imgdupes imgcat pyotp nvitop
 pip3 install --break-system-packages -U frida frida-tools mitmproxy
 
 # ? Github
@@ -48,14 +48,14 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/too
 git clone https://github.com/zsh-users/zsh-completions ${ZSH_CUSTOM:=~/.oh-my-zsh/custom}/plugins/zsh-completions
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
-rm -rf ~/.zshrc && wget -O ~/.zshrc https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/.zshrc
+rm -rf ~/.zshrc && wget -O ~/.zshrc https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/.dots/.zshrc
 
-# ? Snap » Visual Studio Code - Authy
-sudo pacman -S snapd libpamac-snap-plugin -y
-sudo systemctl enable --now snapd.socket
-sudo systemctl enable --now snapd.apparmor
-sudo ln -s /var/lib/snapd/snap /snap
-sudo snap install authy
+# ? Snap » Authy
+# sudo pacman -S snapd libpamac-snap-plugin -y
+# sudo systemctl enable --now snapd.socket
+# sudo systemctl enable --now snapd.apparmor
+# sudo ln -s /var/lib/snapd/snap /snap
+# sudo snap install authy
 
 # ? Flatpak » Spotify - PulseEffects - Anydesk - MongoDB - VLC - WhatsApp - Whaler - qBittorrent
 # yay -S extra/flatpak && flatpak install spotify

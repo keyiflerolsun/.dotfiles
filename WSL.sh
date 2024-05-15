@@ -50,12 +50,12 @@ sudo systemctl enable docker.service
 sudo usermod -aG docker $USER
 
 # keyif
-rm -rf ~/.zshrc && wget https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/.zshrc
+rm -rf ~/.zshrc && wget https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/.dots/.zshrc
 echo "KekikAkademi" > /etc/hostname
 sudo apt install screenfetch -y
 sudo apt install neofetch -y
 sudo apt install tmux -y
-wget https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/.tmux.conf
+wget https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/.dots/.tmux.conf
 sudo apt install jq -y
 sudo apt install ffmpeg -y
 sudo chsh -s $(which zsh) && zsh

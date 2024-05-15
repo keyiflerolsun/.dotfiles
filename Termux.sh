@@ -38,9 +38,9 @@ git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 
 # keyiflerolsun
-rm -rf ~/.zshrc && wget https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/.zshrc
+rm -rf ~/.zshrc && wget https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/.dots/.zshrc
 apt install screenfetch tmux -y
-wget https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/.tmux.conf
+wget https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/.dots/.tmux.conf
 apt install jq ffmpeg -y
 git config --global user.email "keyiflerolsun@gmail.com"
 git config --global user.name "keyiflerolsun"
