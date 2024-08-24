@@ -24,10 +24,10 @@ sudo timedatectl set-timezone Europe/Istanbul
 # ulimit -n 4096
 
 # ? Python
-sudo pip3 install --upgrade pip
-sudo pip3 install -U setuptools wheel
-sudo pip3 install -U yt-dlp vizex Kekik SelSik thefuck
-sudo pip3 install -U bpython imgdupes imgcat
+sudo pip3 install --break-system-packages --upgrade pip
+sudo pip3 install --break-system-packages -U setuptools wheel
+sudo pip3 install --break-system-packages -U yt-dlp vizex Kekik SelSik thefuck
+sudo pip3 install --break-system-packages -U bpython imgdupes imgcat
 
 # ? ZSH
 sudo apt install zsh -y
