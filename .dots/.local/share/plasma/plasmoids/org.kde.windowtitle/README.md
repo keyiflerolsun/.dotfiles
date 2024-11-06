@@ -1,30 +1,50 @@
 # Window Title Applet
+A Plasma 6 port of the [Window Title Applet](https://github.com/psifidotos/applet-window-title/) for Latte Dock by the legendary [Psifidotos](https://github.com/psifidotos).
+> ### Requires Plasma 6
+## Mouse Gestures
+- <b>Scroll Wheel</b> : Cycle through tasks
+- <b>Double Click</b> : Maximize / Unmaximize
+- <b>Middle Button Click</b> : Close active task
+## Extra Features (Added over the original applet)
 
-This is a Plasma 5 applet that shows the current window title and icon in your panels. This plasmoid is coming from [Latte land](https://phabricator.kde.org/source/latte-dock/repository/master/) but it can also support Plasma panels.
+- [x] Show only on maximize
+- [x] Placeholder icon
+- [ ] Drag to move window
 
-<p align="center">
-<img src="https://i.imgur.com/Zdjshmt.png" width="580"><br/>
-<i>Window Title left to Plasma 5 global menu</i>
+## Images
+<div align="center">
+<p>
+
+![Screenshot_20240309_030116](https://github.com/dhruv8sh/plasma6-window-title-applet/assets/67322047/3be393cf-616a-4eb5-ad25-aa47f4ceb250)<br/>
+<i>Plasmoid with Firefox web browser open</i>
+<br/><br/>
 </p>
 
-<p align="center">
-<img src="https://imgur.com/ZOlnDvv.png" width="580"><br/>
+<p>
+
+![Screenshot_20240309_030208](https://github.com/dhruv8sh/plasma6-window-title-applet/assets/67322047/52c59b33-b278-469c-9111-9ba0a0b2ae4f)<br/>
+<i>Example of placeholder text and icon</i>
+<br/><br/>
+</p>
+
+<p>
+
+![Screenshot_20240309_025532](https://github.com/dhruv8sh/plasma6-window-title-applet/assets/67322047/49a7fbe9-5e9f-4e75-8b05-83e0cd87f8ec)<br/>
 <i>Appearance Settings</i>
+
+<br/><br/>
 </p>
 
-<p align="center">
-<img src="https://imgur.com/Y2L7AZj.png" width="580"><br/>
-<i>Behavior Settings</i>
+<p>
+
+![Screenshot_20240309_025552](https://github.com/dhruv8sh/plasma6-window-title-applet/assets/67322047/dd3ced74-c8f5-44d3-9b3a-b886eef694e9)<br/>
+<i>Behavioral Settings</i>
+<br/><br/>
 </p>
 
-# Requires
+</div>
 
-- Plasma >= 5.8
-- KDeclarative
-- Kirigami2
+## Installation
+Either use "Add Widget functionality" or use ```kpackagetool5 -i ./``` when in the root directory of the applet
 
-# Install
-
-This is a QML applet and as such it can be easily installed from Plasma 5 Widgets Explorer or alternative you can execute `plasmapkg2 -i .` in the root directory of the applet.
-
-
+or install it from the AUR [plasma6-applets-window-title](https://aur.archlinux.org/packages/plasma6-applets-window-title).

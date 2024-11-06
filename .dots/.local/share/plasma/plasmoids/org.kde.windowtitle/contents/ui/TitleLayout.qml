@@ -1,30 +1,12 @@
-/*
-*  Copyright 2018-2019 Michail Vourlakos <mvourlakos@gmail.com>
-*
-*  This file is part of applet-window-title
-*
-*  Latte-Dock is free software; you can redistribute it and/or
-*  modify it under the terms of the GNU General Public License as
-*  published by the Free Software Foundation; either version 2 of
-*  the License, or (at your option) any later version.
-*
-*  Latte-Dock is distributed in the hope that it will be useful,
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*  GNU General Public License for more details.
-*
-*  You should have received a copy of the GNU General Public License
-*  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 
-import QtQuick 2.7
-import QtQml.Models 2.2
-import QtQuick.Layouts 1.1
-import QtQuick.Controls 1.4
-
-import org.kde.plasma.plasmoid 2.0
-import org.kde.plasma.core 2.0 as PlasmaCore
-import org.kde.plasma.components 2.0 as PlasmaComponents
+import QtQuick
+import QtQml.Models
+import QtQuick.Layouts
+import QtQuick.Controls
+import org.kde.plasma.plasmoid
+import org.kde.plasma.core as PlasmaCore
+import org.kde.plasma.components as PlasmaComponents
+import org.kde.kirigami as Kirigami
 
 GridLayout{
     id: titleLayout
@@ -82,17 +64,20 @@ GridLayout{
                                   root.thickness : iconItem.iconSize
         Layout.maximumHeight: Layout.minimumHeight
 
-        visible: plasmoid.configuration.showIcon
+        visible: plasmoid.configuration.showIcon && (existsWindowActive || Plasmoid.configuration.placeHolderIcon !== "")
 
-        PlasmaCore.IconItem{
+        Kirigami.Icon{
             id: iconItem
             anchors.fill: parent
             anchors.topMargin: plasmoid.formFactor === PlasmaCore.Types.Horizontal ? thickMargin : 0
             anchors.bottomMargin: plasmoid.formFactor === PlasmaCore.Types.Horizontal ? thickMargin : 0
             anchors.leftMargin: plasmoid.formFactor === PlasmaCore.Types.Vertical ? thickMargin : 0
             anchors.rightMargin: plasmoid.formFactor === PlasmaCore.Types.Vertical ? thickMargin : 0
-            roundToIconSize: !root.isInLatte
-            source: existsWindowActive ? activeTaskItem.icon : fullActivityInfo.icon
+            source: {
+                if( existsWindowActive ) return activeTaskItem.icon;
+                else if( Plasmoid.configuration.useActivityIcon ) return fullActivityInfo.icon;
+                else return Plasmoid.configuration.placeHolderIcon;
+            }
 
 
             readonly property int thickMargin: plasmoid.configuration.iconFillThickness ?
@@ -113,7 +98,7 @@ GridLayout{
         Layout.preferredHeight: Layout.minimumHeight
         Layout.maximumHeight: Layout.minimumHeight
 
-        visible: mainIcon.visible && plasmoid.configuration.style !== 4 /*NoText*/
+        visible: mainIcon.visible && (firstTxt.visible || lastTxt.visible) && plasmoid.configuration.style !== 4 /*NoText*/
     }
 
     Item{
@@ -164,6 +149,8 @@ GridLayout{
                     return -90;
                 } else if (plasmoid.location === PlasmaCore.Types.RightEdge) {
                     return 90;
+                } else {
+                    return 0;
                 }
             }
 
@@ -174,7 +161,7 @@ GridLayout{
                 verticalAlignment: Text.AlignVCenter
 
                 text: existsWindowActive ? root.firstTitleText : root.fallBackText
-                color: enforceLattePalette ? latteBridge.palette.textColor : theme.textColor
+                color: PlasmaCore.Theme.textColor
                 font.capitalization: plasmoid.configuration.capitalFont ? Font.Capitalize : Font.MixedCase
                 font.bold: plasmoid.configuration.boldFont
                 font.italic: plasmoid.configuration.italicFont
@@ -200,13 +187,7 @@ GridLayout{
                     return Text.ElideNone;
                 }
 
-                visible: {
-                    if (!isUsedForMetrics && showsTitleText && exceedsApplicationText) {
-                        return false;
-                    }
-
-                    return true;
-                }
+                visible: text !== "" && !(!isUsedForMetrics && showsTitleText && exceedsApplicationText)
             }
 
             Label{

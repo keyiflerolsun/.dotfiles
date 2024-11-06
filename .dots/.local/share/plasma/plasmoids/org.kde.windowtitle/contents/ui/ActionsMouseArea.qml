@@ -1,46 +1,26 @@
-/*
-*  Copyright 2020 Michail Vourlakos <mvourlakos@gmail.com>
-*
-*  This file is part of applet-window-title
-*
-*  Latte-Dock is free software; you can redistribute it and/or
-*  modify it under the terms of the GNU General Public License as
-*  published by the Free Software Foundation; either version 2 of
-*  the License, or (at your option) any later version.
-*
-*  Latte-Dock is distributed in the hope that it will be useful,
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*  GNU General Public License for more details.
-*
-*  You should have received a copy of the GNU General Public License
-*  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-import QtQuick 2.7
-
-import org.kde.plasma.plasmoid 2.0
+import QtQuick
+import org.kde.plasma.core
+import org.kde.plasma.plasmoid
 
 MouseArea {
     id: actionsArea
-    acceptedButtons: Qt.LeftButton | Qt.MidButton
+    acceptedButtons: Qt.LeftButton | Qt.MiddleButton
 
     property bool wheelIsBlocked: false
 
-    onClicked: {
-        if (existsWindowActive && mouse.button === Qt.MidButton) {
+    onClicked: function(event){
+        if (existsWindowActive && event.button === Qt.MiddleButton) {
             windowInfoLoader.item.requestClose();
         }
     }
 
-    onDoubleClicked: {
-        if (existsWindowActive && mouse.button === Qt.LeftButton) {
+    onDoubleClicked: function(){
+        if (existsWindowActive)
             windowInfoLoader.item.toggleMaximized();
-        }
     }
 
-    onWheel: {
-        if (wheelIsBlocked || !plasmoid.configuration.actionScrollMinimize) {
+    onWheel: function(wheel) {
+         if (wheelIsBlocked || !plasmoid.configuration.actionScrollMinimize) {
             return;
         }
 

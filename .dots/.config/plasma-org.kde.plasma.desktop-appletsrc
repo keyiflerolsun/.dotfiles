@@ -5,26 +5,6 @@ wheel:Vertical;NoModifier=org.kde.switchdesktop
 [ActionPlugins][1]
 RightButton;NoModifier=org.kde.contextmenu
 
-[Containments][1]
-ItemGeometries-1920x1080=
-ItemGeometriesHorizontal=
-activityId=6e9b61bc-c51a-46a8-9217-14483fce7b55
-formfactor=0
-immutability=1
-lastScreen=0
-location=0
-plugin=org.kde.plasma.folder
-wallpaperplugin=org.kde.image
-
-[Containments][1][General]
-ToolBoxButtonState=topcenter
-ToolBoxButtonX=342
-ToolBoxButtonY=58
-
-[Containments][1][Wallpaper][org.kde.image][General]
-Image=/home/keyiflerolsun/Resimler/Astronot.png
-SlidePaths=/home/keyiflerolsun/.local/share/wallpapers/,/usr/share/wallpapers/
-
 [Containments][10]
 activityId=
 formfactor=2
@@ -136,31 +116,10 @@ DialogHeight=540
 DialogWidth=720
 
 [Containments][10][General]
-extraItems=org.kde.plasma.notifications,org.kde.plasma.devicenotifier,org.kde.kdeconnect,org.kde.plasma.volume,org.kde.plasma.keyboardindicator,org.kde.plasma.clipboard,org.kde.kscreen,org.kde.plasma.printmanager,org.kde.plasma.battery,org.kde.plasma.networkmanagement,org.kde.plasma.manage-inputmethod,org.kde.plasma.keyboardlayout,org.kde.plasma.mediacontroller,org.kde.plasma.bluetooth,org.kde.plasma.brightness,org.kde.plasma.cameraindicator,chrome_status_icon_1
+extraItems=org.kde.plasma.notifications,org.kde.plasma.devicenotifier,org.kde.kdeconnect,org.kde.plasma.volume,org.kde.plasma.keyboardindicator,org.kde.plasma.clipboard,org.kde.kscreen,org.kde.plasma.printmanager,org.kde.plasma.battery,org.kde.plasma.networkmanagement,org.kde.plasma.manage-inputmethod,org.kde.plasma.keyboardlayout,org.kde.plasma.mediacontroller,org.kde.plasma.bluetooth,org.kde.plasma.brightness,org.kde.plasma.cameraindicator
 hiddenItems=Yakuake,org.kde.plasma.brightness,chrome_status_icon_1
 knownItems=org.kde.plasma.notifications,org.kde.plasma.devicenotifier,org.kde.kdeconnect,org.kde.plasma.volume,org.kde.plasma.keyboardindicator,org.kde.plasma.clipboard,org.kde.kscreen,org.kde.plasma.printmanager,org.kde.plasma.battery,org.kde.plasma.networkmanagement,org.kde.plasma.manage-inputmethod,org.kde.plasma.keyboardlayout,org.kde.plasma.mediacontroller,org.kde.plasma.bluetooth,org.kde.plasma.brightness,org.kde.plasma.cameraindicator
 shownItems=Optimus Manager Qt
-
-[Containments][2]
-ItemGeometries-1600x900=
-ItemGeometries-1920x1080=
-ItemGeometriesHorizontal=
-activityId=6e9b61bc-c51a-46a8-9217-14483fce7b55
-formfactor=0
-immutability=1
-lastScreen=1
-location=0
-plugin=org.kde.plasma.folder
-wallpaperplugin=org.kde.image
-
-[Containments][2][General]
-ToolBoxButtonState=topcenter
-ToolBoxButtonX=182
-ToolBoxButtonY=58
-
-[Containments][2][Wallpaper][org.kde.image][General]
-Image=/home/keyiflerolsun/Resimler/Astronot.png
-SlidePaths=/home/keyiflerolsun/.local/share/wallpapers/,/usr/share/wallpapers/
 
 [Containments][29]
 activityId=
@@ -281,6 +240,11 @@ plugin=org.kde.plasma.appmenu
 immutability=1
 plugin=org.kde.windowtitle
 
+[Containments][3][Applets][32][Configuration]
+PreloadWeight=60
+popupHeight=432
+popupWidth=432
+
 [Containments][3][Applets][32][Configuration][ConfigDialog]
 DialogHeight=540
 DialogWidth=720
@@ -294,6 +258,11 @@ placeHolder=keyiflerolsun
 [Containments][3][Applets][33]
 immutability=1
 plugin=org.kde.netspeedWidget
+
+[Containments][3][Applets][33][Configuration]
+PreloadWeight=60
+popupHeight=432
+popupWidth=432
 
 [Containments][3][Applets][33][Configuration][ConfigDialog]
 DialogHeight=540
@@ -326,7 +295,7 @@ systemFavorites=suspend\\,hibernate\\,reboot\\,shutdown
 global=Alt+F1
 
 [Containments][3][Applets][4][Shortcuts]
-global=Alt+F1
+global=
 
 [Containments][3][Applets][6]
 immutability=1
@@ -532,6 +501,31 @@ plugin=org.kde.plasma.minimizeall
 
 [Containments][56][General]
 AppletOrder=58;59;57;67;66;64;71;72
+
+[Containments][74]
+ItemGeometries-1920x1080=
+ItemGeometriesHorizontal=
+activityId=2fc84552-98d4-47ee-9ae3-646316d2d04e
+formfactor=0
+immutability=1
+lastScreen=0
+location=0
+plugin=org.kde.plasma.folder
+wallpaperplugin=org.kde.image
+
+[Containments][74][General]
+arrangement=1
+
+[Containments][75]
+ItemGeometries-1600x900=
+ItemGeometriesHorizontal=
+activityId=2fc84552-98d4-47ee-9ae3-646316d2d04e
+formfactor=0
+immutability=1
+lastScreen=1
+location=0
+plugin=org.kde.plasma.folder
+wallpaperplugin=org.kde.image
 
 [Containments29Appletsts][5][Configuration][General]
 groupedTaskVisualization=1

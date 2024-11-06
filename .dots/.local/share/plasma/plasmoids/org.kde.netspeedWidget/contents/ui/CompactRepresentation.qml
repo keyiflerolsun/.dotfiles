@@ -14,9 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http: //www.gnu.org/licenses/>.
  */
-import QtQuick 2.5
-import QtQuick.Layouts 1.1
-import org.kde.plasma.core 2.0 as PlasmaCore
+import QtQuick
+import QtQuick.Layouts
+import org.kde.plasma.core as PlasmaCore
+import org.kde.plasma.plasma5support as Plasma5Support
+import org.kde.kirigami as Kirigami
 
 Item {
     anchors.fill: parent
@@ -52,7 +54,7 @@ Item {
         switch (speedLayout) {
             case 'rows': return false
             case 'columns': return true
-            default: return height / 2 * fontSizeScale < theme.smallestFont.pixelSize && plasmoid.formFactor != PlasmaCore.Types.Vertical
+            default: return height / 2 * fontSizeScale < Kirigami.Theme.smallFont.pixelSize && plasmoid.formFactor != PlasmaCore.Types.Vertical
         }
     }
 
@@ -99,7 +101,7 @@ Item {
         } else if (plasmoid.formFactor === PlasmaCore.Types.Horizontal) {
             return 0
         } else {
-            return Math.ceil(theme.smallestFont.pixelSize / fontSizeScale)
+            return Math.ceil(Kirigami.Theme.smallFont.pixelSize / fontSizeScale)
         }
     }
 
@@ -158,7 +160,7 @@ Item {
         font.pixelSize: 64
     }
 
-    PlasmaCore.DataSource {
+    Plasma5Support.DataSource {
         id: appsSource
         engine: 'apps'
         connectedSources: launchApplication
@@ -191,7 +193,7 @@ Item {
         renderType: Text.NativeRendering
 
         text: showSeparately ? (swapDownUp ? '↑' : '↓') : '↓↑'
-        color: theme.textColor
+        color: Kirigami.Theme.textColor
         visible: showIcons
     }
 
@@ -209,7 +211,7 @@ Item {
         font.pixelSize: height * fontHeightRatio * fontSizeScale
         renderType: Text.NativeRendering
 
-        text: speedText(showSeparately ? (swapDownUp ? upSpeed : downSpeed) : downSpeed + upSpeed)
+        text: speedText(showSeparately ? (swapDownUp ? upSpeed : downSpeed) : downSpeed + upSpeed, showLowSpeeds)
         color: speedColor(showSeparately ? (swapDownUp ? upSpeed : downSpeed) : downSpeed + upSpeed)
     }
 
@@ -227,7 +229,7 @@ Item {
         renderType: Text.NativeRendering
 
         text: speedUnit(showSeparately ? (swapDownUp ? upSpeed : downSpeed) : downSpeed + upSpeed)
-        color: theme.textColor
+        color: Kirigami.Theme.textColor
         visible: showUnits
     }
 
@@ -245,7 +247,7 @@ Item {
         renderType: Text.NativeRendering
 
         text: swapDownUp ? '↓' : '↑'
-        color: theme.textColor
+        color: Kirigami.Theme.textColor
         visible: showSeparately && showIcons
     }
 
@@ -263,7 +265,7 @@ Item {
         font.pixelSize: height * fontHeightRatio * fontSizeScale
         renderType: Text.NativeRendering
 
-        text: speedText(swapDownUp ? downSpeed : upSpeed)
+        text: speedText(swapDownUp ? downSpeed : upSpeed, showLowSpeeds)
         color: speedColor(swapDownUp ? downSpeed : upSpeed)
         visible: showSeparately
     }
@@ -282,7 +284,7 @@ Item {
         renderType: Text.NativeRendering
 
         text: speedUnit(swapDownUp ? downSpeed : upSpeed)
-        color: theme.textColor
+        color: Kirigami.Theme.textColor
         visible: showSeparately && showUnits
     }
 
@@ -297,59 +299,65 @@ Item {
         }
     }
 
-    function speedText(value) {
+    function speedText(value, showLowSpeeds) {
         if (speedUnits === 'bits') {
             value *= 8 * 1.024
-            if (value >= 1000000) {
-                value /= 1000000
+            if (value >= 1000 * 1000 * 1000) {
+                value /= 1000 * 1000 * 1000
+            }
+            else if (value >= 1000 * 1000) {
+                value /= 1000 * 1000
             }
             else if (value >= 1000) {
                 value /= 1000
             }
-            else if (value < 1) {
-                value *= 1000
+            else if (!showLowSpeeds) {
+                value = 0
             }
         } else {
-            if (value >= 1048576) {
-                value /= 1048576
+            if (value >= 1000 * 1024 * 1024) {
+                value /= 1024 * 1024 * 1024
             }
-            else if (value >= 1024) {
+            else if (value >= 1000 * 1024) {
+                value /= 1024 * 1024
+            }
+            else if (value >= 1000) {
                 value /= 1024
             }
-            else if (value < 1) {
-                value *= 1024
+            else if (!showLowSpeeds) {
+                value = 0
             }
         }
-        return value.toFixed(1)
+        return (Math.round(value * 10) / 10).toFixed(1)
     }
 
     function speedColor(value) {
         if (!customColors) {
-            return theme.textColor
+            return Kirigami.Theme.textColor
         }
 
         if (speedUnits === 'bits') {
             value *= 8 * 1.024
-            if (value >= 1000000) {
+            if (value >= 1000 * 1000 * 1000) {
                 return gigabyteColor
             }
-            else if (value >= 1000) {
+            else if (value >= 1000 * 1000) {
                 return megabyteColor
             }
-            else if (value >= 1) {
+            else if (value >= 1000) {
                 return kilobyteColor
             }
             else {
                 return byteColor
             }
         } else {
-            if (value >= 1048576) {
+            if (value >= 1000 * 1024 * 1024) {
                 return gigabyteColor
             }
-            else if (value >= 1024) {
+            else if (value >= 1000 * 1024) {
                 return megabyteColor
             }
-            else if (value >= 1) {
+            else if (value >= 1000) {
                 return kilobyteColor
             }
             else {
@@ -361,26 +369,26 @@ Item {
     function speedUnit(value) {
         if (speedUnits === 'bits') {
             value *= 8 * 1.024
-            if (value >= 1000000) {
+            if (value >= 1000 * 1000 * 1000) {
                 return shortUnits ? 'g' : 'Gb/s'
             }
-            else if (value >= 1000) {
+            else if (value >= 1000 * 1000) {
                 return shortUnits ? 'm' : 'Mb/s'
             }
-            else if (value >= 1) {
+            else if (value >= 1000) {
                 return shortUnits ? 'k' : 'Kb/s'
             }
             else {
                 return shortUnits ? 'b' : 'b/s'
             }
         } else {
-            if (value >= 1048576) {
+            if (value >= 1000 * 1024 * 1024) {
                 return shortUnits ? 'G' : 'GiB/s'
             }
-            else if (value >= 1024) {
+            else if (value >= 1000 * 1024) {
                 return shortUnits ? 'M' : 'MiB/s'
             }
-            else if (value >= 1) {
+            else if (value >= 1000) {
                 return shortUnits ? 'K' : 'KiB/s'
             }
             else {
@@ -391,21 +399,21 @@ Item {
 
     function totalText(value) {
         var unit
-        if (value >= 1048576) {
-            value /= 1048576
+        if (value >= 1024 * 1024 * 1024) {
+            value /= 1024 * 1024 * 1024
             unit = 'GiB'
+        }
+        else if (value >= 1024 * 1024) {
+            value /= 1024 * 1024
+            unit = 'MiB'
         }
         else if (value >= 1024) {
             value /= 1024
-            unit = 'MiB'
-        }
-        else if (value >= 1) {
             unit = 'KiB'
         }
         else {
-            value *= 1024
             unit = 'B'
         }
-        return value.toFixed(1) + ' ' + unit
+        return (Math.round(value * 10) / 10).toFixed(1) + ' ' + unit
     }
 }

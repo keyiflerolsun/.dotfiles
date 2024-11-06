@@ -1,26 +1,8 @@
-/*
-*  Copyright 2019 Michail Vourlakos <mvourlakos@gmail.com>
-*
-*  This file is part of applet-window-title
-*
-*  Latte-Dock is free software; you can redistribute it and/or
-*  modify it under the terms of the GNU General Public License as
-*  published by the Free Software Foundation; either version 2 of
-*  the License, or (at your option) any later version.
-*
-*  Latte-Dock is distributed in the hope that it will be useful,
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*  GNU General Public License for more details.
-*
-*  You should have received a copy of the GNU General Public License
-*  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 
-import QtQuick 2.7
-import QtQml.Models 2.2
+import QtQuick
+import QtQml.Models
 
-import org.kde.taskmanager 0.1 as TaskManager
+import org.kde.taskmanager as TaskManager
 
 Item {
     id: plasmaTasksItem
@@ -31,7 +13,7 @@ Item {
         id: tasksModel
         sortMode: TaskManager.TasksModel.SortVirtualDesktop
         groupMode: TaskManager.TasksModel.GroupDisabled
-        screenGeometry: plasmoid.screenGeometry
+        screenGeometry: root.screenGeometry
         activity: activityInfo.currentActivity
         virtualDesktop: virtualDesktopInfo.currentDesktop
 
@@ -39,7 +21,6 @@ Item {
         filterByVirtualDesktop: true
         filterByActivity: true
     }
-
     Item{
         id: taskList
         Repeater{
@@ -112,8 +93,17 @@ Item {
 
                 onIsActiveChanged: {
                     if (isActive) {
-                        plasmaTasksItem.activeTaskItem = task;
+                        if(plasmoid.configuration.showOnlyOnMaximize && !task.isMaximized)
+                            plasmaTasksItem.activeTaskItem = null;
+                        else
+                            plasmaTasksItem.activeTaskItem = task;
+
                     }
+                }
+
+                onIsMaximizedChanged: {
+                    if(plasmoid.configuration.showOnlyOnMaximize && isActive)
+                        plasmaTasksItem.activeTaskItem = task.isMaximized ? task : null;
                 }
 
                 onModelAppNameChanged: task.cleanupTitle()
@@ -231,7 +221,6 @@ Item {
                 break;
             }
         }
-
         tasksModel.requestActivate(target);
     }
 }
