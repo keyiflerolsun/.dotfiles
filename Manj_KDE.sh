@@ -32,6 +32,7 @@ yay -S visual-studio-code-bin --noconfirm
 
 # ? Python
 pip3 install --break-system-packages -U pip
+python3 -m pip config set global.break-system-packages true
 pip3 install --break-system-packages -U setuptools wheel
 pip3 install --break-system-packages -U yt-dlp vizex Kekik SelSik thefuck
 pip3 install --break-system-packages -U bpython imgdupes imgcat pyotp nvitop
