@@ -31,12 +31,12 @@ yay -S visual-studio-code-bin --noconfirm
 # yay -S mkinitcpio-firmware --noconfirm
 
 # ? Python
-pip3 install --break-system-packages -U pip
 python3 -m pip config set global.break-system-packages true
-pip3 install --break-system-packages -U setuptools wheel
-pip3 install --break-system-packages -U yt-dlp vizex Kekik SelSik thefuck
-pip3 install --break-system-packages -U bpython imgdupes imgcat pyotp nvitop
-pip3 install --break-system-packages -U frida frida-tools mitmproxy
+pip3 install -U pip
+pip3 install -U setuptools wheel
+pip3 install -U yt-dlp vizex Kekik SelSik thefuck
+pip3 install -U bpython imgdupes imgcat pyotp nvitop
+pip3 install -U frida frida-tools mitmproxy
 
 # ? Github
 git config --global user.email "keyiflerolsun@gmail.com"
@@ -91,8 +91,8 @@ sudo pacman -S pandoc texlive-latexextra texlive-fontsextra -y
 sudo wget -O /usr/share/pandoc/data/templates/pdf_theme.latex https://raw.githubusercontent.com/Wandmalfarbe/pandoc-latex-template/master/eisvogel.tex
 
 
-# ? Swap Alanı Oluştur (16M » 16GB)
-sudo dd if=/dev/zero of=/swap bs=1024 count=16M
+# ? Swap Alanı Oluştur (16GB)
+sudo sudo fallocate -l 16G /swap
 sudo chmod 600 /swap
 # sudo chown root:root /swap
 sudo mkswap /swap

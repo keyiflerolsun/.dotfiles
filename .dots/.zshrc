@@ -35,7 +35,7 @@ echo "\n"
 # * keyiflerolsun
 alias p="python3"
 alias c="clear"
-alias j='jsonVer(){ cat "$@" | jq; unset -f jsonVer; }; jsonVer'
+alias json='jsonVer(){ cat "$@" | jq; unset -f jsonVer; }; jsonVer'
 alias tw="sudo teamviewer --daemon enable && systemctl enable teamviewerd && systemctl start teamviewerd && teamviewer"
 alias yenile="killall -q latte-dock && killall -q plasmashell && rm ~/.cache/icon-cache.kcache && nohup kstart plasmashell >/dev/null 2>&1 && nohup latte-dock >/dev/null 2>&1 &"
 alias ara='ara(){ find / -type f -name "$@" -print 2>/dev/null }; ara'

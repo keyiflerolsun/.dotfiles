@@ -24,10 +24,11 @@ sudo timedatectl set-timezone Europe/Istanbul
 # ulimit -n 4096
 
 # ? Python
-sudo pip3 install --break-system-packages --upgrade pip
-sudo pip3 install --break-system-packages -U setuptools wheel
-sudo pip3 install --break-system-packages -U yt-dlp vizex Kekik SelSik thefuck
-sudo pip3 install --break-system-packages -U bpython imgdupes imgcat
+python3 -m pip config set global.break-system-packages true
+pip3 install -U pip
+pip3 install -U setuptools wheel
+pip3 install -U yt-dlp vizex Kekik SelSik thefuck
+pip3 install -U bpython imgdupes imgcat pyotp nvitop
 
 # ? ZSH
 sudo apt install zsh -y
@@ -54,8 +55,8 @@ sudo apt install build-essential -y
 sudo apt install libncurses5-dev -y
 sudo gem install colorls
 
-# ? Swap Alanı Oluştur (3M » 3GB)
-# sudo dd if=/dev/zero of=/swap bs=1024 count=3M
+# ? Swap Alanı Oluştur (4GB)
+# sudo fallocate -l 4G /swap
 # sudo chmod 600 /swap
 # sudo chown root:root /swap
 # sudo mkswap /swap
