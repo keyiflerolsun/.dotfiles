@@ -5,13 +5,11 @@ autocmd BufNewFile,BufRead *.c,*.h :Stdheader
 syntax on
 set number
 colorscheme habamax
+;set cindent
 
 set autoindent       " Bir önceki satırın girintisini kopyala
 set smarttab         " Tab ve geri tab davranışını akıllı yapar
 set noexpandtab      " Tab tuşu ile gerçek tab karakteri ekle (boşluk değil)
-
-set tabstop=4        " Bir tab ne kadar genişlikte boşluk temsil eder
-set shiftwidth=4     " otomatik girintilemede kullanılacak genişlik
 
 set nowrap           " Uzun satırların sarılmasını kapatır
 set noswapfile       " .swp dosyası oluşturma
