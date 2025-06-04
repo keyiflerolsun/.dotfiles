@@ -5,15 +5,15 @@ export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="agnoster"
 
 plugins=(
-        fzf
-        thefuck
-        web-search
-        command-not-found
-        fancy-ctrl-z
-        colored-man-pages
-        zsh-autosuggestions
-        zsh-syntax-highlighting
-        zsh-interactive-cd
+  fzf
+  thefuck
+  web-search
+  command-not-found
+  fancy-ctrl-z
+  colored-man-pages
+  zsh-autosuggestions
+  zsh-syntax-highlighting
+  zsh-interactive-cd
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -55,8 +55,13 @@ cat() {
 }
 
 # * fzf
-export FZF_CTRL_T_OPTS="--preview 'pygmentize -g -O style=monokai {}' --style=full --preview-window=right:74%"
+export FZF_ALT_C_OPTS="--walker-skip .git,node_modules,target --preview 'colorls --tree --sd --gs {} | head -100' --style=full --preview-window=right:74%"
+export FZF_CTRL_T_OPTS="--walker-skip .git,node_modules,target --preview 'pygmentize -g -O style=monokai {}' --style=full --preview-window=right:74%"
 export FZF_CTRL_T_COMMAND='find . -type f -not -path "*/\.git/*"'
+
+# * C
+alias valgrind="colorgrind --leak-check=full --show-leak-kinds=all $@"
+alias cc="cc -Wall -Wextra -Werror -std=c11 -pedantic -g -fsanitize=address,undefined $@"
 
 # * 42
 USER="osancak"
