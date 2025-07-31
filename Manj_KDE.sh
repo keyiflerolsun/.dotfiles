@@ -84,7 +84,7 @@ sudo systemctl enable sshd.service
 sudo systemctl start sshd.service
 
 # ? Docker
-sudo pacman -S docker docker-compose -y
+sudo pacman -S docker docker-compose docker-buildx -y
 sudo systemctl start docker.service
 sudo systemctl enable docker.service
 sudo usermod -aG docker $USER
