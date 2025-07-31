@@ -64,9 +64,9 @@ alias valgrind="colorgrind --leak-check=full --show-leak-kinds=all $@"
 alias cc="cc -Wall -Wextra -Werror -std=c11 -pedantic -g -fsanitize=address,undefined $@"
 
 # * 42
-USER="osancak"
+#USER="osancak"
 MAIL="osancak@student.42istanbul.com.tr"
-export USER
+$export USER
 export MAIL
 
 # * keyiflerolsun
@@ -87,7 +87,13 @@ alias ipv4="nmcli device show | awk '/IP4.ADDRESS/{print \$2}' | cut -d'/' -f1 |
 alias ipv6="nmcli device show | awk '/IP6.ADDRESS/{print \$2}' | cut -d'/' -f1 | head -1"
 
 # ! Thinkpad TrackPoint
-# xinput --set-prop "Elan TrackPoint" "libinput Accel Speed" -0.7
+# * TrackPoint hızını ayarla
+#xinput --set-prop "Elan TrackPoint" "libinput Accel Speed" -0.7
+# * Scroll özelliğini aktif et
+#xinput --set-prop "Elan TrackPoint" "libinput Scroll Method Enabled" 0 0 1
+# * Orta tuşu (button 2) scroll için ata
+#xinput --set-prop "Elan TrackPoint" "libinput Button Scrolling Button" 2
+
 
 # * youtube-dl
 alias yt='yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio" --merge-output-format mp4'
