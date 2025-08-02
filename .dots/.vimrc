@@ -5,7 +5,7 @@ autocmd BufNewFile,BufRead *.c,*.h :Stdheader
 syntax on
 set number
 colorscheme habamax
-;set cindent
+"set cindent
 
 set autoindent       " Bir önceki satırın girintisini kopyala
 set smarttab         " Tab ve geri tab davranışını akıllı yapar

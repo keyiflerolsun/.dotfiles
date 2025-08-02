@@ -63,12 +63,6 @@ export FZF_CTRL_T_COMMAND='find . -type f -not -path "*/\.git/*"'
 alias valgrind="colorgrind --leak-check=full --show-leak-kinds=all $@"
 alias cc="cc -Wall -Wextra -Werror -std=c11 -pedantic -g -fsanitize=address,undefined $@"
 
-# * 42
-#USER="osancak"
-MAIL="osancak@student.42istanbul.com.tr"
-$export USER
-export MAIL
-
 # * keyiflerolsun
 alias p="python3"
 alias c="clear"
