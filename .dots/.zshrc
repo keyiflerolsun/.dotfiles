@@ -49,15 +49,33 @@ path+=(
 
 # * pygments
 cat() {
-  for file in "$@"; do
-    pygmentize -g -O style=monokai "$file"
-  done
+  if [[ -t 0 && "$#" -gt 0 ]]; then
+    # Argümanlar varsa ve stdin terminalden geliyorsa, sadece dosya isimleri var mı kontrol et
+    for arg in "$@"; do
+      if [[ "$arg" == -* ]]; then
+        # Seçenek varsa, orijinal cat çalışsın
+        command cat "$@"
+        return
+      fi
+    done
+    # Sadece dosya isimleri varsa pygmentize ile göster
+    for file in "$@"; do
+      pygmentize -g -O style=monokai "$file"
+    done
+  else
+    # stdin terminal değilse veya hiç argüman yoksa, orijinal cat çalışsın
+    command cat "$@"
+  fi
 }
 
 # * fzf
 export FZF_ALT_C_OPTS="--walker-skip .git,node_modules,target --preview 'colorls --tree --sd --gs {} | head -100' --style=full --preview-window=right:74%"
-export FZF_CTRL_T_OPTS="--walker-skip .git,node_modules,target --preview 'pygmentize -g -O style=monokai {}' --style=full --preview-window=right:74%"
-export FZF_CTRL_T_COMMAND='find . -type f -not -path "*/\.git/*"'
+export FZF_CTRL_T_OPTS="--preview 'pygmentize -g -O style=monokai {}' --style=full --preview-window=right:74%"
+export FZF_CTRL_T_COMMAND='find . -type f \
+						-not -path "*/.git/*" \
+						-not -path "*/.vscode/*" \
+						-not -name "*.o*" \
+						-not -name "*.a"'
 
 # * C
 alias valgrind="colorgrind --leak-check=full --show-leak-kinds=all $@"
