@@ -33,43 +33,6 @@ sudo pacman -S --needed --noconfirm \
 if ! gem list -i colorls >/dev/null 2>&1; then
   gem install colorls
 fi
-
-
-# ? PAM dosyalarına fprintd satırını başlığın ALTINA ekle
-PAM_LINE="auth       sufficient                  pam_fprintd.so  max_tries=3  timeout=10"
-PAM_FILES=(
-  /etc/pam.d/sddm
-  /etc/pam.d/system-local-login
-  /etc/pam.d/kscreenlocker
-  /etc/pam.d/kde
-  /etc/pam.d/sudo
-  /etc/pam.d/login
-  /etc/pam.d/polkit-1
-)
-
-for file in "${PAM_FILES[@]}"; do
-  if [ -f "$file" ]; then
-    if grep -Fxq "$PAM_LINE" "$file"; then
-      echo "✓ $file zaten ayarlı"
-      continue
-    fi
-
-    echo "→ $file için yedek alınıyor"
-    sudo cp -a "$file" "${file}.bak.$(date +%s)"
-
-    if head -n1 "$file" | grep -q '^#%PAM-1.0'; then
-      # Başlık var: hemen ALTINA ekle
-      sudo sed -i "1a $PAM_LINE" "$file"
-    else
-      # Başlık yok: en üste ekle
-      sudo sed -i "1i $PAM_LINE" "$file"
-    fi
-
-    echo "✔ $file güncellendi"
-  else
-    echo "⚠️ $file bulunamadı, atlanıyor"
-  fi
-done
 # -------------------------------------------------------------------------------
 
 

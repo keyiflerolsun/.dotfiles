@@ -5,6 +5,32 @@ wheel:Vertical;NoModifier=org.kde.switchdesktop
 [ActionPlugins][1]
 RightButton;NoModifier=org.kde.contextmenu
 
+[Containments][1]
+ItemGeometries-1707x1067=
+ItemGeometries-1920x1200=
+ItemGeometriesHorizontal=
+activityId=0951118e-f765-4b15-8aef-579c93af4888
+formfactor=0
+immutability=1
+lastScreen=0
+location=0
+plugin=org.kde.plasma.folder
+wallpaperplugin=org.kde.image
+
+[Containments][1][ConfigDialog]
+DialogHeight=540
+DialogWidth=720
+
+[Containments][1][General]
+arrangement=1
+iconSize=2
+positions={"1707x1067":[],"1920x1200":[]}
+
+[Containments][1][Wallpaper][org.kde.image][General]
+Image=/home/keyiflerolsun/Resimler/Astronot.png
+PreviewImage=/home/keyiflerolsun/Resimler/Astronot.png
+SlidePaths=/home/keyiflerolsun/.local/share/wallpapers/,/usr/share/wallpapers/
+
 [Containments][10]
 activityId=
 formfactor=2
@@ -21,18 +47,21 @@ immutability=1
 plugin=org.kde.plasma.notifications
 
 [Containments][10][Applets][11][Configuration]
-PreloadWeight=70
+PreloadWeight=85
 
 [Containments][10][Applets][12]
 immutability=1
 plugin=org.kde.plasma.devicenotifier
 
 [Containments][10][Applets][12][Configuration]
-PreloadWeight=65
+PreloadWeight=75
 
 [Containments][10][Applets][13]
 immutability=1
 plugin=org.kde.kdeconnect
+
+[Containments][10][Applets][13][Configuration]
+PreloadWeight=55
 
 [Containments][10][Applets][14]
 immutability=1
@@ -53,11 +82,14 @@ immutability=1
 plugin=org.kde.plasma.clipboard
 
 [Containments][10][Applets][16][Configuration]
-PreloadWeight=75
+PreloadWeight=100
 
 [Containments][10][Applets][17]
 immutability=1
 plugin=org.kde.kscreen
+
+[Containments][10][Applets][17][Configuration]
+PreloadWeight=55
 
 [Containments][10][Applets][18]
 immutability=1
@@ -78,6 +110,9 @@ PreloadWeight=100
 immutability=1
 plugin=org.kde.plasma.cameraindicator
 
+[Containments][10][Applets][21][Configuration]
+PreloadWeight=60
+
 [Containments][10][Applets][22]
 immutability=1
 plugin=org.kde.plasma.nightcolorcontrol
@@ -86,30 +121,39 @@ plugin=org.kde.plasma.nightcolorcontrol
 immutability=1
 plugin=org.kde.plasma.battery
 
+[Containments][10][Applets][23][Configuration]
+PreloadWeight=90
+
+[Containments][10][Applets][23][Configuration][General]
+showPercentage=true
+
 [Containments][10][Applets][24]
 immutability=1
 plugin=org.kde.plasma.bluetooth
 
 [Containments][10][Applets][24][Configuration]
-PreloadWeight=85
+PreloadWeight=100
 
 [Containments][10][Applets][25]
 immutability=1
 plugin=org.kde.plasma.networkmanagement
 
 [Containments][10][Applets][25][Configuration]
-PreloadWeight=55
+PreloadWeight=75
 
 [Containments][10][Applets][26]
 immutability=1
 plugin=org.kde.plasma.brightness
+
+[Containments][10][Applets][26][Configuration]
+PreloadWeight=65
 
 [Containments][10][Applets][37]
 immutability=1
 plugin=org.kde.plasma.mediacontroller
 
 [Containments][10][Applets][37][Configuration]
-PreloadWeight=55
+PreloadWeight=0
 
 [Containments][10][ConfigDialog]
 DialogHeight=540
@@ -140,8 +184,9 @@ DialogWidth=720
 
 [Containments][29][Applets][36][Configuration][General]
 groupedTaskVisualization=3
-launchers=preferred://filemanager,applications:org.kde.konsole.desktop,applications:systemsettings.desktop,applications:org.manjaro.pamac.manager.desktop,preferred://browser,applications:code.desktop,applications:org.telegram.desktop.desktop,file:///var/lib/flatpak/exports/share/applications/io.github.mimbrero.WhatsAppDesktop.desktop,file:///var/lib/flatpak/exports/share/applications/com.spotify.Client.desktop,applications:org.remmina.Remmina.desktop,file:///var/lib/flatpak/exports/share/applications/com.anydesk.Anydesk.desktop,file:///usr/share/applications/com.teamviewer.TeamViewer.desktop,file:///var/lib/flatpak/exports/share/applications/com.mongodb.Compass.desktop,file:///var/lib/flatpak/exports/share/applications/com.github.sdv43.whaler.desktop,file:///var/lib/flatpak/exports/share/applications/org.qbittorrent.qBittorrent.desktop
+launchers=preferred://filemanager,applications:org.kde.konsole.desktop,applications:systemsettings.desktop,applications:org.manjaro.pamac.manager.desktop,applications:brave-browser.desktop,applications:code.desktop,applications:org.telegram.desktop.desktop,file:///var/lib/flatpak/exports/share/applications/com.spotify.Client.desktop,applications:org.remmina.Remmina.desktop,file:///var/lib/flatpak/exports/share/applications/com.anydesk.Anydesk.desktop,file:///usr/share/applications/com.teamviewer.TeamViewer.desktop,file:///var/lib/flatpak/exports/share/applications/com.mongodb.Compass.desktop,file:///var/lib/flatpak/exports/share/applications/com.github.sdv43.whaler.desktop,file:///var/lib/flatpak/exports/share/applications/org.qbittorrent.qBittorrent.desktop
 showOnlyCurrentScreen=true
+showToolTips=false
 
 [Containments][29][Applets][46]
 immutability=1
@@ -200,7 +245,7 @@ DialogHeight=540
 DialogWidth=720
 
 [Containments][29][Applets][70][Configuration][General]
-positions={"1920x1080":[]}
+positions={"1707x1067":[],"1920x1080":[],"1920x1200":[]}
 url=file:///home/keyiflerolsun/İndirilenler
 
 [Containments][29][General]
@@ -270,7 +315,6 @@ DialogWidth=720
 
 [Containments][3][Applets][33][Configuration][General]
 fontSize=140
-speedUnits=bits
 
 [Containments][3][Applets][4]
 immutability=1
@@ -278,7 +322,7 @@ plugin=org.kde.plasma.kickoff
 
 [Containments][3][Applets][4][Configuration]
 PreloadWeight=100
-popupHeight=514
+popupHeight=516
 popupWidth=665
 
 [Containments][3][Applets][4][Configuration][ConfigDialog]
@@ -346,186 +390,6 @@ SystrayContainmentId=10
 
 [Containments][3][General]
 AppletOrder=4;8;61;32;60;31;30;33;6;9;21;68;69
-
-[Containments][44]
-activityId=
-formfactor=2
-immutability=1
-lastScreen=1
-location=4
-plugin=org.kde.panel
-wallpaperplugin=org.kde.image
-
-[Containments][44][Applets][45]
-immutability=1
-plugin=org.kde.plasma.icontasks
-
-[Containments][44][Applets][45][Configuration][ConfigDialog]
-DialogHeight=540
-DialogWidth=720
-
-[Containments][44][Applets][45][Configuration][General]
-groupedTaskVisualization=3
-launchers=preferred://filemanager,applications:org.kde.konsole.desktop,applications:systemsettings.desktop,applications:org.manjaro.pamac.manager.desktop,preferred://browser,applications:code.desktop,applications:org.telegram.desktop.desktop,file:///var/lib/flatpak/exports/share/applications/io.github.mimbrero.WhatsAppDesktop.desktop,file:///var/lib/flatpak/exports/share/applications/com.spotify.Client.desktop,applications:org.remmina.Remmina.desktop,file:///var/lib/flatpak/exports/share/applications/com.anydesk.Anydesk.desktop,file:///usr/share/applications/com.teamviewer.TeamViewer.desktop,file:///var/lib/flatpak/exports/share/applications/com.mongodb.Compass.desktop,file:///var/lib/flatpak/exports/share/applications/com.github.sdv43.whaler.desktop,file:///var/lib/flatpak/exports/share/applications/org.qbittorrent.qBittorrent.desktop
-showOnlyCurrentScreen=true
-
-[Containments][44][Applets][52]
-immutability=1
-plugin=org.kde.plasma.marginsseparator
-
-[Containments][44][Applets][53]
-immutability=1
-plugin=org.kde.plasma.minimizeall
-
-[Containments][44][Applets][55]
-immutability=1
-plugin=org.kde.plasma.trash
-
-[Containments][44][Applets][63]
-immutability=1
-plugin=org.kde.plasma.panelspacer
-
-[Containments][44][Applets][63][Configuration][General]
-expanding=false
-length=100
-
-[Containments][44][Applets][73]
-activityId=
-formfactor=0
-immutability=1
-lastScreen=-1
-location=0
-plugin=org.kde.plasma.folder
-wallpaperplugin=
-
-[Containments][44][Applets][73][Configuration]
-PreloadWeight=55
-activityId=
-formfactor=0
-immutability=1
-lastScreen=-1
-location=0
-plugin=org.kde.plasma.folder
-popupHeight=388
-popupWidth=288
-wallpaperplugin=
-
-[Containments][44][Applets][73][Configuration][ConfigDialog]
-DialogHeight=540
-DialogWidth=720
-
-[Containments][44][Applets][73][Configuration][General]
-positions={"1600x900":[]}
-url=file:///home/keyiflerolsun/İndirilenler
-
-[Containments][44][General]
-AppletOrder=45;63;52;73;53;55
-
-[Containments][56]
-activityId=
-formfactor=2
-immutability=1
-lastScreen=1
-location=3
-plugin=org.kde.panel
-wallpaperplugin=org.kde.image
-
-[Containments][56][Applets][57]
-immutability=1
-plugin=org.kde.plasma.appmenu
-
-[Containments][56][Applets][58]
-immutability=1
-plugin=org.kde.windowtitle
-
-[Containments][56][Applets][58][Configuration][ConfigDialog]
-DialogHeight=540
-DialogWidth=720
-
-[Containments][56][Applets][58][Configuration][General]
-capitalFont=false
-filterActivityInfo=false
-filterByScreen=true
-placeHolder=keyiflerolsun
-
-[Containments][56][Applets][59]
-immutability=1
-plugin=org.kde.plasma.panelspacer
-
-[Containments][56][Applets][59][Configuration][General]
-expanding=false
-length=20
-
-[Containments][56][Applets][64]
-immutability=1
-plugin=org.kde.plasma.digitalclock
-
-[Containments][56][Applets][64][Configuration][Appearance]
-customDateFormat=d MMMM dddd
-dateFormat=custom
-
-[Containments][56][Applets][64][Configuration][ConfigDialog]
-DialogHeight=540
-DialogWidth=720
-
-[Containments][56][Applets][66]
-immutability=1
-plugin=org.kde.netspeedWidget
-
-[Containments][56][Applets][66][Configuration][ConfigDialog]
-DialogHeight=540
-DialogWidth=720
-
-[Containments][56][Applets][66][Configuration][General]
-fontSize=140
-speedUnits=bits
-
-[Containments][56][Applets][67]
-immutability=1
-plugin=org.kde.plasma.panelspacer
-
-[Containments][56][Applets][71]
-immutability=1
-plugin=org.kde.plasma.lock_logout
-
-[Containments][56][Applets][71][Configuration][ConfigDialog]
-DialogHeight=540
-DialogWidth=720
-
-[Containments][56][Applets][71][Configuration][General]
-show_requestShutDown=false
-
-[Containments][56][Applets][72]
-immutability=1
-plugin=org.kde.plasma.minimizeall
-
-[Containments][56][General]
-AppletOrder=58;59;57;67;66;64;71;72
-
-[Containments][74]
-ItemGeometries-1920x1080=
-ItemGeometriesHorizontal=
-activityId=2fc84552-98d4-47ee-9ae3-646316d2d04e
-formfactor=0
-immutability=1
-lastScreen=0
-location=0
-plugin=org.kde.plasma.folder
-wallpaperplugin=org.kde.image
-
-[Containments][74][General]
-arrangement=1
-
-[Containments][75]
-ItemGeometries-1600x900=
-ItemGeometriesHorizontal=
-activityId=2fc84552-98d4-47ee-9ae3-646316d2d04e
-formfactor=0
-immutability=1
-lastScreen=1
-location=0
-plugin=org.kde.plasma.folder
-wallpaperplugin=org.kde.image
 
 [Containments29Appletsts][5][Configuration][General]
 groupedTaskVisualization=1
