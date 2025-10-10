@@ -1,0 +1,8 @@
+#%PAM-1.0
+# Parmak izi desteği (modül yoksa hata vermesin diye başında - var)
+-auth     sufficient  pam_fprintd.so max_tries=3 timeout=10
+
+auth      include     system-auth
+account   include     system-auth
+password  include     system-auth
+session   include     system-auth

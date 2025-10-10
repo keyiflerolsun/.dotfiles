@@ -1,0 +1,14 @@
+#%PAM-1.0
+auth    sufficient  pam_rootok.so
+#auth   sufficient  pam_wheel.so trust use_uid
+#auth   required    pam_wheel.so use_uid
+
+# Parmak izi ile su -l
+auth    sufficient  pam_fprintd.so max_tries=3 timeout=10
+
+# Parmak izi yoksa/başarısızsa parola ile devam
+auth    include     system-auth
+
+account include     system-auth
+session include     system-auth
+password include    system-auth
