@@ -1,0 +1,6 @@
+#%PAM-1.0
+
+auth		sufficient	pam_rootok.so
+-auth		sufficient	pam_fprintd.so max_tries=3 timeout=10
+account		required	pam_permit.so
+password	include		system-auth

@@ -1,11 +1,8 @@
 #%PAM-1.0
 
-# Parmak izi ile hızlı giriş
-auth       sufficient   pam_fprintd.so max_tries=3 timeout=10
-
+-auth      sufficient   pam_fprintd.so max_tries=3 timeout=10
 auth       requisite    pam_nologin.so
 auth       include      system-local-login
-
 account    include      system-local-login
 session    include      system-local-login
 password   include      system-local-login
