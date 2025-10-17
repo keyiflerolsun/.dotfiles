@@ -1,6 +1,6 @@
 #%PAM-1.0
 
--auth           sufficient      pam_fprintd.so max_tries=3 timeout=10
+-auth           optional        pam_fprintd.so max_tries=3 timeout=10
 auth            include         system-login
 auth            optional        pam_kwallet5.so
 account         include         system-login

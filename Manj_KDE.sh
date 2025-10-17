@@ -17,7 +17,7 @@ fi
 sudo pacman -Syu --noconfirm
 sudo pacman -S --needed --noconfirm \
   yay vim pacui libxcrypt-compat webkit2gtk xdg-desktop-portal gnome-disk-utility kwallet-pam \
-  fastfetch micro thefuck jq bat sweeper inxi lshw sshpass ufw \
+  fastfetch micro thefuck jq bat sweeper inxi lshw sshpass ufw mission-center \
   telegram-desktop brave-browser chromium smplayer filezilla kvantum \
   remmina libvncserver freerdp \
   python-pip python-flask python-numpy python-pandas scrapy opencv tk \
