@@ -5,12 +5,14 @@
 # * Pacman Paketleri -------------------------------------------------------------
 sudo pacman -Syu --noconfirm
 sudo pacman -S --needed --noconfirm \
-  fastfetch micro thefuck jq bat sshpass ufw mission-center htop unzip lazydocker tmux sstp-client \
+  fastfetch micro thefuck jq bat sshpass ufw mission-center webkitgtk-6.0 htop unzip lazydocker tmux sstp-client \
   brave-bin telegram-desktop chromium kvantum remmina libvncserver freerdp spotify-launcher \
-  python-pip clang cmake make gcc gcc-libs rust cargo npm ruby jdk-openjdk gdb valgrind \
+  python-pip clang cmake make gcc gcc-libs rust cargo npm ruby jdk-openjdk gdb glibc-debug valgrind \
   android-tools mongodb-tools-bin mongodb-compass freedownloadmanager \
   ffmpeg leptonica tesseract tesseract-data-eng \
-  fprintd libfprint
+  fprintd libfprint \
+  yay yakuake \
+  libreoffice-still okular
 
 # * Ruby: colorls kurulumu -------------------------------------------------------
 if ! gem list -i colorls >/dev/null 2>&1; then
@@ -79,13 +81,3 @@ docker run -d --name=portainer --restart=always -p 8000:8000 -p 9000:9000 -v /va
 # ? Markdown » PDF
 sudo pacman -S pandoc texlive-latexextra texlive-fontsextra -y
 sudo wget -O /usr/share/pandoc/data/templates/pdf_theme.latex https://raw.githubusercontent.com/Wandmalfarbe/pandoc-latex-template/master/eisvogel.tex
-
-
-# ? Swap Alanı Oluştur (16GB)
-sudo sudo fallocate -l 16G /swap
-sudo chmod 600 /swap
-# sudo chown root:root /swap
-sudo mkswap /swap
-sudo sh -c "echo '/swap swap swap defaults 0 0' >> /etc/fstab"
-sudo swapon /swap
-free -h
