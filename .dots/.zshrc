@@ -34,8 +34,8 @@ echo "\n"
 # * Path Ayarları
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/.cargo/bin:$PATH"
-export PATH=~/Android/Sdk/emulator:$PATH
-export PATH=~/Android/Sdk/cmdline-tools/latest/bin:$PATH
+export PATH="$HOME/Android/Sdk/emulator:$PATH"
+export PATH="$HOME/Android/Sdk/cmdline-tools/latest/bin:$PATH"
 
 # * colorls
 source $(dirname $(gem which colorls))/tab_complete.sh
