@@ -6,7 +6,7 @@
 sudo pacman -Syu --noconfirm
 sudo pacman -S --needed --noconfirm \
   fastfetch micro thefuck jq bat sshpass ufw mission-center webkitgtk-6.0 htop unzip lazydocker tmux sstp-client yay yakuake \
-  tlp acpi_call fprintd libfprint tpm2-tss intel-media-driver fwupd iio-sensor-proxy \
+  fprintd libfprint tpm2-tss intel-media-driver fwupd \
   brave-bin telegram-desktop chromium remmina libvncserver freerdp spotify-launcher freedownloadmanager \
   kvantum libreoffice-still okular \
   python-pip clang cmake make gcc gcc-libs rust cargo npm ruby jdk-openjdk gdb glibc-debug valgrind \
@@ -20,9 +20,13 @@ if ! gem list -i colorls >/dev/null 2>&1; then
 fi
 # -------------------------------------------------------------------------------
 
+# ? Acpi Call
+yay -S --needed --noconfirm acpi_call-dkms
+sudo modprobe acpi_call || true
+echo "acpi_call" | sudo tee /etc/modules-load.d/acpi_call.conf >/dev/null
 
 # ? Batarya Optimizasyonu
-sudo pacman -S tlp tlp-rdw -y
+sudo pacman -S --needed --noconfirm tlp tlp-rdw -y
 systemctl enable tlp.service
 sudo tlp-stat -s
 
