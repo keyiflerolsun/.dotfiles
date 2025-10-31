@@ -5,14 +5,14 @@
 # * Pacman Paketleri -------------------------------------------------------------
 sudo pacman -Syu --noconfirm
 sudo pacman -S --needed --noconfirm \
-  fastfetch micro thefuck jq bat sshpass ufw mission-center webkitgtk-6.0 htop unzip lazydocker tmux sstp-client \
-  brave-bin telegram-desktop chromium kvantum remmina libvncserver freerdp spotify-launcher \
+  fastfetch micro thefuck jq bat sshpass ufw mission-center webkitgtk-6.0 htop unzip lazydocker tmux sstp-client yay yakuake \
+  tlp acpi_call fprintd libfprint tpm2-tss intel-media-driver fwupd iio-sensor-proxy \
+  brave-bin telegram-desktop chromium remmina libvncserver freerdp spotify-launcher freedownloadmanager \
+  kvantum libreoffice-still okular \
   python-pip clang cmake make gcc gcc-libs rust cargo npm ruby jdk-openjdk gdb glibc-debug valgrind \
-  android-tools mongodb-tools-bin mongodb-compass freedownloadmanager \
-  ffmpeg leptonica tesseract tesseract-data-eng \
-  fprintd libfprint \
-  yay yakuake \
-  libreoffice-still okular
+  android-tools \
+  mongodb-tools-bin mongodb-compass \
+  ffmpeg leptonica tesseract tesseract-data-eng
 
 # * Ruby: colorls kurulumu -------------------------------------------------------
 if ! gem list -i colorls >/dev/null 2>&1; then
@@ -79,5 +79,12 @@ docker run -d --name=portainer --restart=always -p 8000:8000 -p 9000:9000 -v /va
 
 
 # ? Markdown » PDF
-sudo pacman -S pandoc texlive-latexextra texlive-fontsextra -y
+sudo pacman -S --needed --noconfirm \
+  pandoc \
+  texlive-bin texlive-core \
+  texlive-latex texlive-latexextra \
+  texlive-fontsextra \
+  texlive-fontsrecommended \
+  texlive-xetex
+sudo mktexlsr && sudo fmtutil-sys --all
 sudo wget -O /usr/share/pandoc/data/templates/pdf_theme.latex https://raw.githubusercontent.com/Wandmalfarbe/pandoc-latex-template/master/eisvogel.tex
