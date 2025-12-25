@@ -25,7 +25,7 @@ sudo timedatectl set-timezone Europe/Istanbul
 
 # ? Genel
 sudo apt-get install -yq wget git zsh htop
-sudo apt-get install -yq python3-dev python3-pip python3-scrapy python3-pandas
+sudo apt-get install -yq python3-dev python3-pip
 sudo apt-get install -yq screenfetch neofetch
 sudo apt-get install -yq jq ffmpeg
 # echo "KekikAkademi" > /etc/hostname
