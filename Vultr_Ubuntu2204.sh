@@ -1,13 +1,15 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # Bu araç @keyiflerolsun tarafından | @KekikAkademi için yazılmıştır.
 
 # Ubuntu Kurulum Paketi
 
-set -e
+set -euo pipefail
 export DEBIAN_FRONTEND=noninteractive
 
 # needrestart prompt'unu kapat
-sudo sed -i "s/#\$nrconf{restart} = 'i';/\$nrconf{restart} = 'a';/" /etc/needrestart/needrestart.conf || true
+if [[ -f /etc/needrestart/needrestart.conf ]]; then
+  sudo sed -i "s/#\$nrconf{restart} = 'i';/\$nrconf{restart} = 'a';/" /etc/needrestart/needrestart.conf || true
+fi
 
 # Sunucu Güncellemesi (tamamen sessiz)
 sudo apt-get update -yq && sudo apt-get -yq upgrade && sudo apt-get -yq dist-upgrade
@@ -153,7 +155,7 @@ EOF
 # * unattended-upgrades (Otomatik Güvenlik Güncellemeleri)
 sudo apt-get install -yq unattended-upgrades apt-listchanges update-notifier-common
 
-# Helper: Anahtar varsa güncelle, yoksa ekle (idempotent)
+# ---------- unattended-upgrades helpers ----------
 set_unattended_option() {
   local file="$1" key="$2" value="$3"
   sudo touch "$file"
@@ -164,7 +166,23 @@ set_unattended_option() {
   fi
 }
 
+dedupe_unattended_autoreboot() {
+  local file="$1"
+  sudo awk '
+    BEGIN{seen=0}
+    /^Unattended-Upgrade::Automatic-Reboot[[:space:]]+"/{
+      if(seen==0){seen=1; print; next}
+      next
+    }
+    {print}
+  ' "$file" | sudo tee "${file}.tmp" >/dev/null
+  sudo mv "${file}.tmp" "$file"
+}
+
 UNATTENDED_CONF="/etc/apt/apt.conf.d/50unattended-upgrades"
+if [[ ! -f "$UNATTENDED_CONF" ]]; then
+  sudo cp /usr/share/unattended-upgrades/50unattended-upgrades "$UNATTENDED_CONF"
+fi
 
 # Kullanılmayan kernel/bağımlılıkları kaldır
 set_unattended_option "$UNATTENDED_CONF" "Unattended-Upgrade::Remove-Unused-Kernel-Packages" "true"
@@ -179,12 +197,17 @@ set_unattended_option "$UNATTENDED_CONF" "Unattended-Upgrade::Automatic-Reboot-T
 # Loglama
 set_unattended_option "$UNATTENDED_CONF" "Unattended-Upgrade::SyslogEnable" "true"
 
-# Security origin satırlarını yorumdan çıkar (dosyada varsa)
+# Geliştirme sürümlerini yoksay
+set_unattended_option "$UNATTENDED_CONF" "Unattended-Upgrade::DevRelease" "false"
+
+# security origin satırını yorumdan çıkar
 sudo sed -i -E 's|^[[:space:]]*//[[:space:]]*("\$\{distro_id\}:\$\{distro_codename\}-security";)|\1|' "$UNATTENDED_CONF"
 
-# 20auto-upgrades yapılandırması
-AUTO_UPGRADES="/etc/apt/apt.conf.d/20auto-upgrades"
-sudo tee "$AUTO_UPGRADES" >/dev/null <<'EOF'
+# “Automatic-Reboot” tekrarlarını temizle
+dedupe_unattended_autoreboot "$UNATTENDED_CONF"
+
+# 20auto-upgrades her çalıştırmada aynı içerik
+sudo tee /etc/apt/apt.conf.d/20auto-upgrades >/dev/null <<'EOF'
 APT::Periodic::Update-Package-Lists "1";
 APT::Periodic::Unattended-Upgrade "1";
 APT::Periodic::Download-Upgradeable-Packages "1";
@@ -198,16 +221,14 @@ sudo systemctl restart unattended-upgrades
 # * Fail2Ban Kurulumu
 sudo apt-get install -yq fail2ban
 
+# ---------- fail2ban helpers ----------
 # jail.local yoksa oluştur (idempotent)
-if [ ! -f /etc/fail2ban/jail.local ]; then
+if [[ ! -f /etc/fail2ban/jail.local ]]; then
   sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
 fi
 
-# Helper: [DEFAULT] bloğunda anahtar varsa değiştir, yoksa ekle (idempotent)
 set_f2b_default() {
-  local key="$1"
-  local value="$2"
-  local file="/etc/fail2ban/jail.local"
+  local key="$1" value="$2" file="/etc/fail2ban/jail.local"
 
   if sudo sed -n '/^\[DEFAULT\]/,/^\[/p' "$file" | grep -qE "^[[:space:]]*${key}[[:space:]]*="; then
     sudo sed -i "/^\[DEFAULT\]/,/^\[/ s|^[[:space:]]*${key}[[:space:]]*=.*|${key} = ${value}|" "$file"
@@ -216,11 +237,8 @@ set_f2b_default() {
   fi
 }
 
-# Helper: [sshd] bloğunda anahtar varsa değiştir, yoksa ekle; sshd bloğu yoksa oluştur (idempotent)
 set_f2b_sshd() {
-  local key="$1"
-  local value="$2"
-  local file="/etc/fail2ban/jail.local"
+  local key="$1" value="$2" file="/etc/fail2ban/jail.local"
 
   # sshd bloğu yoksa ekle
   if ! sudo grep -qE '^[[:space:]]*\[sshd\][[:space:]]*$' "$file"; then
@@ -245,12 +263,22 @@ set_f2b_default bantime 1h
 set_f2b_default findtime 10m
 set_f2b_default maxretry 3
 
+# nftables action varsa onu kullan
+if ls /etc/fail2ban/action.d 2>/dev/null | grep -q '^nftables-multiport\.conf$'; then
+  set_f2b_default banaction nftables-multiport
+fi
+
 # [sshd] enable
 set_f2b_sshd enabled true
 
 # Fail2Ban servisini etkinleştir
 sudo systemctl enable fail2ban
 sudo systemctl restart fail2ban
+
+# ? Son Kontroller
+sudo unattended-upgrades --dry-run --debug | tail -n 20 || true
+sudo fail2ban-client status || true
+sudo fail2ban-client status sshd || true
 
 # * keyiflerolsun
 git config --global user.email "keyiflerolsun@gmail.com"
