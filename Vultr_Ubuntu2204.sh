@@ -166,17 +166,14 @@ set_unattended_option() {
   fi
 }
 
-dedupe_unattended_autoreboot() {
+# Bu anahtarların dosyada yorumlu/yorumsuz TÜM tekrarlarını temizler
+purge_unattended_keys() {
   local file="$1"
-  sudo awk '
-    BEGIN{seen=0}
-    /^Unattended-Upgrade::Automatic-Reboot[[:space:]]+"/{
-      if(seen==0){seen=1; print; next}
-      next
-    }
-    {print}
-  ' "$file" | sudo tee "${file}.tmp" >/dev/null
-  sudo mv "${file}.tmp" "$file"
+  sudo sed -i -E '
+    /^[[:space:]]*\/\/[[:space:]]*Unattended-Upgrade::(Remove-Unused-Kernel-Packages|Remove-New-Unused-Dependencies|Remove-Unused-Dependencies|Automatic-Reboot|Automatic-Reboot-WithUsers|Automatic-Reboot-Time|SyslogEnable|DevRelease)\b/d
+    /^[[:space:]]*Unattended-Upgrade::(Remove-Unused-Kernel-Packages|Remove-New-Unused-Dependencies|Remove-Unused-Dependencies|Automatic-Reboot|Automatic-Reboot-WithUsers|Automatic-Reboot-Time|SyslogEnable|DevRelease)\b/d
+    /^[[:space:]]*\/\/[[:space:]]*when[[:space:]]+Unattended-Upgrade::Automatic-Reboot\b/d
+  ' "$file"
 }
 
 UNATTENDED_CONF="/etc/apt/apt.conf.d/50unattended-upgrades"
@@ -184,15 +181,18 @@ if [[ ! -f "$UNATTENDED_CONF" ]]; then
   sudo cp /usr/share/unattended-upgrades/50unattended-upgrades "$UNATTENDED_CONF"
 fi
 
+# Önce ilgili anahtarları tamamen temizle (tekrarları engeller)
+purge_unattended_keys "$UNATTENDED_CONF"
+
 # Kullanılmayan kernel/bağımlılıkları kaldır
 set_unattended_option "$UNATTENDED_CONF" "Unattended-Upgrade::Remove-Unused-Kernel-Packages" "true"
 set_unattended_option "$UNATTENDED_CONF" "Unattended-Upgrade::Remove-New-Unused-Dependencies" "true"
 set_unattended_option "$UNATTENDED_CONF" "Unattended-Upgrade::Remove-Unused-Dependencies" "true"
 
-# Otomatik reboot ayarları
-set_unattended_option "$UNATTENDED_CONF" "Unattended-Upgrade::Automatic-Reboot" "true"
+# Otomatik reboot KAPALI (prod safe)
+set_unattended_option "$UNATTENDED_CONF" "Unattended-Upgrade::Automatic-Reboot" "false"
 set_unattended_option "$UNATTENDED_CONF" "Unattended-Upgrade::Automatic-Reboot-WithUsers" "false"
-set_unattended_option "$UNATTENDED_CONF" "Unattended-Upgrade::Automatic-Reboot-Time" "04:00"
+# Automatic-Reboot-Time yazmıyoruz (reboot kapalıyken gereksiz)
 
 # Loglama
 set_unattended_option "$UNATTENDED_CONF" "Unattended-Upgrade::SyslogEnable" "true"
@@ -202,9 +202,6 @@ set_unattended_option "$UNATTENDED_CONF" "Unattended-Upgrade::DevRelease" "false
 
 # security origin satırını yorumdan çıkar
 sudo sed -i -E 's|^[[:space:]]*//[[:space:]]*("\$\{distro_id\}:\$\{distro_codename\}-security";)|\1|' "$UNATTENDED_CONF"
-
-# “Automatic-Reboot” tekrarlarını temizle
-dedupe_unattended_autoreboot "$UNATTENDED_CONF"
 
 # 20auto-upgrades her çalıştırmada aynı içerik
 sudo tee /etc/apt/apt.conf.d/20auto-upgrades >/dev/null <<'EOF'
