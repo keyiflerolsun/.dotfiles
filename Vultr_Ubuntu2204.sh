@@ -155,17 +155,13 @@ sudo apt-get install -yq unattended-upgrades apt-listchanges update-notifier-com
 
 # Helper: Anahtar varsa güncelle, yoksa ekle (idempotent)
 set_unattended_option() {
-    local file="$1"
-    local key="$2"
-    local value="$3"
-    
-    # Yorumlu veya yorumsuz satırı bul ve değiştir
-    if grep -qE "^//?\s*${key}" "$file" 2>/dev/null; then
-        sudo sed -i "s|^//\?\s*${key}.*|${key} \"${value}\";|" "$file"
-    else
-        # Satır yoksa dosya sonuna ekle
-        echo "${key} \"${value}\";" | sudo tee -a "$file" >/dev/null
-    fi
+  local file="$1" key="$2" value="$3"
+  sudo touch "$file"
+  if sudo grep -qE "^[[:space:]]*(//[[:space:]]*)?${key}[[:space:]]+" "$file"; then
+    sudo sed -i -E "s|^[[:space:]]*(//[[:space:]]*)?${key}[[:space:]]+.*|${key} \"${value}\";|g" "$file"
+  else
+    echo "${key} \"${value}\";" | sudo tee -a "$file" >/dev/null
+  fi
 }
 
 UNATTENDED_CONF="/etc/apt/apt.conf.d/50unattended-upgrades"
@@ -183,6 +179,9 @@ set_unattended_option "$UNATTENDED_CONF" "Unattended-Upgrade::Automatic-Reboot-T
 # Loglama
 set_unattended_option "$UNATTENDED_CONF" "Unattended-Upgrade::SyslogEnable" "true"
 
+# Security origin satırlarını yorumdan çıkar (dosyada varsa)
+sudo sed -i -E 's|^[[:space:]]*//[[:space:]]*("\$\{distro_id\}:\$\{distro_codename\}-security";)|\1|' "$UNATTENDED_CONF"
+
 # 20auto-upgrades yapılandırması
 AUTO_UPGRADES="/etc/apt/apt.conf.d/20auto-upgrades"
 sudo tee "$AUTO_UPGRADES" >/dev/null <<'EOF'
@@ -199,18 +198,57 @@ sudo systemctl restart unattended-upgrades
 # * Fail2Ban Kurulumu
 sudo apt-get install -yq fail2ban
 
-# Fail2Ban ana yapılandırması
-sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+# jail.local yoksa oluştur (idempotent)
+if [ ! -f /etc/fail2ban/jail.local ]; then
+  sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+fi
 
-# [DEFAULT] bölümündeki değerleri değiştir
-sudo sed -i '/^\[DEFAULT\]/,/^\[/ s/^bantime.*=.*/bantime = 1h/' /etc/fail2ban/jail.local
-sudo sed -i '/^\[DEFAULT\]/,/^\[/ s/^findtime.*=.*/findtime = 10m/' /etc/fail2ban/jail.local
-sudo sed -i '/^\[DEFAULT\]/,/^\[/ s/^maxretry.*=.*/maxretry = 3/' /etc/fail2ban/jail.local
+# Helper: [DEFAULT] bloğunda anahtar varsa değiştir, yoksa ekle (idempotent)
+set_f2b_default() {
+  local key="$1"
+  local value="$2"
+  local file="/etc/fail2ban/jail.local"
 
-# [sshd] bölümünde enabled = true yap
-sudo sed -i '/^\[sshd\]/,/^\[/ s/^enabled.*=.*/enabled = true/' /etc/fail2ban/jail.local
+  if sudo sed -n '/^\[DEFAULT\]/,/^\[/p' "$file" | grep -qE "^[[:space:]]*${key}[[:space:]]*="; then
+    sudo sed -i "/^\[DEFAULT\]/,/^\[/ s|^[[:space:]]*${key}[[:space:]]*=.*|${key} = ${value}|" "$file"
+  else
+    sudo sed -i "/^\[DEFAULT\]/ a ${key} = ${value}" "$file"
+  fi
+}
 
-# Fail2Ban servislerini etkinleştir ve başlat
+# Helper: [sshd] bloğunda anahtar varsa değiştir, yoksa ekle; sshd bloğu yoksa oluştur (idempotent)
+set_f2b_sshd() {
+  local key="$1"
+  local value="$2"
+  local file="/etc/fail2ban/jail.local"
+
+  # sshd bloğu yoksa ekle
+  if ! sudo grep -qE '^[[:space:]]*\[sshd\][[:space:]]*$' "$file"; then
+    sudo tee -a "$file" >/dev/null <<EOF
+
+[sshd]
+${key} = ${value}
+EOF
+    return
+  fi
+
+  # sshd bloğunda key var mı?
+  if sudo sed -n '/^\[sshd\]/,/^\[/p' "$file" | grep -qE "^[[:space:]]*${key}[[:space:]]*="; then
+    sudo sed -i "/^\[sshd\]/,/^\[/ s|^[[:space:]]*${key}[[:space:]]*=.*|${key} = ${value}|" "$file"
+  else
+    sudo sed -i "/^\[sshd\]/ a ${key} = ${value}" "$file"
+  fi
+}
+
+# [DEFAULT] değerleri
+set_f2b_default bantime 1h
+set_f2b_default findtime 10m
+set_f2b_default maxretry 3
+
+# [sshd] enable
+set_f2b_sshd enabled true
+
+# Fail2Ban servisini etkinleştir
 sudo systemctl enable fail2ban
 sudo systemctl restart fail2ban
 
