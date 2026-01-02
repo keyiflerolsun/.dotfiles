@@ -29,7 +29,7 @@ else
   if [[ -n "$CUR_EXIT" ]]; then
     exit 0
   fi
-  OUT=$(/usr/bin/tailscale up --exit-node="$EXIT_NODE" --exit-node-allow-lan-access --ssh 2>&1)
+  OUT=$(/usr/bin/tailscale up --ssh --exit-node="$EXIT_NODE" --exit-node-allow-lan-access 2>&1)
   RC=$?
   logger -t ts-exit "AWAY: exit node ON (conn=$CONN state=$STATE) rc=$RC out=$OUT"
 fi
