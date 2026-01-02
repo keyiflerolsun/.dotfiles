@@ -192,7 +192,6 @@ set_unattended_option "$UNATTENDED_CONF" "Unattended-Upgrade::Remove-Unused-Depe
 # Otomatik reboot KAPALI (prod safe)
 set_unattended_option "$UNATTENDED_CONF" "Unattended-Upgrade::Automatic-Reboot" "false"
 set_unattended_option "$UNATTENDED_CONF" "Unattended-Upgrade::Automatic-Reboot-WithUsers" "false"
-# Automatic-Reboot-Time yazmıyoruz (reboot kapalıyken gereksiz)
 
 # Loglama
 set_unattended_option "$UNATTENDED_CONF" "Unattended-Upgrade::SyslogEnable" "true"
