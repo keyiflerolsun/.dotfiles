@@ -1,0 +1,35 @@
+#!/bin/bash
+HOME_SSID="KeeneticNetwork"
+EXIT_NODE="webservisler"
+
+IFACE="$1"
+STATUS="$2"
+
+[ "$IFACE" = "wlan0" ] || exit 0
+
+case "$STATUS" in
+  up|dhcp4-change|connectivity-change) ;;
+  *) exit 0 ;;
+esac
+
+CONN=$(/usr/bin/nmcli -g GENERAL.CONNECTION dev show wlan0 2>/dev/null)
+STATE=$(/usr/bin/nmcli -g GENERAL.STATE dev show wlan0 2>/dev/null)
+CUR_EXIT=$(/usr/bin/tailscale debug prefs 2>/dev/null | sed -n 's/.*"ExitNodeID": "\(.*\)".*/\1/p')
+
+if [[ "$STATE" == 100* && "$CONN" == "$HOME_SSID" ]]; then
+  # Evde: exit kapalı olmalı
+  if [[ -z "$CUR_EXIT" ]]; then
+    exit 0
+  fi
+  OUT=$(/usr/bin/tailscale up --ssh --exit-node= --exit-node-allow-lan-access=false 2>&1)
+  RC=$?
+  logger -t ts-exit "HOME: exit node OFF ($CONN) rc=$RC out=$OUT"
+else
+  # Dışarıda: exit açık olmalı
+  if [[ -n "$CUR_EXIT" ]]; then
+    exit 0
+  fi
+  OUT=$(/usr/bin/tailscale up --exit-node="$EXIT_NODE" --exit-node-allow-lan-access --ssh 2>&1)
+  RC=$?
+  logger -t ts-exit "AWAY: exit node ON (conn=$CONN state=$STATE) rc=$RC out=$OUT"
+fi
