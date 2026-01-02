@@ -88,24 +88,20 @@ sudo usermod -aG docker "$DOCKER_USER" || true
 
 ## * Docker IPv6 -- https://medium.com/@skleeschulte/how-to-enable-ipv6-for-docker-containers-on-ubuntu-18-04-c68394a219a2
 cat >/etc/docker/daemon.json <<EOF
-
 {
   "log-driver": "json-file",
   "log-opts": { "max-size": "10m", "max-file": "2" },
   "ipv6": true,
-  "fixed-cidr-v6": "fd00::/64",
-  "experimental": true,
+  "fixed-cidr-v6": "fd00:dead:beef::/48",
   "ip6tables": true,
   "default-address-pools": [
-    { "base": "172.17.0.0/16", "size": 24 },
-    { "base": "192.168.0.0/16", "size": 24 },
-    { "base": "fd00::/64", "size": 64 }
+    { "base": "172.20.0.0/14", "size": 24 },
+    { "base": "fd00:dead:beef::/48", "size": 64 }
   ]
 }
-
 EOF
 
-# sudo systemctl restart docker
+sudo systemctl restart docker
 
 # sudo ip6tables -t nat -A POSTROUTING -s fd00::/80 ! -o docker0 -j MASQUERADE
 # sudo apt-get install -yq iptables-persistent
@@ -151,6 +147,72 @@ cat >>~/.zshrc <<EOF
 ulimit -n 32768
 
 EOF
+
+# ? Güvenlik Yapılandırmaları
+
+# * unattended-upgrades (Otomatik Güvenlik Güncellemeleri)
+sudo apt-get install -yq unattended-upgrades apt-listchanges update-notifier-common
+
+# Helper: Anahtar varsa güncelle, yoksa ekle (idempotent)
+set_unattended_option() {
+    local file="$1"
+    local key="$2"
+    local value="$3"
+    
+    # Yorumlu veya yorumsuz satırı bul ve değiştir
+    if grep -qE "^//?\s*${key}" "$file" 2>/dev/null; then
+        sudo sed -i "s|^//\?\s*${key}.*|${key} \"${value}\";|" "$file"
+    else
+        # Satır yoksa dosya sonuna ekle
+        echo "${key} \"${value}\";" | sudo tee -a "$file" >/dev/null
+    fi
+}
+
+UNATTENDED_CONF="/etc/apt/apt.conf.d/50unattended-upgrades"
+
+# Kullanılmayan kernel/bağımlılıkları kaldır
+set_unattended_option "$UNATTENDED_CONF" "Unattended-Upgrade::Remove-Unused-Kernel-Packages" "true"
+set_unattended_option "$UNATTENDED_CONF" "Unattended-Upgrade::Remove-New-Unused-Dependencies" "true"
+set_unattended_option "$UNATTENDED_CONF" "Unattended-Upgrade::Remove-Unused-Dependencies" "true"
+
+# Otomatik reboot ayarları
+set_unattended_option "$UNATTENDED_CONF" "Unattended-Upgrade::Automatic-Reboot" "true"
+set_unattended_option "$UNATTENDED_CONF" "Unattended-Upgrade::Automatic-Reboot-WithUsers" "false"
+set_unattended_option "$UNATTENDED_CONF" "Unattended-Upgrade::Automatic-Reboot-Time" "04:00"
+
+# Loglama
+set_unattended_option "$UNATTENDED_CONF" "Unattended-Upgrade::SyslogEnable" "true"
+
+# 20auto-upgrades yapılandırması
+AUTO_UPGRADES="/etc/apt/apt.conf.d/20auto-upgrades"
+sudo tee "$AUTO_UPGRADES" >/dev/null <<'EOF'
+APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Unattended-Upgrade "1";
+APT::Periodic::Download-Upgradeable-Packages "1";
+APT::Periodic::AutocleanInterval "7";
+EOF
+
+# unattended-upgrades servisini etkinleştir
+sudo systemctl enable unattended-upgrades
+sudo systemctl restart unattended-upgrades
+
+# * Fail2Ban Kurulumu
+sudo apt-get install -yq fail2ban
+
+# Fail2Ban ana yapılandırması
+sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+
+# [DEFAULT] bölümündeki değerleri değiştir
+sudo sed -i '/^\[DEFAULT\]/,/^\[/ s/^bantime.*=.*/bantime = 1h/' /etc/fail2ban/jail.local
+sudo sed -i '/^\[DEFAULT\]/,/^\[/ s/^findtime.*=.*/findtime = 10m/' /etc/fail2ban/jail.local
+sudo sed -i '/^\[DEFAULT\]/,/^\[/ s/^maxretry.*=.*/maxretry = 3/' /etc/fail2ban/jail.local
+
+# [sshd] bölümünde enabled = true yap
+sudo sed -i '/^\[sshd\]/,/^\[/ s/^enabled.*=.*/enabled = true/' /etc/fail2ban/jail.local
+
+# Fail2Ban servislerini etkinleştir ve başlat
+sudo systemctl enable fail2ban
+sudo systemctl restart fail2ban
 
 # * keyiflerolsun
 git config --global user.email "keyiflerolsun@gmail.com"
