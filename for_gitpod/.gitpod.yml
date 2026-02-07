@@ -1,67 +1,55 @@
 vscode:
   extensions:
+    # Jinja Template Support
+    - 000000.jinja2
+    - noxiz.jinja-snippets
+    - samuelcolvin.jinjahtml
+    - wholroyd.jinja
+    
+    # Code Quality & Formatting
     - aaron-bond.better-comments
-    - adpyke.codesnap
-    - af4jm.vscode-m3u
-    - AnbuselvanRocky.bootstrap5-vscode
-    - bitwisecook.tcl
-    - cstrap.python-snippets
-    - DavidAnson.vscode-markdownlint
-    - DEVSENSE.phptools-vscode
-    - DEVSENSE.profiler-php-vscode
-    - dracula-theme.theme-dracula
     - esbenp.prettier-vscode
-    - ex-codes.pine-script-syntax-highlighter
     - formulahendry.auto-close-tag
     - formulahendry.auto-rename-tag
+    
+    # Shell & Script Support
     - foxundermoon.shell-format
-    - GitHub.copilot
-    - GitHub.copilot-labs
-    - github.vscode-github-actions
-    - gitpod.gitpod-desktop
-    - Janne252.fontawesome-autocomplete
     - jeff-hykin.better-shellscript-syntax
-    - kejun.devtoys
-    - KevinRose.vsc-python-indent
-    - laktak.hjson
-    - magicstack.MagicPython
-    - mechatroner.rainbow-csv
-    - mintlify.document
-    - mongodb.mongodb-vscode
-    - ms-azuretools.vscode-docker
-    - MS-CEINTL.vscode-language-pack-tr
+    
+    # Git & Version Control
+    - eamodio.gitlens
+    
+    # Python Development
+    - ms-python.black-formatter
     - ms-python.isort
     - ms-python.python
     - ms-python.vscode-pylance
-    - ms-toolsai.jupyter-renderers
-    - ms-vscode-remote.remote-containers
+    
+    # C/C++ Development
+    - ms-vscode.cpptools
+    - ms-vscode.cpptools-extension-pack
+    
+    # Remote Development
     - ms-vscode-remote.remote-ssh
     - ms-vscode-remote.remote-ssh-edit
-    - ms-vscode-remote.remote-wsl
-    - ms-vscode-remote.vscode-remote-extensionpack
-    - ms-vscode.live-server
     - ms-vscode.remote-explorer
-    - ms-vscode.remote-server
-    - ms-vsliveshare.vsliveshare
-    - nico-castell.linux-desktop-file
-    - njpwerner.autodocstring
-    - njqdev.vscode-python-typehint
-    - NoahSyn10.pydoctestbtn
-    - NomicFoundation.hardhat-solidity
-    - noxiz.jinja-snippets
-    - Okteto.remote-kubernetes
-    - PKief.material-icon-theme
-    - pranaygp.vscode-css-peek
-    - rangav.vscode-thunder-client
-    - rifi2k.format-html-in-php
-    - ritwickdey.LiveServer
-    - samuelcolvin.jinjahtml
-    - SonarSource.sonarlint-vscode
-    - sourcery.sourcery
-    - TabNine.tabnine-vscode
-    - VisualStudioExptTeam.intellicode-api-usage-examples
-    - VisualStudioExptTeam.vscodeintellicode
-    - Vue.volar
-    - wholroyd.jinja
-    - wingrunr21.vscode-ruby
-    - zhuangtongfa.material-theme
+    
+    # AI & Productivity
+    - github.copilot-chat
+    - openai.chatgpt
+    
+    # Utilities
+    - dokca.42-ft-count-line
+    - irongeek.vscode-env
+    - kejun.devtoys
+    - mechatroner.rainbow-csv
+    - ms-vscode.live-server
+    - yzhang.markdown-all-in-one
+    
+    # Theme & Icons
+    - dracula-theme.theme-dracula
+    - pkief.material-icon-theme
+    - pkief.material-product-icons
+    
+    # Language Pack
+    - ms-ceintl.vscode-language-pack-tr
