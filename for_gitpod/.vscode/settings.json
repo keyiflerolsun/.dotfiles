@@ -1,33 +1,158 @@
 {
-    "terminal.integrated.defaultProfile.linux" : "zsh",
-    "terminal.integrated.defaultProfile.osx"   : "zsh",
-    "terminal.integrated.rendererType"         : "dom",
-    "terminal.integrated.fontFamily"           : "'JetBrainsMono Medium Nerd Font', 'MesloLGS NF', 'Hack Nerd Font', 'SourceCodePro+Powerline+Awesome Regular', 'Droid Sans Mono', 'monospace', 'Droid Sans Fallback'",
-    "terminal.integrated.fontSize"             : 16,
-    "terminal.integrated.lineHeight"           : 1,
-    "terminal.external.linuxExec"              : "truecolor",
+    // ============================================
+    // EDITOR AYARLARI
+    // ============================================
+    "editor.bracketPairColorization.enabled": true,
+    "editor.guides.bracketPairs": "active",
+    "editor.fontSize": 16,
+    "editor.fontFamily": "'JetBrainsMono Nerd Font', 'Droid Sans Mono', 'monospace', 'Droid Sans Fallback'",
+    "editor.largeFileOptimizations": false,
+    "editor.linkedEditing": true,
+    "editor.inlineSuggest.enabled": true,
+    "editor.unicodeHighlight.ambiguousCharacters": false,
+    "editor.unicodeHighlight.invisibleCharacters": false,
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": true,
+    "editor.cursorBlinking": "smooth",
+    "editor.cursorSmoothCaretAnimation": "on",
+    "editor.smoothScrolling": true,
+    "editor.suggestSelection": "first",
+    "editor.snippetSuggestions": "top",
+    "editor.renderWhitespace": "boundary",
+    "editor.minimap.enabled": true,
+    "editor.minimap.renderCharacters": false,
+    "editor.minimap.maxColumn": 120,
+    "editor.stickyScroll.enabled": true,
+    "editor.accessibilitySupport": "off",
+    "editor.quickSuggestions": {
+        "other": true,
+        "comments": false,
+        "strings": false
+    },
 
-    "editor.fontFamily"                           : "'JetBrainsMono Nerd Font', 'Droid Sans Mono', 'monospace', 'Droid Sans Fallback'",
-    "editor.fontSize"                             : 16,
-    "editor.bracketPairColorization.enabled"      : true,
-    "editor.guides.bracketPairs"                  : "active",
-    "editor.inlineSuggest.enabled"                : true,
-    "editor.linkedEditing"                        : true,
-    "editor.unicodeHighlight.ambiguousCharacters" : false,
-    "editor.unicodeHighlight.invisibleCharacters" : false,
-    "editor.largeFileOptimizations"               : false,
+    // ============================================
+    // TERMINAL AYARLARI
+    // ============================================
+    "terminal.integrated.defaultProfile.linux": "zsh",
+    "terminal.integrated.defaultProfile.osx": "zsh",
+    "terminal.integrated.fontFamily": "'JetBrainsMono Medium Nerd Font', 'MesloLGS NF', 'Hack Nerd Font', 'SourceCodePro+Powerline+Awesome Regular', 'Droid Sans Mono', 'monospace', 'Droid Sans Fallback'",
+    "terminal.integrated.fontSize": 16,
+    "terminal.integrated.lineHeight": 1,
+    // "terminal.integrated.letterSpacing": 2,
+    "terminal.integrated.rendererType": "dom",
+    "terminal.integrated.suggest.enabled": false,
+    "terminal.integrated.smoothScrolling": true,
+    "terminal.integrated.cursorBlinking": true,
+    "terminal.integrated.copyOnSelection": true,
+    "terminal.external.linuxExec": "truecolor",
 
-    "workbench.colorTheme"          : "Dracula",
-    "workbench.iconTheme"           : "material-icon-theme",
-    "workbench.productIconTheme"    : "material-product-icons",
-    "workbench.colorCustomizations" : {},
+    // ============================================
+    // WORKBENCH AYARLARI
+    // ============================================
+    "workbench.colorTheme": "Dracula Theme",
+    "workbench.iconTheme": "material-icon-theme",
+    "workbench.productIconTheme": "material-product-icons",
+    "workbench.secondarySideBar.defaultVisibility": "hidden",
+    "workbench.editor.enablePreview": false,
+    "workbench.editor.highlightModifiedTabs": true,
+    "workbench.startupEditor": "none",
+    "workbench.tree.indent": 8,
+    "workbench.list.smoothScrolling": true,
+    "workbench.editor.tabSizing": "shrink",
+    // "workbench.activityBar.location": "top",
 
-    "explorer.confirmDelete" : false,
+    // ============================================
+    // DİL SPESİFİK FORMATTER AYARLARI
+    // ============================================
+    "[json]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[jsonc]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[html]": {
+        "editor.defaultFormatter": "vscode.html-language-features"
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter"
+    },
+    "[css]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
 
-    "security.workspace.trust.untrustedFiles" : "open",
+    // ============================================
+    // PYTHON AYARLARI
+    // ============================================
+    "python.createEnvironment.trigger": "off",
+    "python.languageServer": "Pylance",
 
-    "git.autofetch"                     : true,
-    "git.openRepositoryInParentFolders" : "always",
+    // ============================================
+    // PRETTIER AYARLARI
+    // ============================================
+    "prettier.tabWidth": 4,
 
-    "diffEditor.experimental.showMoves" : true
+    // ============================================
+    // GIT AYARLARI
+    // ============================================
+    "git.autofetch": true,
+    "git.confirmSync": false,
+    "git.enableSmartCommit": true,
+    "git.decorations.enabled": true,
+    "git.suggestSmartCommit": false,
+
+    // ============================================
+    // DIFF EDITOR AYARLARI
+    // ============================================
+    "diffEditor.experimental.showMoves": true,
+    "diffEditor.hideUnchangedRegions.enabled": true,
+    "diffEditor.ignoreTrimWhitespace": false,
+
+    // ============================================
+    // FILES & EXPLORER AYARLARI
+    // ============================================
+    "explorer.confirmDelete": false,
+    "explorer.confirmDragAndDrop": false,
+    "explorer.compactFolders": false,
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "files.trimFinalNewlines": true,
+    "files.trimAutoWhitespace": true,
+    "files.eol": "\n",
+    "files.exclude": {
+        "**/.DS_Store": true,
+        "**/.git": true,
+        "**/.hg": true,
+        "**/.svn": true,
+        "**/CVS": true,
+        "**/Thumbs.db": true,
+        "**/__pycache__": true,
+        "**/.pytest_cache": true,
+        "**/*.pyc": true,
+        "**/.mypy_cache": true
+    },
+
+    // ============================================
+    // SECURITY AYARLARI
+    // ============================================
+    "security.workspace.trust.untrustedFiles": "open",
+
+    // ============================================
+    // EXTENSION AYARLARI
+    // ============================================
+    "auto-rename-tag.activationOnLanguage": [
+        "html",
+        "xml",
+        "php",
+        "javascript"
+    ],
+
+    // ============================================
+    // GITHUB COPILOT & CHAT AYARLARI
+    // ============================================
+    "github.copilot.nextEditSuggestions.enabled": true,
+    "chat.agent.maxRequests": 200,
 }
