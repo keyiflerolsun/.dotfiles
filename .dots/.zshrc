@@ -28,7 +28,7 @@ echo "\t\t\e[32m| | / / ____| |  _ _| |  _     /  \ | |  _ ____  _ | | ____ ____
 echo "\t\t\e[32m| |< < / _  ) | / ) | | / )   / /\ \| | / ) _  |/ || |/ _  )    \| |"
 echo "\t\t\e[32m| | \ ( (/ /| |< (| | |< (   | |__| | |< ( ( | ( (_| ( (/ /| | | | |"
 echo "\t\t\e[32m|_|  \_)____)_| \_)_|_| \_)  |______|_| \_)_||_|\____|\____)_|_|_|_|"
-echo "\n"                                                                    
+echo "\n"
 #--------------------------------------------------------------------------------------#
 
 # * Path Ayarları
@@ -43,12 +43,6 @@ alias lc="colorls -lA --sd --gs"
 alias l="colorls --gs"
 alias lsd="colorls --sd --gs"
 alias ltree="colorls --tree --sd --gs"
-
-# * thefuck
-eval $(thefuck --alias)
-path+=(
-    $(ruby -e 'puts File.join(Gem.user_dir, "bin")')
-)
 
 # * pygments
 cat() {

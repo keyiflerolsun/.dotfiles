@@ -29,15 +29,18 @@ sudo timedatectl set-timezone Europe/Istanbul
 sudo apt-get install -yq wget git zsh htop
 sudo apt-get install -yq python3-dev python3-pip
 sudo apt-get install -yq screenfetch neofetch
-sudo apt-get install -yq jq ffmpeg
+sudo apt-get install -yq jq ffmpeg fzf
 # echo "KekikAkademi" > /etc/hostname
 # ulimit -n 4096
 
 # ? Python
-python3 -m pip config set global.break-system-packages true || true
-pip3 install -U --ignore-installed pip setuptools wheel
-pip3 install -U --ignore-installed yt-dlp vizex Kekik SelSik thefuck
-pip3 install -U --ignore-installed bpython imgdupes imgcat pyotp nvitop
+# python3 -m pip config set global.break-system-packages true || true
+# pip3 install -U --ignore-installed pip setuptools wheel
+# pip3 install -U --ignore-installed yt-dlp vizex Kekik SelSik thefuck
+# pip3 install -U --ignore-installed bpython imgdupes imgcat pyotp nvitop
+
+# ? uv
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # ? ZSH
 sudo apt-get install -yq zsh

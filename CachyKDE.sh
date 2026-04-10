@@ -5,7 +5,7 @@
 # * Pacman Paketleri -------------------------------------------------------------
 sudo pacman -Syu --noconfirm
 sudo pacman -S --needed --noconfirm \
-  fastfetch micro thefuck jq bat sshpass ufw mission-center webkitgtk-6.0 htop unzip lazydocker tmux sstp-client yay yakuake \
+  fastfetch micro fzf jq bat sshpass ufw mission-center webkitgtk-6.0 htop unzip lazydocker tmux sstp-client yay yakuake \
   fprintd libfprint tpm2-tss intel-media-driver fwupd \
   brave-bin telegram-desktop chromium remmina libvncserver freerdp spotify-launcher freedownloadmanager \
   kvantum libreoffice-still okular \
@@ -40,12 +40,16 @@ yay -Yc --noconfirm
 
 
 # ? Python
-python3 -m pip config set global.break-system-packages true
-python3 -m pip install -U pip setuptools wheel
-python3 -m pip install -U \
-  yt-dlp vizex Kekik SelSik \
-  bpython imgdupes imgcat pyotp \
-  frida frida-tools mitmproxy
+# python3 -m pip config set global.break-system-packages true
+# python3 -m pip install -U pip setuptools wheel
+# python3 -m pip install -U \
+#   yt-dlp vizex Kekik SelSik \
+#   bpython imgdupes imgcat pyotp \
+#   frida frida-tools mitmproxy
+
+
+# ? uv
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
 
 # ? Github
@@ -91,4 +95,4 @@ sudo pacman -S --needed --noconfirm \
   texlive-fontsrecommended \
   texlive-xetex
 sudo mktexlsr && sudo fmtutil-sys --all
-sudo wget -O /usr/share/pandoc/data/templates/pdf_theme.latex https://raw.githubusercontent.com/Wandmalfarbe/pandoc-latex-template/master/eisvogel.tex
+sudo wget -O /usr/share/pandoc/data/templates/pdf_theme.latex https://raw.githubusercontent.com/Wandmalfarbe/pandoc-latex-template/master/eisvogel.texf_theme.latex https://raw.githubusercontent.com/Wandmalfarbe/pandoc-latex-template/master/eisvogel.tex
