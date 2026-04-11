@@ -62,6 +62,13 @@ curl -fsSL https://getmic.ro | bash
 sudo install -m 0755 ./micro /usr/local/bin/micro
 sudo apt-get install -yq xclip xsel
 
+# ? bat
+sudo apt-get install -yq bat
+if ! command -v batcat >/dev/null 2>&1; then
+  mkdir -p ~/.local/bin
+  ln -s /usr/bin/batcat ~/.local/bin/bat
+fi
+
 # ? colorls
 sudo apt-get install -yq ruby rbenv ruby-dev ruby-colorize
 sudo apt-get install -yq build-essential libncurses5-dev
