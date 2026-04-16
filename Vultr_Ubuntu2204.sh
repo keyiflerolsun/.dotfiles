@@ -227,55 +227,38 @@ sudo systemctl restart unattended-upgrades
 # * Fail2Ban Kurulumu
 sudo apt-get install -yq fail2ban
 
-# ---------- fail2ban helpers ----------
-# jail.local yoksa oluştur (idempotent)
-if [[ ! -f /etc/fail2ban/jail.local ]]; then
-  sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
-fi
+sudo tee /etc/fail2ban/jail.local > /dev/null <<EOF
+[DEFAULT]
+# IP adresinizi buraya ekleyerek kendinizi engellenmekten koruyun
+# ignoreip = 127.0.0.1/8 ::1
 
-set_f2b_default() {
-  local key="$1" value="$2" file="/etc/fail2ban/jail.local"
+bantime  = 1h
+findtime = 10m
+maxretry = 3
 
-  if sudo sed -n '/^\[DEFAULT\]/,/^\[/p' "$file" | grep -qE "^[[:space:]]*${key}[[:space:]]*="; then
-    sudo sed -i "/^\[DEFAULT\]/,/^\[/ s|^[[:space:]]*${key}[[:space:]]*=.*|${key} = ${value}|" "$file"
-  else
-    sudo sed -i "/^\[DEFAULT\]/ a ${key} = ${value}" "$file"
-  fi
-}
-
-set_f2b_sshd() {
-  local key="$1" value="$2" file="/etc/fail2ban/jail.local"
-
-  # sshd bloğu yoksa ekle
-  if ! sudo grep -qE '^[[:space:]]*\[sshd\][[:space:]]*$' "$file"; then
-    sudo tee -a "$file" >/dev/null <<EOF
+banaction = nftables-multiport
+backend = auto
 
 [sshd]
-${key} = ${value}
+enabled = true
+port    = ssh
+logpath = %(sshd_log)s
+backend = %(sshd_backend)s
+maxretry = 3
+
+[recidive]
+enabled   = true
+logpath   = /var/log/fail2ban.log
+banaction = nftables-allports
+bantime   = 1w
+findtime  = 1d
+maxretry  = 5
+
+[scripts]
+enabled = true
+filter = sshd
+port = 1,2,3,4,5,6,7,8,9,10
 EOF
-    return
-  fi
-
-  # sshd bloğunda key var mı?
-  if sudo sed -n '/^\[sshd\]/,/^\[/p' "$file" | grep -qE "^[[:space:]]*${key}[[:space:]]*="; then
-    sudo sed -i "/^\[sshd\]/,/^\[/ s|^[[:space:]]*${key}[[:space:]]*=.*|${key} = ${value}|" "$file"
-  else
-    sudo sed -i "/^\[sshd\]/ a ${key} = ${value}" "$file"
-  fi
-}
-
-# [DEFAULT] değerleri
-set_f2b_default bantime 1h
-set_f2b_default findtime 10m
-set_f2b_default maxretry 3
-
-# nftables action varsa onu kullan
-if ls /etc/fail2ban/action.d 2>/dev/null | grep -q '^nftables-multiport\.conf$'; then
-  set_f2b_default banaction nftables-multiport
-fi
-
-# [sshd] enable
-set_f2b_sshd enabled true
 
 # Fail2Ban servisini etkinleştir
 sudo systemctl enable fail2ban
