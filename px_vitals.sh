@@ -171,11 +171,24 @@ fi
 # 4. KONTEYNER (LXC) HARİTASI
 # ==========================================
 echo -e "  ${C_YELLOW}🚀 KONTEYNER (LXC) HARITASI${NC}"
-echo -e "  ${DIM}┌──────┬──────────────────┬───────────────┬─────────┐${NC}"
-echo -e "  ${DIM}│${NC} ${C_BLUE}ID${NC}   ${DIM}│${NC} ${C_BLUE}KONTEYNER ISMI${NC}   ${DIM}│${NC} ${C_BLUE}BAGLI HAVUZ${NC}   ${DIM}│${NC} ${C_BLUE}BOYUT${NC}   ${DIM}│${NC}"
-echo -e "  ${DIM}├──────┼──────────────────┼───────────────┼─────────┤${NC}"
 
-pct list | tail -n +2 | while read -r vmid status name; do
+# Başlıklar
+H_LXC_ID=$(printf "%-4s" "ID")
+H_LXC_NAME=$(printf "%-16s" "KONTEYNER ISMI")
+H_LXC_POOL=$(printf "%-13s" "BAGLI HAVUZ")
+H_LXC_SIZE=$(printf "%-7s" "KOTA")
+H_LXC_USE=$(printf "%-20s" "KAPASITE ANALIZI")
+
+echo -e "  ${DIM}┌──────┬──────────────────┬───────────────┬─────────┬──────────────────────┐${NC}"
+echo -e "  ${DIM}│${NC} ${C_BLUE}${H_LXC_ID}${NC} ${DIM}│${NC} ${C_BLUE}${H_LXC_NAME}${NC} ${DIM}│${NC} ${C_BLUE}${H_LXC_POOL}${NC} ${DIM}│${NC} ${C_BLUE}${H_LXC_SIZE}${NC} ${DIM}│${NC} ${C_BLUE}${H_LXC_USE}${NC} ${DIM}│${NC}"
+echo -e "  ${DIM}├──────┼──────────────────┼───────────────┼─────────┼──────────────────────┤${NC}"
+
+HAS_ANY_MISMATCH=0
+
+# Alt kabuk (subshell) değişken kaybını önlemek için döngü yapısı değiştirildi
+while read -r vmid status name; do
+    [[ -z "$vmid" ]] && continue
+    
     rootfs=$(pct config $vmid 2>/dev/null | grep "^rootfs:")
     storage=$(echo "$rootfs" | awk '{print $2}' | cut -d':' -f1)
     size=$(echo "$rootfs" | grep -o 'size=[0-9]*[A-Z]' | cut -d'=' -f2)
@@ -183,15 +196,86 @@ pct list | tail -n +2 | while read -r vmid status name; do
     [[ -z "$size" ]] && size="---"
     [[ -z "$storage" ]] && storage="---"
     
+    USAGE_TXT="---                 "
+    CONF_MISMATCH=0
+    
+    if [[ "$storage" != "---" ]]; then
+        zfs_ds=$(zfs list -H -o name 2>/dev/null | grep "$storage/subvol-$vmid-disk" | head -n 1)
+        if [[ -n "$zfs_ds" ]]; then
+            refer_bytes=$(zfs get -H -p -o value refer "$zfs_ds" 2>/dev/null)
+            refquota_bytes=$(zfs get -H -p -o value refquota "$zfs_ds" 2>/dev/null)
+            
+            # .conf dosyasındaki GB/MB değerini net Byte'a çevir (Milimetrik hesap)
+            quota_num=$(echo "$size" | tr -d 'GKM')
+            if [[ "$size" == *G* ]]; then
+                quota_bytes=$(awk "BEGIN {print $quota_num * 1024 * 1024 * 1024}")
+            elif [[ "$size" == *M* ]]; then
+                quota_bytes=$(awk "BEGIN {print $quota_num * 1024 * 1024}")
+            else
+                quota_bytes=0
+            fi
+
+            # 🚨 UYUMSUZLUK KONTROLÜ (ZFS Quota vs Proxmox Conf)
+            if [[ "$refquota_bytes" =~ ^[0-9]+$ && "$quota_bytes" -gt 0 ]]; then
+                if [[ "$quota_bytes" -ne "$refquota_bytes" ]]; then
+                    CONF_MISMATCH=1
+                    HAS_ANY_MISMATCH=1
+                fi
+            fi
+
+            # Bar ve Yüzde Hesaplama (Kayıp ve Bozulmaları Önleyen Sabit Karakter Mantığı)
+            if [[ -n "$refer_bytes" && "$quota_bytes" -gt 0 ]]; then
+                pct_val=$(awk "BEGIN {printf \"%d\", ($refer_bytes / $quota_bytes) * 100}")
+                
+                f_pct=$(printf "%3s%%" "$pct_val")
+                
+                bar=""
+                spaces=""
+                limit=$(( pct_val * 10 / 100 ))
+                [[ $limit -gt 10 ]] && limit=10
+                
+                U_COLOR=$C_CYAN
+                [[ $pct_val -gt 70 ]] && U_COLOR=$C_YELLOW
+                [[ $pct_val -gt 90 ]] && U_COLOR=$C_RED
+                
+                for ((i=0; i<limit; i++)); do bar+="■"; done
+                for ((i=limit; i<10; i++)); do spaces+=" "; done
+                
+                # Tam 20 karakter uzunluk: Yüzde(4) + Boşluk(1) + Çubuk(10) + SabitDolgu(5)
+                USAGE_TXT="${U_COLOR}${f_pct} ${bar}${NC}${spaces}     "
+            fi
+        fi
+    fi
+
     f_id=$(printf "%-4s" "$vmid")
     f_name=$(printf "%-16s" "${name:0:16}")
     f_store=$(printf "%-13s" "${storage:0:13}")
-    f_size=$(printf "%-7s" "${size:0:7}")
+    
+    # 🚨 Uyumsuzluk varsa KOTA sütununu kırmızı yap ve ünlem ekle
+    if [[ $CONF_MISMATCH -eq 1 ]]; then
+        display_str="${size} !"
+        padded_str=$(printf "%-7s" "$display_str")
+        f_size="${C_RED}${padded_str}${NC}"
+    else
+        padded_str=$(printf "%-7s" "${size:0:7}")
+        f_size="${C_CYAN}${padded_str}${NC}"
+    fi
     
     [[ "$status" == "running" ]] && c_id=$C_GREEN || c_id=$DIM
-    echo -e "  ${DIM}│${NC} ${c_id}${f_id}${NC} ${DIM}│${NC} ${f_name} ${DIM}│${NC} ${C_YELLOW}${f_store}${NC} ${DIM}│${NC} ${C_CYAN}${f_size}${NC} ${DIM}│${NC}"
-done
-echo -e "  ${DIM}└──────┴──────────────────┴───────────────┴─────────┘${NC}\n"
+    
+    echo -e "  ${DIM}│${NC} ${c_id}${f_id}${NC} ${DIM}│${NC} ${f_name} ${DIM}│${NC} ${C_YELLOW}${f_store}${NC} ${DIM}│${NC} ${f_size} ${DIM}│${NC} ${USAGE_TXT} ${DIM}│${NC}"
+
+done <<< "$(pct list | tail -n +2)"
+
+echo -e "  ${DIM}└──────┴──────────────────┴───────────────┴─────────┴──────────────────────┘${NC}"
+
+# Eğer herhangi bir uyumsuzluk bulunduysa tablonun altına uyarı fırlat
+if [[ $HAS_ANY_MISMATCH -eq 1 ]]; then
+    echo -e "  ${C_RED}⚠  UYARI: Kirmizi (!) isaretli konteynerlarda ZFS (refquota) siniri ile${NC}"
+    echo -e "  ${C_RED}   Proxmox (.conf) kota degerleri eslesmiyor. Lutfen senkronize edin!${NC}\n"
+else
+    echo -e ""
+fi
 
 # ==========================================
 # 5. ZFS DATASET (İKONLU MİNİ BARLAR) & PARAMETRELER
