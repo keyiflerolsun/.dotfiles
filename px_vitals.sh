@@ -10,7 +10,8 @@ C_BLUE='\033[1;34m'
 NC='\033[0m'
 DIM='\033[1;30m'
 
-POOL_NAME="harici_zfs"
+# Dinamik ZFS Havuz Tespiti (Sistemdeki ilk aktif havuzu otomatik bulur)
+POOL_NAME=$(zpool list -H -o name 2>/dev/null | head -n 1)
 
 clear
 echo -e "\n  ${C_CYAN}🖥  KEKIK COMMAND CENTER${NC}  ${DIM}[Node: $(hostname)]${NC}\n"
