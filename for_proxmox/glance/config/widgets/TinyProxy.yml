@@ -1,0 +1,61 @@
+- type: custom-api
+  title: TinyProxy
+  cache: 5s
+  url: http://px-proxy:8678
+  template: |
+    <style>
+      .proxy-totals { display: flex; justify-content: space-between; text-align: center; margin-bottom: 1rem; }
+      .proxy-totals-value { font-size: 2rem; font-weight: 700; color: var(--color-text-highlight); }
+      .proxy-totals-label { font-size: var(--font-size-h6); opacity: 0.6; margin-top: 0.25rem; }
+      .proxy-stat-value { font-size: 2rem; font-weight: 700; color: var(--color-primary); }
+      .proxy-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.25rem; font-size: var(--font-size-base); }
+      .proxy-list-item { display: flex; justify-content: space-between; gap: 0.625rem; padding: 0.2rem 0; }
+      .proxy-list-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .proxy-list-pct { text-align: right; width: 4rem; flex-shrink: 0; }
+      .proxy-details { margin-top: 1rem; }
+      .proxy-details summary { cursor: pointer; font-size: var(--font-size-base); opacity: 0.8; }
+      .proxy-dot-get { color: var(--color-positive); font-size: 0.6rem; vertical-align: middle; margin-right: 0.375rem; }
+      .proxy-dot-other { color: var(--color-primary); font-size: 0.6rem; vertical-align: middle; margin-right: 0.375rem; }
+      .proxy-log-detail { opacity: 0.5; font-size: var(--font-size-h6); margin-left: 0.25rem; }
+      .proxy-log-type { font-family: monospace; text-align: right; opacity: 0.6; }
+    </style>
+
+    <div class="proxy-totals">
+      <div>
+        <div class="proxy-totals-value">{{ .JSON.Int "total" }}</div>
+        <div class="proxy-totals-label">TOTAL</div>
+      </div>
+      {{ range $index, $stat := .JSON.Array "stats" }}
+        {{ if lt $index 2 }}
+          <div>
+            <div class="proxy-stat-value">{{ $stat.Int "count" }}</div>
+            <div class="proxy-totals-label">{{ $stat.String "category" }}</div>
+          </div>
+        {{ end }}
+      {{ end }}
+    </div>
+
+    <ul class="proxy-list">
+      {{ range .JSON.Array "stats" }}
+        <li class="proxy-list-item">
+          <div class="proxy-list-label">{{ .String "category" }}</div>
+          <div class="proxy-list-pct"><span style="color: var(--color-text-highlight);">{{ .Int "percent" }}</span>%</div>
+        </li>
+      {{ end }}
+    </ul>
+
+    <details class="proxy-details">
+      <summary>Live Traffic</summary>
+      <ul class="proxy-list" style="margin-top: 0.625rem;">
+        {{ range .JSON.Array "logs" }}
+          <li class="proxy-list-item">
+            <div class="proxy-list-label">
+              <span class="{{ if eq (.String "type") "GET" }}proxy-dot-get{{ else }}proxy-dot-other{{ end }}">⬤</span>
+              <span>{{ .String "category" }}</span>
+              <span class="proxy-log-detail">{{ .String "detail" }}</span>
+            </div>
+            <div class="proxy-log-type">{{ .String "type" }}</div>
+          </li>
+        {{ end }}
+      </ul>
+    </details>

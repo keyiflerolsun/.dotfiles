@@ -1,0 +1,42 @@
+- size: small
+  widgets:
+    - $include: ../widgets/NextDNS.yml
+    - $include: ../widgets/TinyProxy.yml
+
+    - type: group
+      name: 📰 Feed
+      widgets:
+        - type: rss
+          style: vertical-list
+          limit: 30
+          collapse-after: 10
+          feeds:
+            - url: https://www.technopat.net/feed/
+              title: Technopat
+            - url: https://www.webtekno.com/rss.xml
+              title: Webtekno
+            - url: https://evrimagaci.org/rss.xml
+              title: Evrim Ağacı
+
+        - type: videos
+          title: YouTube
+          style: vertical-list
+          collapse-after: 30
+          channels:
+            - UCR-DXc1voovS8nhAvccRZhg # Jeff Geerling
+            - UCXuqSBlHAE6Xw-yeJA0Tunw # Linus Tech Tips
+            - UC7YOGHUfC1Tb6E4pudI9STA # Mental Outlaw
+
+        - type: reddit
+          subreddit: selfhosted
+          style: vertical-cards
+          limit: 10
+
+        - type: hacker-news
+          limit: 30
+          collapse-after: 10
+
+        - type: lobsters
+          sort-by: hot
+          limit: 30
+          collapse-after: 10

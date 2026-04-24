@@ -1,0 +1,81 @@
+/* Markets widget ayarları */
+/* Market öğesi için dahili sembol etiketini gizle, sadece başlık görünsün. */
+.widget-type-markets .size-h3.block.text-truncate {
+    display: none;
+}
+
+/* Yüzdelik değişim metnini gizle, widget daha sade görünsün. */
+.widget-type-markets .market-values .size-h3 {
+    display: none;
+}
+
+/* Özel başlık metnini (örn. Dolar/TL) büyüt ve vurgula. */
+.widget-type-markets .text-truncate:not(.size-h3) {
+    font-size: var(--font-size-h3);
+    color: var(--color-text-highlight);
+    font-weight: bold;
+    margin-bottom: 0.2rem;
+}
+
+/* Fiyat değerini daha büyük ve belirgin yap. */
+.widget-type-markets .market-values div:not(.size-h3) {
+    font-size: var(--font-size-h3);
+    font-weight: 500;
+}
+
+/* Monitor widget ayarları */
+/* Monitor site konteynerini relative konumda tut, durum metni içeride mutlak konumlanabilsin. */
+.monitor-site {
+    position: relative !important;
+}
+
+/* Yanıt/durum metnini monitor satırının sağına yerleştir. */
+.widget-type-monitor .list-horizontal-text {
+    position: absolute !important;
+    right: 42px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    margin: 0 !important;
+    display: flex !important;
+    gap: 12px !important;
+}
+
+/* Monitor başlık/metin bloğundaki fazla alt boşluğu kaldır, daha sıkı bir düzen oluştur. */
+.widget-type-monitor .grow.min-width-0 {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+/* Bookmarks widget için duyarlı (responsive) düzen */
+/* Başlangıçta iki sütunlu grid, widget genişliğine göre açılır veya daralır. */
+.widget-type-bookmarks .dynamic-columns {
+    display: grid !important;
+    gap: 1.5rem !important;
+    grid-template-columns: repeat(2, minmax(220px, 1fr)) !important;
+}
+
+/* Dinamik sütunlar arasındaki varsayılan sol boşluk/çizgiyi kaldır, grid hizalı olsun. */
+.widget-type-bookmarks .dynamic-columns > * {
+    padding-left: 0 !important;
+    border-left: none !important;
+}
+
+/* İlk sütunda üst kenar çizgisi/boşluğunu da kaldır, ilk öğe hizalı kalsın. */
+.widget-type-bookmarks .dynamic-columns > *:first-child {
+    padding-top: 0 !important;
+    border-top: none !important;
+}
+
+/* Widget yeterince genişse, tüm bookmark gruplarını dört sütunda göster. */
+@container widget (min-width: 980px) {
+    .widget-type-bookmarks .dynamic-columns {
+        grid-template-columns: repeat(4, minmax(220px, 1fr)) !important;
+    }
+}
+
+/* Widget dar ise, okunabilirlik için tek sütuna düş. */
+@container widget (max-width: 549px) {
+    .widget-type-bookmarks .dynamic-columns {
+        grid-template-columns: 1fr !important;
+    }
+}

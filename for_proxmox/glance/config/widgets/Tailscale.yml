@@ -1,0 +1,76 @@
+- type: custom-api
+  title: Tailscale Network
+  title-url: https://login.tailscale.com/admin/machines
+  cache: 1m
+  url: https://api.tailscale.com/api/v2/tailnet/-/devices
+  headers:
+    Authorization: Bearer ${TAILSCALE_API}
+  template: |
+    <style>
+      .ts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+        gap: 1rem;
+        padding: 0.5rem 0;
+      }
+      .ts-card {
+        background: var(--color-widget-background-highlight);
+        border-radius: var(--border-radius);
+        padding: 1rem;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.2s ease, border-color 0.2s ease;
+      }
+      .ts-card.is-offline { opacity: 0.6; }
+      .ts-status-dot { width: 0.5625rem; height: 0.5625rem; border-radius: 50%; flex-shrink: 0; }
+      .status-up { background-color: var(--color-positive); box-shadow: 0 0 0.375rem var(--color-positive); }
+      .status-down { background-color: var(--color-negative); box-shadow: 0 0 0.375rem var(--color-negative); }
+      .ts-name {
+        font-weight: 600;
+        font-size: var(--font-size-h4);
+        color: var(--color-primary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .ts-ip { font-family: monospace; font-size: var(--font-size-h6); opacity: 0.6; margin-top: 0.3rem; }
+      .ts-meta {
+        margin-top: 0.75rem;
+        display: flex;
+        justify-content: space-between;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        opacity: 0.45;
+      }
+      .ts-update { color: #f1c40f; font-weight: bold; opacity: 1; }
+    </style>
+
+    <div class="ts-grid">
+      {{ range .JSON.Array "devices" }}
+        {{ $lastSeen := .String "lastSeen" | parseTime "rfc3339" }}
+        {{ $isOnline := $lastSeen.After (offsetNow "-1m") }}
+
+        <div class="ts-card {{ if not $isOnline }}is-offline{{ end }}">
+          <div class="flex items-center justify-between">
+            <span class="ts-name">{{ findMatch "^([^.]+)" (.String "name") }}</span>
+            <span class="ts-status-dot {{ if $isOnline }}status-up{{ else }}status-down{{ end }}"
+                  data-popover-type="text"
+                  data-popover-text="{{ if $isOnline }}Connected{{ else }}Last seen: {{ ($lastSeen.In now.Location).Format "Jan 2 15:04" }}{{ end }}">
+            </span>
+          </div>
+
+          <div class="ts-ip">{{ .String "addresses.0" }}</div>
+
+          <div class="ts-meta">
+            <span>{{ .String "os" }}</span>
+            {{ if .Bool "updateAvailable" }}
+              <span class="ts-update">UPDATE</span>
+            {{ else }}
+              <span>{{ if .Exists "tags.0" }}{{ trimPrefix "tag:" (.String "tags.0") }}{{ else }}Client{{ end }}</span>
+            {{ end }}
+          </div>
+        </div>
+      {{ end }}
+    </div>

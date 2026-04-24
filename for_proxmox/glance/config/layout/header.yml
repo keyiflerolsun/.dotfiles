@@ -1,0 +1,12 @@
+- type: search
+  hide-header: true
+  autofocus: false
+  search-engine: google
+  placeholder: "varsayılan google | !gh github | !yt youtube"
+  bangs:
+    - title: GitHub
+      shortcut: "!gh"
+      url: https://github.com/search?q={QUERY}
+    - title: YouTube
+      shortcut: "!yt"
+      url: https://www.youtube.com/results?search_query={QUERY}

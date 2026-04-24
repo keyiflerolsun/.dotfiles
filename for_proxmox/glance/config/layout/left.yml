@@ -1,0 +1,32 @@
+- size: small
+  widgets:
+    - type: clock
+      hide-header: true
+      hour-format: 24h
+
+    - type: weather
+      hide-header: true
+      location: Istanbul
+      units: metric
+
+    - type: markets
+      hide-header: true
+      markets:
+        - symbol: USDTRY=X
+          name: USD/TRY
+
+    - type: repository
+      hide-header: true
+      token: ${GITHUB_TOKEN}
+      repository: keyiflerolsun/KekikStream
+      pull-requests-limit: 5
+      issues-limit: 3
+      commits-limit: 3
+
+    - type: repository
+      hide-header: true
+      token: ${GITHUB_TOKEN}
+      repository: WatchBuddy-tv/.github
+      pull-requests-limit: 5
+      issues-limit: 3
+      commits-limit: 3

@@ -106,21 +106,21 @@ pvesm status | grep -v "Name" | while read -r name type status total used avail 
         FINAL_BAR="${DIM} N/A (Disabled)         ${NC}"
     else
         int_per=${clean_per%.*}
-        
+
         # Yüzdeyi sabitle (% ifadesi her zaman 4 karakter yer kaplar: "  5%", " 45%", "100%")
         f_pct=$(printf "%3s%%" "$int_per")
-        
+
         bar=""
         spaces=""
         limit=$(( int_per * 17 / 100 ))
         [[ $limit -gt 17 ]] && limit=17
-        
+
         [[ $int_per -gt 80 ]] && COLOR_B=$C_RED || COLOR_B=$C_CYAN
         [[ "$type" == "pbs" ]] && COLOR_B=$C_YELLOW
 
         for ((i=0; i<limit; i++)); do bar+="■"; done
         for ((i=limit; i<17; i++)); do spaces+=" "; done
-        
+
         # Yüzde ve Bar'ın Birleşimi (Toplam 22 karakter)
         FINAL_BAR="${COLOR_B}${f_pct} ${bar}${NC}${spaces}"
     fi
@@ -189,23 +189,23 @@ HAS_ANY_MISMATCH=0
 # Alt kabuk (subshell) değişken kaybını önlemek için döngü yapısı değiştirildi
 while read -r vmid status name; do
     [[ -z "$vmid" ]] && continue
-    
+
     rootfs=$(pct config $vmid 2>/dev/null | grep "^rootfs:")
     storage=$(echo "$rootfs" | awk '{print $2}' | cut -d':' -f1)
     size=$(echo "$rootfs" | grep -o 'size=[0-9]*[A-Z]' | cut -d'=' -f2)
-    
+
     [[ -z "$size" ]] && size="---"
     [[ -z "$storage" ]] && storage="---"
-    
+
     USAGE_TXT="---                 "
     CONF_MISMATCH=0
-    
+
     if [[ "$storage" != "---" ]]; then
         zfs_ds=$(zfs list -H -o name 2>/dev/null | grep "$storage/subvol-$vmid-disk" | head -n 1)
         if [[ -n "$zfs_ds" ]]; then
             refer_bytes=$(zfs get -H -p -o value refer "$zfs_ds" 2>/dev/null)
             refquota_bytes=$(zfs get -H -p -o value refquota "$zfs_ds" 2>/dev/null)
-            
+
             # .conf dosyasındaki GB/MB değerini net Byte'a çevir (Milimetrik hesap)
             quota_num=$(echo "$size" | tr -d 'GKM')
             if [[ "$size" == *G* ]]; then
@@ -227,21 +227,21 @@ while read -r vmid status name; do
             # Bar ve Yüzde Hesaplama (Kayıp ve Bozulmaları Önleyen Sabit Karakter Mantığı)
             if [[ -n "$refer_bytes" && "$quota_bytes" -gt 0 ]]; then
                 pct_val=$(awk "BEGIN {printf \"%d\", ($refer_bytes / $quota_bytes) * 100}")
-                
+
                 f_pct=$(printf "%3s%%" "$pct_val")
-                
+
                 bar=""
                 spaces=""
                 limit=$(( pct_val * 10 / 100 ))
                 [[ $limit -gt 10 ]] && limit=10
-                
+
                 U_COLOR=$C_CYAN
                 [[ $pct_val -gt 70 ]] && U_COLOR=$C_YELLOW
                 [[ $pct_val -gt 90 ]] && U_COLOR=$C_RED
-                
+
                 for ((i=0; i<limit; i++)); do bar+="■"; done
                 for ((i=limit; i<10; i++)); do spaces+=" "; done
-                
+
                 # Tam 20 karakter uzunluk: Yüzde(4) + Boşluk(1) + Çubuk(10) + SabitDolgu(5)
                 USAGE_TXT="${U_COLOR}${f_pct} ${bar}${NC}${spaces}     "
             fi
@@ -251,7 +251,7 @@ while read -r vmid status name; do
     f_id=$(printf "%-4s" "$vmid")
     f_name=$(printf "%-16s" "${name:0:16}")
     f_store=$(printf "%-13s" "${storage:0:13}")
-    
+
     # 🚨 Uyumsuzluk varsa KOTA sütununu kırmızı yap ve ünlem ekle
     if [[ $CONF_MISMATCH -eq 1 ]]; then
         display_str="${size} !"
@@ -261,9 +261,9 @@ while read -r vmid status name; do
         padded_str=$(printf "%-7s" "${size:0:7}")
         f_size="${C_CYAN}${padded_str}${NC}"
     fi
-    
+
     [[ "$status" == "running" ]] && c_id=$C_GREEN || c_id=$DIM
-    
+
     echo -e "  ${DIM}│${NC} ${c_id}${f_id}${NC} ${DIM}│${NC} ${f_name} ${DIM}│${NC} ${C_YELLOW}${f_store}${NC} ${DIM}│${NC} ${f_size} ${DIM}│${NC} ${USAGE_TXT} ${DIM}│${NC}"
 
 done <<< "$(pct list | tail -n +2)"
@@ -284,10 +284,10 @@ fi
 if zfs list -H -o name $POOL_NAME &>/dev/null; then
     echo -e "  ${C_YELLOW}📂 ZFS DATASET DAGILIMI${NC}"
     echo -e "  ${DIM}──────────────────────────────────────────────────────${NC}"
-    
+
     zfs list -H -o name,used -t filesystem | grep "$POOL_NAME/" | while read -r name used; do
         short_name=$(echo $name | cut -d'/' -f2)
-        
+
         # İkon Seçimi
         if [[ "$short_name" == subvol* ]]; then
             ICON="📦"
@@ -305,11 +305,11 @@ if zfs list -H -o name $POOL_NAME &>/dev/null; then
         else
             lib_bar="·"
         fi
-        
+
         f_size=$(printf "%-6s" "$used")
         # Emoji printf dışında tutuldu! Kaymayı önler.
         f_name=$(printf "%-18s" "${short_name:0:18}")
-        
+
         echo -e "  ${ICON} ${f_name} ${C_MAGENTA}→${NC} ${C_YELLOW}${f_size}${NC}  ${DIM}${lib_bar}${NC}"
     done
 
@@ -318,7 +318,7 @@ if zfs list -H -o name $POOL_NAME &>/dev/null; then
     COMP=$(zfs get -H -o value compression $POOL_NAME 2>/dev/null)
     ATIME=$(zfs get -H -o value atime $POOL_NAME 2>/dev/null)
     CRATIO=$(zfs get -H -o value compressratio $POOL_NAME 2>/dev/null)
-    
+
     echo -e "  ${C_CYAN}⚙  PARAMETRELER:${NC} Hiza: ${C_BLUE}${ASHIFT}${NC} | Sikistirma: ${C_GREEN}${COMP} (${CRATIO})${NC} | Atime: ${C_RED}${ATIME}${NC}"
     if [[ "$ATIME" == "on" ]]; then
         echo -e "  ${C_YELLOW}⚠  IPUCU:${NC} SSD omru icin 'zfs set atime=off $POOL_NAME' onerilir.\n"

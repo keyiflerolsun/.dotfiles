@@ -1,0 +1,11 @@
+- name: KekikCluster
+  hide-desktop-navigation: true
+  width: wide
+
+  head-widgets:
+    - $include: layout/header.yml
+
+  columns:
+    - $include: layout/left.yml
+    - $include: layout/center.yml
+    - $include: layout/right.yml

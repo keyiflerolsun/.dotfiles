@@ -1,0 +1,12 @@
+server:
+  assets-path: /app/assets
+
+theme:
+  background-color: 30 2 16  # --background: #2B2A29
+  primary-color: 28 88 52    # --primary: #EF7F1A
+  positive-color: 160 84 39  # --success: #10B981
+  negative-color: 0 84 60    # --error: #EF4444
+  custom-css-file: /assets/user.css
+
+pages:
+  - $include: home.yml

@@ -1,0 +1,244 @@
+- type: custom-api
+  title: PVE Resources
+  title-url: ${PROXMOX_URL}
+  cache: 1m
+  url: ${PROXMOX_URL}/api2/json/cluster/resources
+  allow-insecure: true
+  headers:
+    Accept: application/json
+    Authorization: ${PROXMOX_TOKEN}
+  options:
+    cpu_graph: true
+    disk_graph: true
+    ram_graph: true
+  template: |
+    <style>
+      .pve-card { background: var(--color-widget-background-highlight); border-radius: var(--border-radius); padding: 1.5rem; margin-bottom: 2rem; border: 1px solid var(--color-background); }
+      .pve-node-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid var(--color-background); padding-bottom: 1rem; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem; }
+      .pve-node-title { font-size: 1.8rem; font-weight: bold; color: var(--color-primary); display: flex; align-items: center; gap: 0.75rem; text-transform: uppercase; letter-spacing: 0.0625rem; }
+      .pve-node-stats { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+      .pve-node-stat-item { display: flex; flex-direction: column; align-items: flex-end; min-width: 5rem; }
+      .pve-section-title { font-size: var(--font-size-h4); font-weight: bold; color: var(--color-base); opacity: 0.9; text-transform: uppercase; letter-spacing: 0.125rem; margin-top: 2rem; margin-bottom: 1rem; border-left: 0.3125rem solid var(--color-primary); padding-left: 0.75rem; }
+      .pve-table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 1rem; }
+      .pve-table { width: 100%; border-collapse: collapse; font-size: var(--font-size-h5); min-width: 43.75rem; }
+      .pve-table th { padding: 1rem 0.75rem; border-bottom: 2px solid var(--color-background); color: var(--color-primary); text-transform: uppercase; font-size: var(--font-size-h5); text-align: left; }
+      .pve-table td { padding: 1rem 0.75rem; border-bottom: 1px solid var(--color-background); vertical-align: middle; }
+      .pve-table tr:last-child td { border-bottom: none; }
+      .pve-table tbody tr:hover { background-color: var(--color-background); }
+      .status-indicator { display: inline-block; width: 1rem; height: 1rem; border-radius: 50%; flex-shrink: 0; }
+      .status-up { background-color: var(--color-positive); box-shadow: 0 0 0.375rem var(--color-positive); }
+      .status-down { background-color: var(--color-negative); }
+      .type-badge { font-size: var(--font-size-h6); text-transform: uppercase; padding: 0.25rem 0.5rem; border-radius: 0.375rem; background-color: var(--color-background); color: var(--color-base); font-weight: bold; letter-spacing: 0.04em; }
+      .metric-col { width: 18%; }
+      .pve-bar-track { width: 100%; height: 0.5rem; background-color: var(--color-progress-border); border-radius: 0.375rem; overflow: hidden; margin-top: 0.5rem; min-width: 5rem; }
+      .pve-bar-fill { height: 100%; background-color: var(--color-primary); border-radius: 0.375rem; transition: width 0.4s ease; }
+      .pve-bar-warning { background-color: var(--color-negative) !important; }
+      .pve-error { font-size: var(--font-size-h5); color: var(--color-negative); padding: 1rem; }
+      @media (max-width: 37.5rem) {
+        .pve-node-header { flex-direction: column; align-items: flex-start; }
+        .pve-node-stats { width: 100%; justify-content: flex-start; }
+        .pve-node-stat-item { align-items: flex-start; }
+      }
+    </style>
+
+    {{ if eq .Response.StatusCode 200 }}
+      {{- $bytesInGB   := toFloat 1073741824 -}}
+      {{- $nodes       := .JSON.Array "data.#(type==\"node\")#" -}}
+      {{- $sortedNodes := sortByString "node" "asc" $nodes -}}
+
+      {{- range $sortedNodes -}}
+        {{- $nodeName   := .String "node" -}}
+        {{- $nodeStatus := .String "status" -}}
+        {{- $isNodeUp   := or (eq $nodeStatus "running") (eq $nodeStatus "available") (eq $nodeStatus "ok") (eq $nodeStatus "online") -}}
+
+        <div class="pve-card">
+          <div class="pve-node-header">
+            <div class="pve-node-title">
+              <span class="status-indicator {{ if $isNodeUp }}status-up{{ else }}status-down{{ end }}" title="{{ $nodeStatus }}"></span>
+              🖥️ <a href="${PROXMOX_URL}/#v1:0:=node%2F{{ $nodeName }}:4:5::::::" target="_blank">{{ $nodeName }}</a>
+            </div>
+
+            <div class="pve-node-stats">
+              {{ if $.Options.BoolOr "cpu_graph" true }}
+                {{- if gt (.Float "maxcpu") 0.0 -}}
+                  {{- $percentCPU := mul (.Float "cpu") 100 | toInt -}}
+                  <div class="pve-node-stat-item" data-popover-type="html">
+                    <div data-popover-html>Cores: {{ .Int "maxcpu" }}</div>
+                    <div style="font-size: var(--font-size-h5); text-transform: uppercase; opacity: 0.8;">CPU</div>
+                    <div style="font-size: var(--font-size-h2); font-weight: bold; color: var(--color-text-highlight);">{{ $percentCPU }}%</div>
+                  </div>
+                {{- end -}}
+              {{ end }}
+
+              {{ if $.Options.BoolOr "ram_graph" true }}
+                {{- if gt (.Float "maxmem") 0.0 -}}
+                  {{- $percentRAM := mul (div (.Float "mem") (.Float "maxmem")) 100 | toInt -}}
+                  <div class="pve-node-stat-item" data-popover-type="html">
+                    <div data-popover-html>{{ printf "%.1f" (div (.Float "mem") $bytesInGB) }}GB / {{ printf "%.1f" (div (.Float "maxmem") $bytesInGB) }}GB</div>
+                    <div style="font-size: var(--font-size-h5); text-transform: uppercase; opacity: 0.8;">RAM</div>
+                    <div style="font-size: var(--font-size-h2); font-weight: bold; color: var(--color-text-highlight);">{{ $percentRAM }}%</div>
+                  </div>
+                {{- end -}}
+              {{ end }}
+
+              {{ if $.Options.BoolOr "disk_graph" true }}
+                {{- if gt (.Float "maxdisk") 0.0 -}}
+                  {{- $percentDisk := mul (div (.Float "disk") (.Float "maxdisk")) 100 | toInt -}}
+                  <div class="pve-node-stat-item" data-popover-type="html">
+                    <div data-popover-html>{{ printf "%.1f" (div (.Float "disk") $bytesInGB) }}GB / {{ printf "%.1f" (div (.Float "maxdisk") $bytesInGB) }}GB</div>
+                    <div style="font-size: var(--font-size-h5); text-transform: uppercase; opacity: 0.8;">Disk</div>
+                    <div style="font-size: var(--font-size-h2); font-weight: bold; color: var(--color-text-highlight);">{{ $percentDisk }}%</div>
+                  </div>
+                {{- end -}}
+              {{ end }}
+            </div>
+          </div>
+
+          {{- $nodeResources   := $.JSON.Array (printf "data.#(node==\"%s\")#" $nodeName) -}}
+          {{- $sortedResources := sortByString "id" "asc" $nodeResources -}}
+
+          {{- $hasWorkloads := false -}}
+          {{- range $sortedResources -}}
+            {{- if or (eq (.String "type") "lxc") (eq (.String "type") "qemu") -}}{{- $hasWorkloads = true -}}{{- end -}}
+          {{- end -}}
+
+          {{ if $hasWorkloads }}
+            <div class="pve-section-title">📦 Workloads</div>
+            <div class="pve-table-wrapper">
+              <table class="pve-table">
+                <thead>
+                  <tr>
+                    <th style="width: 5rem;">ID</th>
+                    <th>Name</th>
+                    <th style="width: 6.25rem;">Type</th>
+                    <th style="text-align: center; width: 5rem;">Status</th>
+                    {{ if $.Options.BoolOr "cpu_graph" true }}<th class="metric-col">CPU</th>{{ end }}
+                    {{ if $.Options.BoolOr "ram_graph" true }}<th class="metric-col">RAM</th>{{ end }}
+                    {{ if $.Options.BoolOr "disk_graph" true }}<th class="metric-col">Disk</th>{{ end }}
+                  </tr>
+                </thead>
+                <tbody>
+                  {{- range $sortedResources -}}
+                    {{- $type := .String "type" -}}
+                    {{- if or (eq $type "lxc") (eq $type "qemu") -}}
+                      {{- $status := .String "status" -}}
+                      {{- $isUp   := or (eq $status "running") (eq $status "ok") -}}
+                      <tr>
+                        <td style="font-weight: 600; color: var(--color-primary);">{{ .Int "vmid" }}</td>
+                        <td style="font-weight: 600; font-size: var(--font-size-base);"><a href="${PROXMOX_URL}/#v1:0:={{ $type }}%2F{{ .Int "vmid" }}:4:5::::::" target="_blank">{{ .String "name" }}</a></td>
+                        <td><span class="type-badge">{{ $type }}</span></td>
+                        <td style="text-align: center;">
+                          <span class="status-indicator {{ if $isUp }}status-up{{ else }}status-down{{ end }}" title="{{ $status }}"></span>
+                        </td>
+
+                        {{ if $.Options.BoolOr "cpu_graph" true }}
+                          <td>
+                            {{- if gt (.Float "maxcpu") 0.0 -}}
+                              {{- $percentCPU := mul (.Float "cpu") 100 | toInt -}}
+                              <div data-popover-type="html">
+                                <div data-popover-html>Cores: {{ .Int "maxcpu" }}</div>
+                                <div style="font-weight: 600; color: var(--color-text-highlight);">{{ $percentCPU }}%</div>
+                                <div class="pve-bar-track">
+                                  <div class="pve-bar-fill{{ if ge $percentCPU 85 }} pve-bar-warning{{ end }}" style="width: {{ $percentCPU }}%;"></div>
+                                </div>
+                              </div>
+                            {{- else -}}-{{- end -}}
+                          </td>
+                        {{ end }}
+
+                        {{ if $.Options.BoolOr "ram_graph" true }}
+                          <td>
+                            {{- if gt (.Float "maxmem") 0.0 -}}
+                              {{- $percentRAM := mul (div (.Float "mem") (.Float "maxmem")) 100 | toInt -}}
+                              <div data-popover-type="html">
+                                <div data-popover-html>Used: {{ printf "%.1f" (div (.Float "mem") $bytesInGB) }}GB<br>Total: {{ printf "%.1f" (div (.Float "maxmem") $bytesInGB) }}GB</div>
+                                <div style="font-weight: 600; color: var(--color-text-highlight);">{{ $percentRAM }}%</div>
+                                <div class="pve-bar-track">
+                                  <div class="pve-bar-fill{{ if ge $percentRAM 85 }} pve-bar-warning{{ end }}" style="width: {{ $percentRAM }}%;"></div>
+                                </div>
+                              </div>
+                            {{- else -}}-{{- end -}}
+                          </td>
+                        {{ end }}
+
+                        {{ if $.Options.BoolOr "disk_graph" true }}
+                          <td>
+                            {{- if gt (.Float "maxdisk") 0.0 -}}
+                              {{- $percentDisk := mul (div (.Float "disk") (.Float "maxdisk")) 100 | toInt -}}
+                              <div data-popover-type="html">
+                                <div data-popover-html>Used: {{ printf "%.1f" (div (.Float "disk") $bytesInGB) }}GB<br>Total: {{ printf "%.1f" (div (.Float "maxdisk") $bytesInGB) }}GB</div>
+                                <div style="font-weight: 600; color: var(--color-text-highlight);">{{ $percentDisk }}%</div>
+                                <div class="pve-bar-track">
+                                  <div class="pve-bar-fill{{ if ge $percentDisk 85 }} pve-bar-warning{{ end }}" style="width: {{ $percentDisk }}%;"></div>
+                                </div>
+                              </div>
+                            {{- else -}}-{{- end -}}
+                          </td>
+                        {{ end }}
+                      </tr>
+                    {{- end -}}
+                  {{- end -}}
+                </tbody>
+              </table>
+            </div>
+          {{ end }}
+
+          {{- $hasStorage := false -}}
+          {{- range $sortedResources -}}
+            {{- if eq (.String "type") "storage" -}}{{- $hasStorage = true -}}{{- end -}}
+          {{- end -}}
+
+          {{ if $hasStorage }}
+            <div class="pve-section-title">💾 Storage</div>
+            <div class="pve-table-wrapper">
+              <table class="pve-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th style="width: 6.25rem;">Type</th>
+                    <th style="text-align: center; width: 5rem;">Status</th>
+                    {{ if $.Options.BoolOr "disk_graph" true }}<th class="metric-col" style="width: 50%;">Disk Usage</th>{{ end }}
+                  </tr>
+                </thead>
+                <tbody>
+                  {{- range $sortedResources -}}
+                    {{- $type := .String "type" -}}
+                    {{- if eq $type "storage" -}}
+                      {{- $status := .String "status" -}}
+                      {{- $isUp   := or (eq $status "available") (eq $status "ok") -}}
+                      <tr>
+                        <td style="font-weight: 600; font-size: var(--font-size-base);"><a href="${PROXMOX_URL}/#v1:0:={{ $type }}%2F{{ $nodeName }}%2F{{ .String "storage" }}:4:5::::::" target="_blank">{{ .String "storage" }}</a></td>
+                        <td><span class="type-badge">{{ $type }}</span></td>
+                        <td style="text-align: center;">
+                          <span class="status-indicator {{ if $isUp }}status-up{{ else }}status-down{{ end }}" title="{{ $status }}"></span>
+                        </td>
+
+                        {{ if $.Options.BoolOr "disk_graph" true }}
+                          <td>
+                            {{- if gt (.Float "maxdisk") 0.0 -}}
+                              {{- $percentDisk := mul (div (.Float "disk") (.Float "maxdisk")) 100 | toInt -}}
+                              <div data-popover-type="html">
+                                <div data-popover-html>Used: {{ printf "%.1f" (div (.Float "disk") $bytesInGB) }}GB<br>Total: {{ printf "%.1f" (div (.Float "maxdisk") $bytesInGB) }}GB</div>
+                                <div style="display: flex; align-items: center; gap: 0.9375rem;">
+                                  <div style="font-weight: 600; min-width: 3.75rem; color: var(--color-text-highlight);">{{ $percentDisk }}%</div>
+                                  <div class="pve-bar-track" style="margin-top: 0;">
+                                    <div class="pve-bar-fill{{ if ge $percentDisk 85 }} pve-bar-warning{{ end }}" style="width: {{ $percentDisk }}%;"></div>
+                                  </div>
+                                </div>
+                              </div>
+                            {{- else -}}-{{- end -}}
+                          </td>
+                        {{ end }}
+                      </tr>
+                    {{- end -}}
+                  {{- end -}}
+                </tbody>
+              </table>
+            </div>
+          {{ end }}
+
+        </div>
+      {{- end -}}
+    {{ else }}
+      <p class="pve-error">Error: {{ .Response.Status }}</p>
+    {{ end }}

@@ -1,0 +1,119 @@
+- size: full
+  widgets:
+    - type: split-column
+      max-columns: 2
+      widgets:
+        - type: monitor
+          title: 🖥️ Cluster
+          sites:
+            - title: Beszel
+              url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+              check-url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+              allow-insecure: true
+              icon: di:beszel
+            - title: SV1 (PVE)
+              url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+              check-url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+              allow-insecure: true
+              icon: di:proxmox
+            - title: SV2 (PVE)
+              url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+              check-url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+              allow-insecure: true
+              icon: di:proxmox
+            - title: SV3 (PVE)
+              url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+              check-url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+              allow-insecure: true
+              icon: di:proxmox
+            - title: Yedek (PBS)
+              url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+              check-url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+              allow-insecure: true
+              icon: di:proxmox
+
+        - type: monitor
+          title: 🗄️ Apps
+          sites:
+            - title: Meilisearch
+              url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+              check-url: http://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+              icon: di:meilisearch
+            - title: MongoDB
+              url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+              check-url: http://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+              icon: di:mongodb
+            - title: Bitwarden
+              url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+              check-url: http://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+              icon: di:bitwarden
+            - title: Nginx Proxy Manager
+              url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+              check-url: http://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+              icon: di:nginx-proxy-manager
+            - title: Immich
+              url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+              check-url: http://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+              icon: di:immich
+
+    - type: group
+      widgets:
+        - $include: ../widgets/Proxmox.yml
+        - $include: ../widgets/Beszel.yml
+        - $include: ../widgets/Immich.yml
+        - $include: ../widgets/NPM.yml
+        - $include: ../widgets/Tailscale.yml
+
+    - type: bookmarks
+      title: 🔗 Bookmarks
+      groups:
+        - title: General
+          links:
+            - title: Gmail
+              url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+            - title: Gemini
+              url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+            - title: YouTube
+              url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+            - title: ChatGPT
+              url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+            - title: GitHub
+              url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+        - title: Tools
+          links:
+            - title: md2pdf
+              url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+            - title: R10.net
+              url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+            - title: Cloudflare Dashboard
+              url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+            - title: CapRover
+              url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+            - title: Obfuscator.io Deobfuscator
+              url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+        - title: WebServisler
+          links:
+            - title: aHrefs
+              url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+            - title: Google Search Console
+              url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+            - title: Bing Webmaster Tools
+              url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+            - title: Yandex Webmster
+              url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+            - title: LinkedIn
+              url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+        - title: WatchBuddy
+          links:
+            - title: App Store Connect
+              url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+            - title: Apple Certificates
+              url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+            - title: iOS Release Workflow
+              url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+            - title: Google Play Console
+              url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+            - title: RevenueCat Overview
+              url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+            - title: Google Auth Clients
+              url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨

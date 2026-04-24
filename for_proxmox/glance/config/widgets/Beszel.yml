@@ -1,0 +1,123 @@
+- type: custom-api
+  title: Beszel Resources
+  title-url: ${BESZEL_PUBLIC}
+  cache: 1m
+  options:
+    public-url: ${BESZEL_PUBLIC}
+    base-url: ${BESZEL_URL}
+    api-key: ${BESZEL_API}
+  template: |
+    <style>
+      .beszel-container { background: var(--color-widget-background-highlight); border-radius: var(--border-radius); padding: 1.25rem; border: 1px solid var(--color-background); overflow-x: auto; }
+      .beszel-table { width: 100%; border-collapse: collapse; font-size: var(--font-size-h5); min-width: 600px; }
+      .beszel-table th { padding: 1rem 0.75rem; border-bottom: 2px solid var(--color-background); color: var(--color-primary); text-transform: uppercase; text-align: left; }
+      .beszel-table td { padding: 1.2rem 0.75rem; border-bottom: 1px solid var(--color-background); vertical-align: middle; }
+      .beszel-table tr:last-child td { border-bottom: none; }
+      .beszel-table tbody tr:hover { background-color: var(--color-background); }
+      .status-indicator { display: inline-block; width: 1rem; height: 1rem; border-radius: 50%; flex-shrink: 0; }
+      .status-up { background-color: var(--color-positive); box-shadow: 0 0 0.5rem var(--color-positive); }
+      .status-down { background-color: var(--color-negative); }
+      .beszel-bar-track { width: 100%; height: 0.5rem; background-color: var(--color-progress-border); border-radius: 0.375rem; overflow: hidden; margin-top: 0.5rem; }
+      .beszel-bar-fill { height: 100%; background-color: var(--color-primary); border-radius: 0.375rem; transition: width 0.4s ease; }
+      .beszel-bar-warning { background-color: var(--color-negative) !important; }
+      .beszel-metric { font-size: var(--font-size-base); font-weight: 700; color: var(--color-text-highlight); }
+      .beszel-node-name { font-size: var(--font-size-h4); font-weight: 800; display: flex; align-items: center; gap: 0.75rem; }
+      .beszel-uptime { font-family: monospace; font-size: var(--font-size-h6); color: var(--color-primary); text-align: right; display: block; }
+      .beszel-error { text-align: center; padding: 2rem; color: var(--color-text-subdue); }
+    </style>
+
+    {{ $baseURL := .Options.StringOr "base-url" "" }}
+    {{ $publicURL := .Options.StringOr "public-url" "" }}
+    {{ $apiKey  := .Options.StringOr "api-key" "" }}
+    {{ $token   := concat "Bearer " $apiKey }}
+
+    {{ $systemsResp := newRequest (print $baseURL "/api/collections/systems/records") | withHeader "Authorization" $token | getResponse }}
+
+    <div class="beszel-container">
+      {{ if $systemsResp.JSON }}
+        <table class="beszel-table">
+          <thead>
+            <tr>
+              <th style="width: 25%;">Node</th>
+              <th style="width: 20%;">CPU</th>
+              <th style="width: 25%;">RAM</th>
+              <th style="width: 25%;">Disk</th>
+              <th style="text-align: right; width: 5%;">Up</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{ range $system := $systemsResp.JSON.Array "items" }}
+              {{ $status := $system.String "status" }}
+              {{ $sysID  := $system.String "id" }}
+
+              {{ $statsResp := newRequest (print $baseURL "/api/collections/system_stats/records")
+                  | withHeader "Authorization" $token
+                  | withParameter "sort" "-created"
+                  | withParameter "perPage" "1"
+                  | withParameter "filter" (print "type='1m'&&system='" $sysID "'")
+                  | getResponse }}
+
+              {{ $hasStats := gt (len ($statsResp.JSON.Array "items")) 0 }}
+              {{ $s := "" }}{{ if $hasStats }}{{ $s = index ($statsResp.JSON.Array "items") 0 }}{{ end }}
+
+              {{ $cpu      := $system.Float "info.cpu" }}
+              {{ $ram_pct  := $system.Float "info.mp" }}
+              {{ $disk_pct := $system.Float "info.dp" }}
+              {{ $uptime   := $system.Float "info.u" }}
+
+              <tr>
+                <td>
+                  <div class="beszel-node-name">
+                    <span class="status-indicator {{ if eq $status "up" }}status-up{{ else }}status-down{{ end }}"></span>
+                    <a href="{{ $publicURL }}/system/{{ $sysID }}" target="_blank">{{ $system.String "name" }}</a>
+                  </div>
+                </td>
+
+                <td data-popover-type="html">
+                  <div data-popover-html>
+                    Load: {{ printf "%.1f" $cpu }}%<br>
+                    1m Avg: {{ printf "%.1f" ($system.Float "info.l1") }}
+                  </div>
+                  <div class="beszel-metric">{{ printf "%.1f" $cpu }}%</div>
+                  <div class="beszel-bar-track">
+                    <div class="beszel-bar-fill {{ if ge $cpu 85.0 }}beszel-bar-warning{{ end }}" style="width: {{ $cpu }}%;"></div>
+                  </div>
+                </td>
+
+                <td data-popover-type="html">
+                  {{ if $hasStats }}
+                    <div data-popover-html>
+                      Used: {{ printf "%.1f" ($s.Float "stats.mu") }} GB<br>
+                      Total: {{ printf "%.1f" ($s.Float "stats.m") }} GB
+                    </div>
+                  {{ end }}
+                  <div class="beszel-metric">{{ printf "%.1f" $ram_pct }}%</div>
+                  <div class="beszel-bar-track">
+                    <div class="beszel-bar-fill {{ if ge $ram_pct 85.0 }}beszel-bar-warning{{ end }}" style="width: {{ $ram_pct }}%;"></div>
+                  </div>
+                </td>
+
+                <td data-popover-type="html">
+                  {{ if $hasStats }}
+                    <div data-popover-html>
+                      Used: {{ printf "%.1f" ($s.Float "stats.du") }} GB<br>
+                      Total: {{ printf "%.1f" ($s.Float "stats.d") }} GB
+                    </div>
+                  {{ end }}
+                  <div class="beszel-metric">{{ printf "%.1f" $disk_pct }}%</div>
+                  <div class="beszel-bar-track">
+                    <div class="beszel-bar-fill {{ if ge $disk_pct 85.0 }}beszel-bar-warning{{ end }}" style="width: {{ $disk_pct }}%;"></div>
+                  </div>
+                </td>
+
+                <td>
+                  <span class="beszel-uptime">{{ if eq $status "up" }}{{ printf "%.0f" (mul $uptime 0.000011574) }}d{{ else }}OFF{{ end }}</span>
+                </td>
+              </tr>
+            {{ end }}
+          </tbody>
+        </table>
+      {{ else }}
+        <div class="beszel-error">Beszel API is not responding.</div>
+      {{ end }}
+    </div>
