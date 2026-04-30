@@ -5,38 +5,45 @@ set -e
 CONTAINER_NAME="mongodb"
 IMAGE_NAME="mongo:latest"
 
-echo "▶ MongoDB container volume'ları alınıyor..."
+echo "▶ Mevcut container yapılandırması yedekleniyor..."
 
-VOLUMES=$(docker inspect "$CONTAINER_NAME" \
-  --format '{{ range .Mounts }}{{ if eq .Type "volume" }}-v {{ .Name }}:{{ .Destination }} {{ end }}{{ end }}')
+# Volume'ları hem 'volume' hem 'bind' tipinde olacak şekilde yakalıyoruz
+MOUNT_ARGS=$(docker inspect "$CONTAINER_NAME" --format '
+  {{range .Mounts}}
+    {{- if eq .Type "volume" -}}
+      -v {{.Name}}:{{.Destination}}
+    {{- else if eq .Type "bind" -}}
+      -v {{.Source}}:{{.Destination}}
+    {{- end }}
+  {{end}}')
 
-if [ -z "$VOLUMES" ]; then
-  echo "❌ Volume bulunamadı. İşlem iptal edildi."
-  exit 1
+if [ -z "$MOUNT_ARGS" ]; then
+    echo "⚠ Uyarı: Hiçbir volume bulunamadı! Veri kaybı yaşayabilirsiniz."
+    read -p "Devam etmek istiyor musunuz? (y/n) " -n 1 -r
+    echo
+    [[ ! $REPLY =~ ^[Yy]$ ]] && exit 1
 fi
 
-echo "✔ Bulunan volume'lar:"
-echo "$VOLUMES"
-
-echo "▶ Container durduruluyor..."
+echo "▶ Container durduruluyor ve siliniyor..."
 docker stop "$CONTAINER_NAME"
-
-echo "▶ Container siliniyor..."
 docker rm "$CONTAINER_NAME"
 
-echo "▶ En güncel MongoDB image çekiliyor..."
+echo "▶ Yeni image çekiliyor..."
 docker pull "$IMAGE_NAME"
 
-echo "▶ MongoDB container yeniden oluşturuluyor..."
+echo "▶ MongoDB başlatılıyor..."
 
 docker run -d \
   --name "$CONTAINER_NAME" \
   --restart=unless-stopped \
-  -p 49160:27017 \
-  -e MONGO_INITDB_ROOT_USERNAME=🚨🚨🚨USER🚨🚨🚨 \
-  -e MONGO_INITDB_ROOT_PASSWORD=🚨🚨🚨PASS🚨🚨🚨 \
-  $VOLUMES \
+  -p 27017:27017 \
+  -e "MONGO_INITDB_ROOT_USERNAME=🚨🚨🚨USER🚨🚨🚨" \
+  -e "MONGO_INITDB_ROOT_PASSWORD=🚨🚨🚨PASS🚨🚨🚨" \
+  -e "GLIBC_TUNABLES=glibc.cpu.hwcaps=-SHSTK" \
+  $MOUNT_ARGS \
   "$IMAGE_NAME" \
   --auth
 
-echo "✅ MongoDB başarıyla güncellendi ve volume'lar korundu."
+echo "✅ İşlem tamamlandı. Loglar kontrol ediliyor..."
+sleep 2
+docker logs --tail 20 "$CONTAINER_NAME"

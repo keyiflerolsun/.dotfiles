@@ -307,22 +307,32 @@ if zfs list -H -o name $POOL_NAME &>/dev/null; then
         fi
 
         f_size=$(printf "%-6s" "$used")
-        # Emoji printf dışında tutuldu! Kaymayı önler.
         f_name=$(printf "%-18s" "${short_name:0:18}")
 
         echo -e "  ${ICON} ${f_name} ${C_MAGENTA}→${NC} ${C_YELLOW}${f_size}${NC}  ${DIM}${lib_bar}${NC}"
     done
 
     echo -e "  ${DIM}──────────────────────────────────────────────────────${NC}"
+
+    # Parametreleri Topla
     ASHIFT=$(zdb -C $POOL_NAME 2>/dev/null | grep ashift | awk '{print $2}' | head -n 1)
     COMP=$(zfs get -H -o value compression $POOL_NAME 2>/dev/null)
     ATIME=$(zfs get -H -o value atime $POOL_NAME 2>/dev/null)
+    XATTR=$(zfs get -H -o value xattr $POOL_NAME 2>/dev/null)
     CRATIO=$(zfs get -H -o value compressratio $POOL_NAME 2>/dev/null)
 
-    echo -e "  ${C_CYAN}⚙  PARAMETRELER:${NC} Hiza: ${C_BLUE}${ASHIFT}${NC} | Sikistirma: ${C_GREEN}${COMP} (${CRATIO})${NC} | Atime: ${C_RED}${ATIME}${NC}"
-    if [[ "$ATIME" == "on" ]]; then
-        echo -e "  ${C_YELLOW}⚠  IPUCU:${NC} SSD omru icin 'zfs set atime=off $POOL_NAME' onerilir.\n"
+    # Parametre Satırı
+    echo -e "  ${C_CYAN}⚙  PARAMETRELER:${NC} Hiza: ${C_BLUE}${ASHIFT}${NC} | Sik: ${C_GREEN}${COMP} (${CRATIO})${NC} | Atime: ${C_RED}${ATIME}${NC} | Xattr: ${C_MAGENTA}${XATTR}${NC}"
+
+    # Optimizasyon Kontrolü
+    if [[ "$ATIME" == "on" || "$XATTR" != "sa" ]]; then
+        echo -en "  ${C_YELLOW}⚠  IPUCU:${NC}"
+        [[ "$ATIME" == "on" ]] && echo -en " 'atime=off'"
+        [[ "$ATIME" == "on" && "$XATTR" != "sa" ]] && echo -en " ve"
+        [[ "$XATTR" != "sa" ]] && echo -en " 'xattr=sa'"
+        echo -e " onerilir."
     else
-        echo -e "  ${C_GREEN}✅ SISTEM OPTIMIZE DURUMDA.${NC}\n"
+        echo -e "  ${C_GREEN}✅ SISTEM OPTIMIZE DURUMDA.${NC}"
     fi
+    echo -e ""
 fi
