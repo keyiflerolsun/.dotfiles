@@ -281,12 +281,14 @@ fi
 # ==========================================
 # 5. ZFS DATASET (İKONLU MİNİ BARLAR) & PARAMETRELER
 # ==========================================
-if zfs list -H -o name $POOL_NAME &>/dev/null; then
+if zpool status "$POOL_NAME" &>/dev/null; then
     echo -e "  ${C_YELLOW}📂 ZFS DATASET DAGILIMI${NC}"
     echo -e "  ${DIM}──────────────────────────────────────────────────────${NC}"
 
-    zfs list -H -o name,used -t filesystem | grep "$POOL_NAME/" | while read -r name used; do
-        short_name=$(echo $name | cut -d'/' -f2)
+    # Tüm havuzlardaki "/" içeren (yani alt dataset olan) her şeyi listeler
+    zfs list -H -o name,used -t filesystem | grep "/" | while read -r name used; do
+        # Dataset ismini havuz isminden ayırır (harici/subvol-198 -> subvol-198)
+        short_name=$(echo "$name" | awk -F'/' '{print $NF}')
 
         # İkon Seçimi
         if [[ "$short_name" == subvol* ]]; then
@@ -295,34 +297,35 @@ if zfs list -H -o name $POOL_NAME &>/dev/null; then
             ICON="💾"
         fi
 
+        # Bar hesaplama
         val=$(echo $used | sed 's/[GKM]//; s/,/./')
         int_val=${val%.*}
         [[ -z "$int_val" ]] && int_val=0
         lib_bar=""
         if [[ $used == *G* ]]; then
-            limit=$(( int_val > 24 ? 24 : int_val ))
+            limit=$(( int_val > 20 ? 20 : int_val ))
             for ((i=0; i<limit; i++)); do lib_bar+="■"; done
         else
             lib_bar="·"
         fi
 
-        f_size=$(printf "%-6s" "$used")
-        f_name=$(printf "%-18s" "${short_name:0:18}")
+        f_size=$(printf "%-7s" "$used")
+        f_name=$(printf "%-22s" "${short_name:0:22}")
 
         echo -e "  ${ICON} ${f_name} ${C_MAGENTA}→${NC} ${C_YELLOW}${f_size}${NC}  ${DIM}${lib_bar}${NC}"
     done
 
     echo -e "  ${DIM}──────────────────────────────────────────────────────${NC}"
 
-    # Parametreleri Topla
-    ASHIFT=$(zdb -C $POOL_NAME 2>/dev/null | grep ashift | awk '{print $2}' | head -n 1)
-    COMP=$(zfs get -H -o value compression $POOL_NAME 2>/dev/null)
-    ATIME=$(zfs get -H -o value atime $POOL_NAME 2>/dev/null)
-    XATTR=$(zfs get -H -o value xattr $POOL_NAME 2>/dev/null)
-    CRATIO=$(zfs get -H -o value compressratio $POOL_NAME 2>/dev/null)
+    # Parametreleri Tespit Edilen POOL_NAME (Örn: harici) üzerinden çeker
+    ASHIFT=$(zdb -C "$POOL_NAME" 2>/dev/null | grep ashift | awk '{print $2}' | head -n 1)
+    COMP=$(zfs get -H -o value compression "$POOL_NAME" 2>/dev/null)
+    ATIME=$(zfs get -H -o value atime "$POOL_NAME" 2>/dev/null)
+    XATTR=$(zfs get -H -o value xattr "$POOL_NAME" 2>/dev/null)
+    CRATIO=$(zfs get -H -o value compressratio "$POOL_NAME" 2>/dev/null)
 
     # Parametre Satırı
-    echo -e "  ${C_CYAN}⚙  PARAMETRELER:${NC} Hiza: ${C_BLUE}${ASHIFT}${NC} | Sik: ${C_GREEN}${COMP} (${CRATIO})${NC} | Atime: ${C_RED}${ATIME}${NC} | Xattr: ${C_MAGENTA}${XATTR}${NC}"
+    echo -e "  ${C_CYAN}⚙  PARAMETRELER (${POOL_NAME}):${NC} Hiza: ${C_BLUE}${ASHIFT}${NC} | Sik: ${C_GREEN}${COMP} (${CRATIO})${NC} | Atime: ${C_RED}${ATIME}${NC} | Xattr: ${C_MAGENTA}${XATTR}${NC}"
 
     # Optimizasyon Kontrolü
     if [[ "$ATIME" == "on" || "$XATTR" != "sa" ]]; then
