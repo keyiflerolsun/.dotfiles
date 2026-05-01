@@ -6,7 +6,6 @@ ZSH_THEME="agnoster"
 
 plugins=(
   fzf
-  thefuck
   web-search
   command-not-found
   fancy-ctrl-z
@@ -32,6 +31,7 @@ echo "\n"
 #--------------------------------------------------------------------------------------#
 
 # * Path Ayarları
+export PATH="/usr/local/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/.cargo/bin:$PATH"
 export PATH="$HOME/Android/Sdk/emulator:$PATH"
@@ -62,7 +62,6 @@ alias p="python3"
 alias c="clear"
 alias json='jsonVer(){ cat "$@" | jq; unset -f jsonVer; }; jsonVer'
 alias tw="sudo teamviewer --daemon enable && systemctl enable teamviewerd && systemctl start teamviewerd && teamviewer"
-alias yenile="killall -q latte-dock && killall -q plasmashell && rm ~/.cache/icon-cache.kcache && nohup kstart plasmashell >/dev/null 2>&1 && nohup latte-dock >/dev/null 2>&1 &"
 alias ara='ara(){ find / -type f -name "$@" -print 2>/dev/null }; ara'
 alias md2pdf='md2pdf(){ pandoc -o "${@%%.*}.pdf" --template eisvogel --listings --pdf-engine=xelatex --toc "$@"; unset -f md2pdf; }; md2pdf'
 alias sar='sar(){ tar -cf - --no-same-owner "$@" | pv -s $(du -sb "$@" | awk '"'"'{print $1}'"'"') > "$@.tar"; unset -f sar; }; sar'
@@ -85,7 +84,6 @@ alias ram="bash ~/check-ram.sh"
 # * Orta tuşu (button 2) scroll için ata
 #xinput --set-prop "TPPS/2 Elan TrackPoint" "libinput Button Scrolling Button" 2
 
-
 # * youtube-dl
 alias yt='yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio" --merge-output-format mp4'
 alias mp3="yt-dlp -x --embed-thumbnail --audio-format mp3"
@@ -99,9 +97,6 @@ alias vnc_bitir="x11vnc -R stop"
 
 # * GPG_KEY
 export GPG_TTY=$(tty)
-
-# * aaPanel
-alias aa_ver="bash /etc/init.d/bt default"
 
 # * TR dil ayarları
 # export LC_ALL=tr_TR.UTF-8

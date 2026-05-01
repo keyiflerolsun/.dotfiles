@@ -43,7 +43,7 @@ echo -e "\n  ${C_CYAN}🔄 PBS TASK & NAMESPACE VIZOR${NC}  ${DIM}[Node: $(hostn
 # ==========================================
 # 1. PBS NAMESPACE VE İÇERİK HARİTASI
 # ==========================================
-echo -e "  ${C_YELLOW}🗂️  PBS NAMESPACE & YEDEK HARITASI${NC}"
+echo -e "  ${C_YELLOW}🗂  PBS NAMESPACE & YEDEK HARITASI${NC}"
 echo -e "  ${DIM}──────────────────────────────────────────────────────${NC}"
 
 python3 -c '
@@ -98,7 +98,7 @@ for ds_name, ds_path in datastores.items():
     elif [[ "$type" == "ROOT" ]]; then
         echo -e "  💾 ${C_CYAN}${label}${NC} ${DIM}(Kök Dizin)${NC} ${C_MAGENTA}→${NC} ${C_GREEN}${content}${NC}"
     elif [[ "$type" == "NS" ]]; then
-        echo -e "     └─ 🗂️  ${C_YELLOW}ns:${label}${NC} ${C_MAGENTA}→${NC} ${C_GREEN}${content}${NC}"
+        echo -e "     └─ 🗂  ${C_YELLOW}ns:${label}${NC} ${C_MAGENTA}→${NC} ${C_GREEN}${content}${NC}"
     fi
 done
 echo -e "  ${DIM}──────────────────────────────────────────────────────${NC}\n"
@@ -109,28 +109,46 @@ echo -e "  ${DIM}─────────────────────
 echo -e "  ${C_YELLOW}📦 PVE YEDEKLEME ZAMANLAMALARI (VZDUMP JOBS)${NC}"
 
 if [ -f /etc/pve/jobs.cfg ] && grep -q "^vzdump:" /etc/pve/jobs.cfg; then
-    echo -e "  ${DIM}┌────────────────────────┬──────────────┬────────────────────┬──────────────────┐${NC}"
-    echo -e "  ${DIM}│${NC} ${C_BLUE}$(printf "%-22s" "GOREV ID")${NC} ${DIM}│${NC} ${C_BLUE}$(printf "%-12s" "NODE")${NC} ${DIM}│${NC} ${C_BLUE}$(printf "%-18s" "HEDEF DEPO")${NC} ${DIM}│${NC} ${C_BLUE}$(printf "%-16s" "ZAMANLAMA")${NC} ${DIM}│${NC}"
-    echo -e "  ${DIM}├────────────────────────┼──────────────┼────────────────────┼──────────────────┤${NC}"
+    echo -e "  ${DIM}┌────────────────────────┬──────────┬──────────────┬──────────┬──────────────────────┐${NC}"
+    echo -e "  ${DIM}│${NC} ${C_BLUE}$(printf "%-22s" "GOREV ID")${NC} ${DIM}│${NC} ${C_BLUE}$(printf "%-8s" "NODE")${NC} ${DIM}│${NC} ${C_BLUE}$(printf "%-12s" "HEDEF")${NC} ${DIM}│${NC} ${C_BLUE}$(printf "%-8s" "ZAMAN")${NC} ${DIM}│${NC} ${C_BLUE}$(printf "%-20s" "KAPSAM")${NC} ${DIM}│${NC}"
+    echo -e "  ${DIM}├────────────────────────┼──────────┼──────────────┼──────────┼──────────────────────┤${NC}"
 
     awk '
     /^vzdump:/ {
-        if(id != "") print id"|"node"|"storage"|"sched;
-        id=$2; node="Tumu (All)"; storage="-"; sched="-"
+        if(id != "") print id"|"node"|"storage"|"sched"|"exclude"|"vmid"|"all;
+        id=$2; node="All"; storage="-"; sched="-"; exclude="-"; vmid="-"; all="-"
     }
     /^[ \t]+node / { node=$2 }
     /^[ \t]+storage / { storage=$2 }
     /^[ \t]+schedule / { sched=$2 }
+    /^[ \t]+exclude / { exclude=$2 }
+    /^[ \t]+vmid / { vmid=$2 }
+    /^[ \t]+all / { all=$2 }
     END {
-        if(id != "") print id"|"node"|"storage"|"sched
-    }' /etc/pve/jobs.cfg | while IFS='|' read -r id node storage sched; do
+        if(id != "") print id"|"node"|"storage"|"sched"|"exclude"|"vmid"|"all
+    }' /etc/pve/jobs.cfg | while IFS='|' read -r id node storage sched exclude vmid all; do
+
+        # Kapsam Mantığı
+        if [ "$vmid" != "-" ]; then
+            kapsam="+: $vmid"
+            k_color=$C_GREEN
+        elif [ "$exclude" != "-" ]; then
+            kapsam="-: $exclude"
+            k_color=$C_RED
+        else
+            kapsam="Tümü"
+            k_color=$C_CYAN
+        fi
+
         f_id=$(vpad "${id:0:22}" 22)
-        f_node=$(vpad "${node:0:12}" 12)
-        f_store=$(vpad "${storage:0:18}" 18)
-        f_sched=$(vpad "${sched:0:16}" 16)
-        echo -e "  ${DIM}│${NC} ${C_GREEN}${f_id}${NC} ${DIM}│${NC} ${C_CYAN}${f_node}${NC} ${DIM}│${NC} ${C_YELLOW}${f_store}${NC} ${DIM}│${NC} ${C_MAGENTA}${f_sched}${NC} ${DIM}│${NC}"
+        f_node=$(vpad "${node:0:8}" 8)
+        f_store=$(vpad "${storage:0:12}" 12)
+        f_sched=$(vpad "${sched:0:8}" 8)
+        f_kapsam=$(vpad "${kapsam:0:20}" 20)
+
+        echo -e "  ${DIM}│${NC} ${C_GREEN}${f_id}${NC} ${DIM}│${NC} ${C_CYAN}${f_node}${NC} ${DIM}│${NC} ${C_YELLOW}${f_store}${NC} ${DIM}│${NC} ${C_MAGENTA}${f_sched}${NC} ${DIM}│${NC} ${k_color}${f_kapsam}${NC} ${DIM}│${NC}"
     done
-    echo -e "  ${DIM}└────────────────────────┴──────────────┴────────────────────┴──────────────────┘${NC}\n"
+    echo -e "  ${DIM}└────────────────────────┴──────────┴──────────────┴──────────┴──────────────────────┘${NC}\n"
 else
     echo -e "  ${DIM}Yok. (Bu node uzerinde PVE yedekleme gorevi bulunmuyor)${NC}\n"
 fi
