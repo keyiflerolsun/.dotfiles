@@ -9,6 +9,33 @@ C_BLUE='\033[1;34m'
 NC='\033[0m'
 DIM='\033[1;30m'
 
+# vpad: pad visible width (handles wide unicode chars)
+vpad() {
+    local text="$1"
+    local width="$2"
+    python3 - "$text" "$width" <<'PY'
+import sys, re, unicodedata
+ansi_re = re.compile(r'\x1b\[[0-9;]*m')
+text = sys.argv[1]
+width = int(sys.argv[2])
+plain = ansi_re.sub('', text)
+def wch(ch):
+    ea = unicodedata.east_asian_width(ch)
+    return 2 if ea in ('F','W') else 1
+out = ''
+cur = 0
+for ch in plain:
+    cw = wch(ch)
+    if cur + cw > width:
+        break
+    out += ch
+    cur += cw
+if cur < width:
+    out = out + ' ' * (width - cur)
+sys.stdout.write(out)
+PY
+}
+
 TARGET_PCT=65
 MIN_GB=2
 
@@ -61,16 +88,16 @@ while read -r vmid status name; do
 
             new_size="${target_gb}G"
 
-            f_id=$(printf "%-4s" "$vmid")
-            f_name=$(printf "%-16s" "${name:0:16}")
-            f_use=$(printf "%-8s" "$refer_gb")
+            f_id=$(vpad "$vmid" 4)
+            f_name=$(vpad "${name:0:16}" 16)
+            f_use=$(vpad "$refer_gb" 8)
 
             # Eski ve Yeni sayıyı kıyasla
             old_num=$(echo "$old_size" | tr -d 'GKM')
             new_num=$(echo "$new_size" | tr -d 'GKM')
 
             chg_txt="${old_size} -> ${new_size}"
-            f_chg=$(printf "%-12s" "$chg_txt")
+            f_chg=$(vpad "$chg_txt" 12)
 
             if [[ "$old_num" -lt "$new_num" ]]; then
                 STATUS_TXT="${C_YELLOW}🔼 Buyuyecek ${NC}"

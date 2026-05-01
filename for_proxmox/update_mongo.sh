@@ -5,6 +5,13 @@ set -e
 CONTAINER_NAME="mongodb"
 IMAGE_NAME="mongo:latest"
 
+# --- KONTROL BLOĞU ---
+if ! docker ps -a --format '{{.Names}}' | grep -Eq "^${CONTAINER_NAME}\$"; then
+    echo "❌ Hata: '$CONTAINER_NAME' isminde bir container bulunamadı!"
+    exit 1
+fi
+# ---------------------
+
 echo "▶ Mevcut container yapılandırması yedekleniyor..."
 
 # Volume'ları hem 'volume' hem 'bind' tipinde olacak şekilde yakalıyoruz

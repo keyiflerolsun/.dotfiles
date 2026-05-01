@@ -13,6 +13,33 @@ DIM='\033[1;30m'
 clear
 echo -e "\n  ${C_CYAN}🌐 DYNAMIC NETWORK VIZOR${NC}  ${DIM}[Node: $(hostname)]${NC}\n"
 
+# vpad: pad visible width (handles wide unicode chars)
+vpad() {
+    local text="$1"
+    local width="$2"
+    python3 - "$text" "$width" <<'PY'
+import sys, re, unicodedata
+ansi_re = re.compile(r'\x1b\[[0-9;]*m')
+text = sys.argv[1]
+width = int(sys.argv[2])
+plain = ansi_re.sub('', text)
+def wch(ch):
+    ea = unicodedata.east_asian_width(ch)
+    return 2 if ea in ('F','W') else 1
+out = ''
+cur = 0
+for ch in plain:
+    cw = wch(ch)
+    if cur + cw > width:
+        break
+    out += ch
+    cur += cw
+if cur < width:
+    out = out + ' ' * (width - cur)
+sys.stdout.write(out)
+PY
+}
+
 # ==========================================
 # 1. FİZİKSEL DONANIMLAR (Hardware NICs)
 # ==========================================
@@ -34,11 +61,11 @@ for dev in $(ls /sys/class/net/ | sort); do
         [[ "$state" == "up" || "$state" == "UP" ]] && S_COLOR=$C_GREEN || S_COLOR=$DIM
         [[ "$speed" == "-1" || "$speed" == "0" || "$speed" == "" ]] && speed_str="---" || speed_str="${speed}M"
 
-        f_port=$(printf "%-10s" "${dev:0:10}")
-        f_state=$(printf "%-7s" "${state^^}")
-        f_mtu=$(printf "%-5s" "$mtu")
-        f_speed=$(printf "%-7s" "$speed_str")
-        f_info=$(printf "%-30s" "${info_txt:0:30}")
+        f_port=$(vpad "${dev:0:10}" 10)
+        f_state=$(vpad "${state^^}" 7)
+        f_mtu=$(vpad "$mtu" 5)
+        f_speed=$(vpad "$speed_str" 7)
+        f_info=$(vpad "${info_txt:0:30}" 30)
 
         echo -e "  ${DIM}│${NC} ${C_CYAN}${f_port}${NC} ${DIM}│${NC} ${S_COLOR}${f_state}${NC} ${DIM}│${NC} ${f_mtu} ${DIM}│${NC} ${C_YELLOW}${f_speed}${NC} ${DIM}│${NC} ${f_info} ${DIM}│${NC}"
     fi
@@ -66,10 +93,10 @@ ip -o -4 addr show | grep -v " lo " | while read -r _ dev _ ip_cidr _; do
     [[ "$type" == "VPN" ]] && T_COLOR=$C_CYAN
     [[ "$type" == "LXC/Veth" ]] && T_COLOR=$DIM
 
-    f_dev=$(printf "%-12s" "${dev:0:12}")
-    f_type=$(printf "%-9s" "$type")
-    f_mtu=$(printf "%-5s" "$mtu")
-    f_ip=$(printf "%-26s" "${ip_cidr:0:26}")
+    f_dev=$(vpad "${dev:0:12}" 12)
+    f_type=$(vpad "$type" 9)
+    f_mtu=$(vpad "$mtu" 5)
+    f_ip=$(vpad "${ip_cidr:0:26}" 26)
 
     echo -e "  ${DIM}│${NC} ${C_YELLOW}${f_dev}${NC} ${DIM}│${NC} ${T_COLOR}${f_type}${NC} ${DIM}│${NC} ${f_mtu} ${DIM}│${NC} ${C_CYAN}${f_ip}${NC} ${DIM}│${NC}"
 done
@@ -95,9 +122,9 @@ ip -4 route | while read -r line; do
         D_COLOR=$NC
     fi
 
-    f_dest=$(printf "%-18s" "${dest:0:18}")
-    f_gw=$(printf "%-18s" "${gw:0:18}")
-    f_dev=$(printf "%-8s" "${dev:0:8}")
+    f_dest=$(vpad "${dest:0:18}" 18)
+    f_gw=$(vpad "${gw:0:18}" 18)
+    f_dev=$(vpad "${dev:0:8}" 8)
 
     echo -e "  ${DIM}│${NC} ${D_COLOR}${f_dest}${NC} ${DIM}│${NC} ${C_YELLOW}${f_gw}${NC} ${DIM}│${NC} ${C_CYAN}${f_dev}${NC} ${DIM}│${NC}"
 done
