@@ -5,14 +5,17 @@
 # * Pacman Paketleri -------------------------------------------------------------
 sudo pacman -Syu --noconfirm
 sudo pacman -S --needed --noconfirm \
-  fastfetch micro fzf jq bat sshpass ufw mission-center webkitgtk-6.0 htop unzip lazydocker tmux sstp-client yay yakuake \
-  fprintd libfprint tpm2-tss intel-media-driver fwupd \
-  brave-bin telegram-desktop chromium remmina libvncserver freerdp spotify-launcher freedownloadmanager \
-  kvantum libreoffice-still okular \
-  python-pip clang cmake make gcc gcc-libs rust cargo npm ruby jdk-openjdk gdb glibc-debug valgrind \
-  android-tools \
+  fastfetch micro fzf jq bat zsh sshpass mission-center htop unzip tmux webkit2gtk-4.1 sstp-client yay yakuake \
+  brave-bin telegram-desktop chromium remmina libvncserver freerdp freedownloadmanager \
+  kvantum onlyoffice-bin okular rclone rsync \
+  python-pip clang cmake make gcc gcc-libs rust cargo npm ruby jdk-openjdk gdb valgrind \
+  android-tools obs-studio \
   mongodb-tools-bin mongodb-compass \
-  ffmpeg leptonica tesseract tesseract-data-eng
+  ffmpeg leptonica tesseract tesseract-data-eng tesseract-data-tur
+
+# * TailScale
+curl -fsSL https://tailscale.com/install.sh | sh
+# -------------------------------------------------------------------------------
 
 # * Ruby: colorls kurulumu -------------------------------------------------------
 if ! gem list -i colorls >/dev/null 2>&1; then
@@ -33,7 +36,6 @@ sudo tlp-stat -s
 
 # ? Aur
 yay -S --needed --noconfirm \
-    simplescreenrecorder-git \
     visual-studio-code-bin
 yay -Scc --noconfirm
 yay -Yc --noconfirm
@@ -66,11 +68,6 @@ git clone --depth 1 https://github.com/zsh-users/zsh-syntax-highlighting ${ZSH_C
 git clone --depth 1 https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 git clone --depth 1 https://github.com/unixorn/fzf-zsh-plugin.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/fzf-zsh-plugin
 rm -rf ~/.zshrc && wget -O ~/.zshrc https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/.dots/.zshrc
-
-
-# ? fzf
-git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-~/.fzf/install
 
 # ? Docker
 sudo pacman -S --needed --noconfirm docker docker-compose docker-buildx
