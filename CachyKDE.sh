@@ -30,7 +30,10 @@ echo "acpi_call" | sudo tee /etc/modules-load.d/acpi_call.conf >/dev/null
 
 # ? Batarya Optimizasyonu
 sudo pacman -S --needed --noconfirm tlp tlp-rdw -y
-systemctl enable tlp.service
+sudo systemctl mask power-profiles-daemon.service
+sudo systemctl stop power-profiles-daemon.service
+sudo tlp start
+sudo systemctl enable tlp.service
 sudo tlp-stat -s
 
 
@@ -61,7 +64,7 @@ git config --global credential.helper "cache --timeout=36000"
 
 
 # ? ZSH
-sudo pacman -S zsh -y
+sudo pacman -S --needed --noconfirm zsh
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 git clone --depth 1 https://github.com/zsh-users/zsh-completions ${ZSH_CUSTOM:=~/.oh-my-zsh/custom}/plugins/zsh-completions
 git clone --depth 1 https://github.com/zsh-users/zsh-syntax-highlighting ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
@@ -74,22 +77,3 @@ sudo pacman -S --needed --noconfirm docker docker-compose docker-buildx
 sudo systemctl start docker.service
 sudo systemctl enable docker.service
 sudo usermod -aG docker $USER
-docker pull python:3.13.7-slim-trixie
-docker run -d --name=redis --restart=always -p 6379:6379 redis:latest
-docker run -d --name=mongodb --restart=always -p 27017:27017 \
-    -e MONGO_INITDB_ROOT_USERNAME=fikibok \
-    -e MONGO_INITDB_ROOT_PASSWORD=cukubik \
-    mongo:latest --auth
-docker run -d --name=portainer --restart=always -p 8000:8000 -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:latest
-
-
-# ? Markdown » PDF
-sudo pacman -S --needed --noconfirm \
-  pandoc \
-  texlive-bin texlive-core \
-  texlive-latex texlive-latexextra \
-  texlive-fontsextra \
-  texlive-fontsrecommended \
-  texlive-xetex
-sudo mktexlsr && sudo fmtutil-sys --all
-sudo wget -O /usr/share/pandoc/data/templates/pdf_theme.latex https://raw.githubusercontent.com/Wandmalfarbe/pandoc-latex-template/master/eisvogel.texf_theme.latex https://raw.githubusercontent.com/Wandmalfarbe/pandoc-latex-template/master/eisvogel.tex
