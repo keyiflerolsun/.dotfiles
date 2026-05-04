@@ -130,6 +130,34 @@ pvesm status | grep -v "Name" | while read -r name type status total used avail 
     fi
 
     clean_per=$(echo $per | sed 's/%//')
+
+    # ZFS ve dir için gerçek fs kullanımını al (pvesm sadece managed content sayar)
+    if [[ "$type" == "zfspool" ]]; then
+        pool_name=$(grep -A 20 "^zfspool: ${name}$" /etc/pve/storage.cfg | grep -E "^\s+pool " | head -1 | awk '{print $2}')
+        [[ -z "$pool_name" ]] && pool_name="$name"
+        _used_b=$(zfs list -H -p -o used "$pool_name" 2>/dev/null)
+        _avail_b=$(zfs list -H -p -o available "$pool_name" 2>/dev/null)
+        if [[ -n "$_used_b" && -n "$_avail_b" ]] && (( _used_b + _avail_b > 0 )); then
+            _total_b=$(( _used_b + _avail_b ))
+            _u_fmt=$(awk "BEGIN {b=$_used_b; if(b<1048576) printf \"%.0fK\",b/1024; else if(b<1073741824) printf \"%.0fM\",b/1048576; else printf \"%.1fG\",b/1073741824}")
+            _t_fmt=$(awk "BEGIN {printf \"%.0fG\", $_total_b/1073741824}")
+            USAGE="${_u_fmt}/${_t_fmt}"
+            clean_per=$(awk "BEGIN {printf \"%d\", $_used_b * 100 / $_total_b}")
+        fi
+    elif [[ "$type" == "dir" ]]; then
+        _path=$(grep -A 20 "^dir: ${name}$" /etc/pve/storage.cfg | grep -E "^\s+path " | head -1 | awk '{print $2}')
+        if [[ -n "$_path" ]]; then
+            _df_line=$(df -PB1 "$_path" 2>/dev/null | tail -1)
+            _used_b=$(echo "$_df_line" | awk '{print $3}')
+            _total_b=$(echo "$_df_line" | awk '{print $2}')
+            if [[ -n "$_total_b" && "$_total_b" -gt 0 ]]; then
+                _u_fmt=$(awk "BEGIN {b=$_used_b; if(b<1048576) printf \"%.0fK\",b/1024; else if(b<1073741824) printf \"%.0fM\",b/1048576; else printf \"%.1fG\",b/1073741824}")
+                _t_fmt=$(awk "BEGIN {printf \"%.0fG\", $_total_b/1073741824}")
+                USAGE="${_u_fmt}/${_t_fmt}"
+                clean_per=$(awk "BEGIN {printf \"%d\", $_used_b * 100 / $_total_b}")
+            fi
+        fi
+    fi
     [[ "$status" == "active" ]] && COLOR_S=$C_GREEN || COLOR_S=$C_RED
 
     if [[ "$clean_per" == "N/A" || ! "$clean_per" =~ ^[0-9]+([.][0-9]+)?$ ]]; then
@@ -142,6 +170,7 @@ pvesm status | grep -v "Name" | while read -r name type status total used avail 
         bar=""
         spaces=""
         limit=$(( int_per * 17 / 100 ))
+        [[ $int_per -gt 0 && $limit -eq 0 ]] && limit=1
         [[ $limit -gt 17 ]] && limit=17
 
         [[ $int_per -gt 80 ]] && COLOR_B=$C_RED || COLOR_B=$C_CYAN
@@ -185,7 +214,9 @@ if [[ -n "$POOL_NAMES" ]]; then
         [[ $Z_CAP -gt 80 ]] && COLOR_C=$C_RED || COLOR_C=$C_YELLOW
 
         bar=""; spaces=""
-        limit=$(( Z_CAP * 18 / 100 )); [[ $limit -gt 18 ]] && limit=18
+        limit=$(( Z_CAP * 18 / 100 ))
+        [[ $Z_CAP -gt 0 && $limit -eq 0 ]] && limit=1
+        [[ $limit -gt 18 ]] && limit=18
         for ((i=0; i<limit; i++)); do bar+="■"; done
         for ((i=limit; i<18; i++)); do spaces+=" "; done
 
@@ -193,7 +224,9 @@ if [[ -n "$POOL_NAMES" ]]; then
         f_health=$(vpad "${Z_HEALTH:0:8}" 8)
         f_size=$(vpad "${Z_SIZE:0:8}" 8)
         f_free=$(vpad "${Z_FREE:0:8}" 8)
-        f_bar=$(vpad "${bar}${spaces}" 20)
+        f_pct=$(printf "%3s%%" "$Z_CAP")
+        bar_str="${f_pct} ${bar}${spaces}"
+        f_bar=$(vpad "$bar_str" 20)
 
         echo -e "  ${DIM}│${NC} ${f_pool} ${DIM}│${NC} ${COLOR_H}${f_health}${NC} ${DIM}│${NC} ${C_CYAN}${f_size}${NC} ${DIM}│${NC} ${C_GREEN}${f_free}${NC} ${DIM}│${NC} ${COLOR_C}${f_bar}${NC} ${DIM}│${NC}"
     done <<< "$POOL_NAMES"
@@ -290,6 +323,39 @@ else
 fi
 
 # ==========================================
+# 4b. SANAL MAKİNE (QEMU) HARİTASI
+# ==========================================
+VM_LIST=$(qm list 2>/dev/null | tail -n +2)
+if [[ -n "$VM_LIST" ]]; then
+    echo -e "  ${C_YELLOW}🖥  SANAL MAKINE (QEMU) HARITASI${NC}"
+    echo -e "  ${DIM}┌──────┬──────────────────┬───────────────┬─────────┐${NC}"
+    echo -e "  ${DIM}│${NC} ${C_BLUE}$(vpad "ID" 4)${NC} ${DIM}│${NC} ${C_BLUE}$(vpad "VM ISMI" 16)${NC} ${DIM}│${NC} ${C_BLUE}$(vpad "DEPOLAMA" 13)${NC} ${DIM}│${NC} ${C_BLUE}$(vpad "BOYUT" 7)${NC} ${DIM}│${NC}"
+    echo -e "  ${DIM}├──────┼──────────────────┼───────────────┼─────────┤${NC}"
+
+    while read -r vmid name vm_status _rest; do
+        [[ -z "$vmid" ]] && continue
+        vm_config=$(qm config "$vmid" 2>/dev/null)
+
+        # cloudinit/cdrom hariç, size= içeren ilk diski bul
+        disk_line=$(echo "$vm_config" | grep -E "^(scsi|virtio|sata|ide)[0-9]+:" | grep "size=" | grep -v "cloudinit\|media=cdrom" | head -n 1)
+        [[ -z "$disk_line" ]] && continue
+        vol_id=$(echo "$disk_line" | awk '{print $2}' | cut -d',' -f1)
+        storage=$(echo "$vol_id" | cut -d':' -f1)
+        old_size=$(echo "$disk_line" | grep -o 'size=[0-9]*[A-Z]' | cut -d'=' -f2)
+        [[ -z "$old_size" ]] && continue
+
+        f_id=$(vpad "$vmid" 4)
+        f_name=$(vpad "${name:0:16}" 16)
+        f_disk=$(vpad "${storage:0:13}" 13)
+        f_size=$(vpad "${old_size:0:7}" 7)
+        [[ "$vm_status" == "running" ]] && c_id=$C_GREEN || c_id=$DIM
+        echo -e "  ${DIM}│${NC} ${c_id}${f_id}${NC} ${DIM}│${NC} ${f_name} ${DIM}│${NC} ${C_YELLOW}${f_disk}${NC} ${DIM}│${NC} ${C_CYAN}${f_size}${NC} ${DIM}│${NC}"
+    done <<< "$VM_LIST"
+
+    echo -e "  ${DIM}└──────┴──────────────────┴───────────────┴─────────┘${NC}\n"
+fi
+
+# ==========================================
 # 5. ZFS DATASET DAGILIMI
 # ==========================================
 echo -e "  ${C_YELLOW}📂 ZFS DATASET DAGILIMI${NC}"
@@ -307,10 +373,12 @@ while read -r name used; do
     [[ -z "$int_val" || ! "$int_val" =~ ^[0-9]+$ ]] && int_val=0
 
     lib_bar=""
-    if [[ "$used" == *T* ]]; then limit=20
-    elif [[ "$used" == *G* ]]; then limit=$int_val; [[ $limit -gt 20 ]] && limit=20
-    else limit=0; lib_bar="·"; fi
+    bar_len=0
+    if [[ "$used" == *T* ]]; then limit=10; bar_len=10
+    elif [[ "$used" == *G* ]]; then limit=$int_val; [[ $limit -gt 10 ]] && limit=10; bar_len=$limit
+    else limit=0; lib_bar="·"; bar_len=1; fi
     for ((i=0; i<limit; i++)); do lib_bar+="■"; done
+    for ((i=bar_len; i<10; i++)); do lib_bar+=" "; done
 
     f_size=$(vpad "$used" 7)
     f_name=$(vpad "${short_name:0:22}" 22)
@@ -323,6 +391,27 @@ while read -r name used; do
         DS_OTHERS+=("$line")
     fi
 done <<< "$(zfs list -H -o name,used -t filesystem | grep "/")"
+
+# ZFS zvols (VM diskleri)
+while read -r name used; do
+    short_name=$(echo "$name" | awk -F'/' '{print $NF}')
+    parent_pool=$(echo "$name" | cut -d'/' -f1)
+    [[ "$short_name" != vm-* ]] && continue
+
+    clean_used=$(echo "$used" | sed 's/[a-zA-Z]//g; s/,/./')
+    int_val=${clean_used%.*}
+    [[ -z "$int_val" || ! "$int_val" =~ ^[0-9]+$ ]] && int_val=0
+    lib_bar=""
+    bar_len=0
+    if [[ "$used" == *T* ]]; then limit=10; bar_len=10
+    elif [[ "$used" == *G* ]]; then limit=$int_val; [[ $limit -gt 10 ]] && limit=10; bar_len=$limit
+    else limit=0; lib_bar="·"; bar_len=1; fi
+    for ((i=0; i<limit; i++)); do lib_bar+="■"; done
+    for ((i=bar_len; i<10; i++)); do lib_bar+=" "; done
+    f_size=$(vpad "$used" 7)
+    f_name=$(vpad "${short_name:0:22}" 22)
+    DS_SUBVOLS+=("  🖥  ${f_name} ${C_MAGENTA}→${NC} ${C_YELLOW}${f_size}${NC}  ${DIM}${lib_bar}${NC} ${DIM}[${parent_pool}]${NC}")
+done <<< "$(zfs list -H -o name,used -t volume 2>/dev/null | grep "/")"
 
 for line in "${DS_SUBVOLS[@]}"; do echo -e "$line"; done
 for line in "${DS_OTHERS[@]}"; do echo -e "$line"; done

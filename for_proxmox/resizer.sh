@@ -102,10 +102,10 @@ while read -r vmid status name; do
 
     if [[ "$old_num" -lt "$new_num" ]]; then
         echo -e "  ${DIM}│${NC} ${f_id} ${DIM}│${NC} ${f_name} ${DIM}│${NC} ${C_MAGENTA}${f_use}${NC} ${DIM}│${NC} ${C_YELLOW}${f_chg}${NC} ${DIM}│${NC} ${C_YELLOW}🔼 Buyuyecek ${NC} ${DIM}│${NC}"
-        COMMANDS_TO_RUN+=("$vmid|$old_size|$new_size|$zfs_ds")
+        COMMANDS_TO_RUN+=("lxc|$vmid|$old_size|$new_size|$zfs_ds")
     elif [[ "$old_num" -gt "$new_num" ]]; then
         echo -e "  ${DIM}│${NC} ${f_id} ${DIM}│${NC} ${f_name} ${DIM}│${NC} ${C_MAGENTA}${f_use}${NC} ${DIM}│${NC} ${C_CYAN}${f_chg}${NC} ${DIM}│${NC} ${C_CYAN}🔽 Kuculecek ${NC} ${DIM}│${NC}"
-        COMMANDS_TO_RUN+=("$vmid|$old_size|$new_size|$zfs_ds")
+        COMMANDS_TO_RUN+=("lxc|$vmid|$old_size|$new_size|$zfs_ds")
     else
         echo -e "  ${DIM}│${NC} ${f_id} ${DIM}│${NC} ${f_name} ${DIM}│${NC} ${DIM}${f_use}${NC} ${DIM}│${NC} ${DIM}${f_chg}${NC} ${DIM}│${NC} ${C_GREEN}✅ Ideal     ${NC} ${DIM}│${NC}"
     fi
@@ -113,9 +113,42 @@ done <<< "$(pct list | tail -n +2)"
 
 echo -e "  ${DIM}└──────┴──────────────────┴──────────┴──────────────┴───────────────┘${NC}\n"
 
+# ==========================================
+# SANAL MAKİNELER (QEMU)
+# ==========================================
+VM_LIST=$(qm list 2>/dev/null | tail -n +2)
+if [[ -n "$VM_LIST" ]]; then
+    echo -e "  ${DIM}VM - Sadece Bilgi, Manuel Resize${NC}\n"
+    echo -e "  ${DIM}┌──────┬──────────────────┬──────────┬──────────────┬───────────────┐${NC}"
+    H_VM_DISK=$(printf "%-8s" "DEPOLAMA")
+    H_VM_SIZE=$(printf "%-12s" "BOYUT")
+    echo -e "  ${DIM}│${NC} ${C_BLUE}${H_ID}${NC} ${DIM}│${NC} ${C_BLUE}${H_NAME}${NC} ${DIM}│${NC} ${C_BLUE}${H_VM_DISK}${NC} ${DIM}│${NC} ${C_BLUE}${H_VM_SIZE}${NC} ${DIM}│${NC} ${C_BLUE}${H_STAT}${NC} ${DIM}│${NC}"
+    echo -e "  ${DIM}├──────┼──────────────────┼──────────┼──────────────┼───────────────┤${NC}"
+
+    while read -r vmid name vm_status _rest; do
+        [[ -z "$vmid" ]] && continue
+        vm_config=$(qm config "$vmid" 2>/dev/null)
+
+        disk_line=$(echo "$vm_config" | grep -E "^(scsi|virtio|sata|ide)[0-9]+:" | grep "size=" | grep -v "cloudinit\|media=cdrom" | head -n 1)
+        [[ -z "$disk_line" ]] && continue
+        old_size=$(echo "$disk_line" | grep -o 'size=[0-9]*[A-Z]' | cut -d'=' -f2)
+        [[ -z "$old_size" ]] && continue
+        storage=$(echo "$disk_line" | awk '{print $2}' | cut -d':' -f1)
+
+        f_id=$(vpad "$vmid" 4)
+        f_name=$(vpad "${name:0:16}" 16)
+        f_disk=$(vpad "${storage:0:8}" 8)
+        f_size=$(vpad "${old_size}" 12)
+        [[ "$vm_status" == "running" ]] && status_txt="${C_YELLOW}⚠ Manuel      ${NC}" || status_txt="${DIM}⏸ Durduruldu ${NC}"
+        echo -e "  ${DIM}│${NC} ${f_id} ${DIM}│${NC} ${f_name} ${DIM}│${NC} ${C_CYAN}${f_disk}${NC} ${DIM}│${NC} ${C_CYAN}${f_size}${NC} ${DIM}│${NC} ${status_txt} ${DIM}│${NC}"
+    done <<< "$VM_LIST"
+
+    echo -e "  ${DIM}└──────┴──────────────────┴──────────┴──────────────┴───────────────┘${NC}\n"
+fi
+
 # Eğer yapılacak bir işlem yoksa çık
 if [[ ${#COMMANDS_TO_RUN[@]} -eq 0 ]]; then
-    echo -e "  ${C_GREEN}✅ Tum konteynerlar zaten ideal boyutlarda. Islem yapilmayacak.${NC}\n"
+    echo -e "  ${C_GREEN}✅ Tum LXC ve VM'ler zaten ideal boyutlarda. Islem yapilmayacak.${NC}\n"
     exit 0
 fi
 
@@ -127,19 +160,27 @@ if [[ "$onay" == "E" || "$onay" == "e" ]]; then
     echo -e "\n  ${C_CYAN}⚙  Islemler uygulaniyor...${NC}"
 
     for item in "${COMMANDS_TO_RUN[@]}"; do
-        # Bilgileri parçala (vmid | old_size | new_size | zfs_ds veya dir:)
-        IFS='|' read -r c_vmid c_old c_new c_zfs <<< "$item"
+        IFS='|' read -r c_type c_vmid c_old c_new c_zfs <<< "$item"
 
-        # ZFS veya Dir storage'a göre komutları çalıştır
-        if [[ "$c_zfs" == dir:* ]]; then
-            sed -i "s/size=${c_old}/size=${c_new}/g" /etc/pve/lxc/${c_vmid}.conf
+        if [[ "$c_type" == "vm" ]]; then
+            # VM disk resize
+            if [[ "$c_zfs" == dir:* ]]; then
+                sed -i "s/size=${c_old}/size=${c_new}/g" /etc/pve/qemu-server/${c_vmid}.conf
+            else
+                zfs set volsize=${c_new} ${c_zfs}
+                sed -i "s/size=${c_old}/size=${c_new}/g" /etc/pve/qemu-server/${c_vmid}.conf
+            fi
         else
-            zfs set refquota=${c_new} ${c_zfs}
-            sed -i "s/size=${c_old}/size=${c_new}/g" /etc/pve/lxc/${c_vmid}.conf
+            # LXC disk resize (c_type = "lxc", c_zfs 4. alan)
+            if [[ "$c_zfs" == dir:* ]]; then
+                sed -i "s/size=${c_old}/size=${c_new}/g" /etc/pve/lxc/${c_vmid}.conf
+            else
+                zfs set refquota=${c_new} ${c_zfs}
+                sed -i "s/size=${c_old}/size=${c_new}/g" /etc/pve/lxc/${c_vmid}.conf
+            fi
         fi
 
-        # Canlı log ver
-        echo -e "  ${C_GREEN}✔${NC} ${DIM}[ID: ${c_vmid}]${NC} Kota guncellendi: ${DIM}${c_old}${NC} -> ${C_GREEN}${c_new}${NC}"
+        echo -e "  ${C_GREEN}✔${NC} ${DIM}[${c_type^^} ${c_vmid}]${NC} Kota guncellendi: ${DIM}${c_old}${NC} -> ${C_GREEN}${c_new}${NC}"
     done
 
     echo -e "\n  ${C_GREEN}✅ Tum boyutlandirma islemleri basariyla tamamlandi!${NC}\n"
