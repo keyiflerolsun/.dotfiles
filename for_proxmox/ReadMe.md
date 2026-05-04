@@ -27,17 +27,16 @@ Swappiness değerini düşürür ve dosya sistemi (ZFS/LVM) üzerinde optimizasy
 sysctl -w vm.swappiness=10
 echo "vm.swappiness=10" >> /etc/sysctl.conf
 
-# LVM Alan Genişletme (Local-LVM'yi kaldırıp Root'a ekler)
-# Default (ext4) Kurulum ise
-lvremove /dev/pve/data -y
-lvextend -l +100%FREE /dev/pve/root
-resize2fs /dev/mapper/pve-root
-
 # ZFS Kurulum ise
-zfs destroy rpool/data 2>/dev/null || true
 # ZFS Optimizasyonları
 zfs set atime=off rpool
 zfs set xattr=sa rpool
+
+# Default (ext4) Kurulum ise
+# LVM Alan Genişletme (Local-LVM'yi kaldırıp Root'a ekler)
+lvremove /dev/pve/data -y
+lvextend -l +100%FREE /dev/pve/root
+resize2fs /dev/mapper/pve-root
 ```
 
 ---
