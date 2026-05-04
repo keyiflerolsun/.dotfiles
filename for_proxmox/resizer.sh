@@ -66,54 +66,48 @@ while read -r vmid status name; do
 
     [[ -z "$storage" || "$storage" == "---" ]] && continue
 
-    zfs_ds=$(zfs list -H -o name 2>/dev/null | grep "$storage/subvol-$vmid-disk" | head -n 1)
-
+    refer_bytes=0; zfs_ds=""
+    zfs_ds=$(zfs list -H -o name 2>/dev/null | grep "subvol-$vmid-disk" | head -n 1)
     if [[ -n "$zfs_ds" ]]; then
         refer_bytes=$(zfs get -H -p -o value refer "$zfs_ds" 2>/dev/null)
-
-        if [[ -n "$refer_bytes" && "$refer_bytes" -gt 0 ]]; then
-            # Anlık kullanımı GB olarak hesapla (Ekranda göstermek için)
-            refer_gb=$(awk "BEGIN {printf \"%.2fG\", $refer_bytes/1073741824}")
-
-            # %65 hedefine göre gereken Byte miktarını bul
-            target_bytes=$(( refer_bytes * 100 / TARGET_PCT ))
-
-            # Byte'ı GB'a çevir (Yukarı yuvarlayarak)
-            target_gb=$(( target_bytes / 1073741824 ))
-            remainder=$(( target_bytes % 1073741824 ))
-            [[ $remainder -gt 0 ]] && target_gb=$(( target_gb + 1 ))
-
-            # Minimum 2 GB kuralı
-            [[ $target_gb -lt $MIN_GB ]] && target_gb=$MIN_GB
-
-            new_size="${target_gb}G"
-
-            f_id=$(vpad "$vmid" 4)
-            f_name=$(vpad "${name:0:16}" 16)
-            f_use=$(vpad "$refer_gb" 8)
-
-            # Eski ve Yeni sayıyı kıyasla
-            old_num=$(echo "$old_size" | tr -d 'GKM')
-            new_num=$(echo "$new_size" | tr -d 'GKM')
-
-            chg_txt="${old_size} -> ${new_size}"
-            f_chg=$(vpad "$chg_txt" 12)
-
-            if [[ "$old_num" -lt "$new_num" ]]; then
-                STATUS_TXT="${C_YELLOW}🔼 Buyuyecek ${NC}"
-                echo -e "  ${DIM}│${NC} ${f_id} ${DIM}│${NC} ${f_name} ${DIM}│${NC} ${C_MAGENTA}${f_use}${NC} ${DIM}│${NC} ${C_YELLOW}${f_chg}${NC} ${DIM}│${NC} ${STATUS_TXT} ${DIM}│${NC}"
-
-                COMMANDS_TO_RUN+=("$vmid|$old_size|$new_size|$zfs_ds")
-            elif [[ "$old_num" -gt "$new_num" ]]; then
-                STATUS_TXT="${C_CYAN}🔽 Kuculecek ${NC}"
-                echo -e "  ${DIM}│${NC} ${f_id} ${DIM}│${NC} ${f_name} ${DIM}│${NC} ${C_MAGENTA}${f_use}${NC} ${DIM}│${NC} ${C_CYAN}${f_chg}${NC} ${DIM}│${NC} ${STATUS_TXT} ${DIM}│${NC}"
-
-                COMMANDS_TO_RUN+=("$vmid|$old_size|$new_size|$zfs_ds")
-            else
-                STATUS_TXT="${C_GREEN}✅ Ideal     ${NC}"
-                echo -e "  ${DIM}│${NC} ${f_id} ${DIM}│${NC} ${f_name} ${DIM}│${NC} ${DIM}${f_use}${NC} ${DIM}│${NC} ${DIM}${f_chg}${NC} ${DIM}│${NC} ${STATUS_TXT} ${DIM}│${NC}"
-            fi
+    else
+        vol_id=$(echo "$rootfs" | awk '{print $2}' | cut -d',' -f1)
+        dir_path=$(pvesm path "$vol_id" 2>/dev/null)
+        [[ -z "$dir_path" ]] && dir_path="/var/lib/vz/private/$vmid"
+        if [[ -d "$dir_path" ]]; then
+            refer_bytes=$(timeout 5 du -sb "$dir_path" 2>/dev/null | cut -f1)
+        elif [[ -f "$dir_path" && "$status" == "running" ]]; then
+            used_kb=$(pct exec "$vmid" -- df -k / 2>/dev/null | awk 'NR==2 {print $3}')
+            [[ -n "$used_kb" ]] && refer_bytes=$(( used_kb * 1024 ))
         fi
+        zfs_ds="dir:"
+    fi
+
+    [[ "$refer_bytes" -le 0 ]] && continue
+
+    refer_gb=$(awk "BEGIN {printf \"%.2fG\", $refer_bytes/1073741824}")
+    target_bytes=$(( refer_bytes * 100 / TARGET_PCT ))
+    target_gb=$(( target_bytes / 1073741824 ))
+    remainder=$(( target_bytes % 1073741824 ))
+    [[ $remainder -gt 0 ]] && target_gb=$(( target_gb + 1 ))
+    [[ $target_gb -lt $MIN_GB ]] && target_gb=$MIN_GB
+    new_size="${target_gb}G"
+
+    f_id=$(vpad "$vmid" 4)
+    f_name=$(vpad "${name:0:16}" 16)
+    f_use=$(vpad "$refer_gb" 8)
+    old_num=$(echo "$old_size" | tr -d 'GKM')
+    new_num=$(echo "$new_size" | tr -d 'GKM')
+    f_chg=$(vpad "${old_size} -> ${new_size}" 12)
+
+    if [[ "$old_num" -lt "$new_num" ]]; then
+        echo -e "  ${DIM}│${NC} ${f_id} ${DIM}│${NC} ${f_name} ${DIM}│${NC} ${C_MAGENTA}${f_use}${NC} ${DIM}│${NC} ${C_YELLOW}${f_chg}${NC} ${DIM}│${NC} ${C_YELLOW}🔼 Buyuyecek ${NC} ${DIM}│${NC}"
+        COMMANDS_TO_RUN+=("$vmid|$old_size|$new_size|$zfs_ds")
+    elif [[ "$old_num" -gt "$new_num" ]]; then
+        echo -e "  ${DIM}│${NC} ${f_id} ${DIM}│${NC} ${f_name} ${DIM}│${NC} ${C_MAGENTA}${f_use}${NC} ${DIM}│${NC} ${C_CYAN}${f_chg}${NC} ${DIM}│${NC} ${C_CYAN}🔽 Kuculecek ${NC} ${DIM}│${NC}"
+        COMMANDS_TO_RUN+=("$vmid|$old_size|$new_size|$zfs_ds")
+    else
+        echo -e "  ${DIM}│${NC} ${f_id} ${DIM}│${NC} ${f_name} ${DIM}│${NC} ${DIM}${f_use}${NC} ${DIM}│${NC} ${DIM}${f_chg}${NC} ${DIM}│${NC} ${C_GREEN}✅ Ideal     ${NC} ${DIM}│${NC}"
     fi
 done <<< "$(pct list | tail -n +2)"
 
@@ -133,12 +127,16 @@ if [[ "$onay" == "E" || "$onay" == "e" ]]; then
     echo -e "\n  ${C_CYAN}⚙  Islemler uygulaniyor...${NC}"
 
     for item in "${COMMANDS_TO_RUN[@]}"; do
-        # Bilgileri parçala (vmid | old_size | new_size | zfs_ds)
+        # Bilgileri parçala (vmid | old_size | new_size | zfs_ds veya dir:)
         IFS='|' read -r c_vmid c_old c_new c_zfs <<< "$item"
 
-        # ZFS ve Proxmox komutlarını çalıştır
-        zfs set refquota=${c_new} ${c_zfs}
-        sed -i "s/size=${c_old}/size=${c_new}/g" /etc/pve/lxc/${c_vmid}.conf
+        # ZFS veya Dir storage'a göre komutları çalıştır
+        if [[ "$c_zfs" == dir:* ]]; then
+            sed -i "s/size=${c_old}/size=${c_new}/g" /etc/pve/lxc/${c_vmid}.conf
+        else
+            zfs set refquota=${c_new} ${c_zfs}
+            sed -i "s/size=${c_old}/size=${c_new}/g" /etc/pve/lxc/${c_vmid}.conf
+        fi
 
         # Canlı log ver
         echo -e "  ${C_GREEN}✔${NC} ${DIM}[ID: ${c_vmid}]${NC} Kota guncellendi: ${DIM}${c_old}${NC} -> ${C_GREEN}${c_new}${NC}"

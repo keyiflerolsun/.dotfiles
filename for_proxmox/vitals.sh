@@ -10,7 +10,6 @@ C_BLUE='\033[1;34m'
 NC='\033[0m'
 DIM='\033[1;30m'
 
-POOL_NAME=$(zpool list -H -o name 2>/dev/null | head -n 1)
 
 clear
 echo -e "\n  ${C_CYAN}🖥  KEKIK COMMAND CENTER${NC}  ${DIM}[Node: $(hostname)]${NC}\n"
@@ -169,42 +168,37 @@ echo -e "  ${DIM}└───────────────┴────
 # ==========================================
 # 3. ZFS HAVUZ SAĞLIĞI VE ÖZETİ
 # ==========================================
-if zpool status $POOL_NAME &>/dev/null; then
-    Z_HEALTH=$(zpool list -H -o health $POOL_NAME)
-    Z_SIZE=$(zpool list -H -o size $POOL_NAME)
-    Z_CAP=$(zpool list -H -o capacity $POOL_NAME | sed 's/%//')
-    Z_FREE=$(zpool list -H -o free $POOL_NAME)
-
-    [[ "$Z_HEALTH" == "ONLINE" ]] && COLOR_H=$C_GREEN || COLOR_H=$C_RED
-    [[ $Z_CAP -gt 80 ]] && COLOR_C=$C_RED || COLOR_C=$C_YELLOW
-
-    bar=""
-    spaces=""
-    limit=$(( Z_CAP * 24 / 100 ))
-    [[ $limit -gt 24 ]] && limit=24
-    for ((i=0; i<limit; i++)); do bar+="■"; done
-    for ((i=limit; i<24; i++)); do spaces+=" "; done
-
-    f_pool=$(vpad "${POOL_NAME:0:13}" 13)
-    f_health=$(vpad "${Z_HEALTH:0:8}" 8)
-    f_size=$(vpad "${Z_SIZE:0:8}" 8)
-    f_free=$(vpad "${Z_FREE:0:11}" 11)
-
+POOL_NAMES=$(zpool list -H -o name 2>/dev/null)
+if [[ -n "$POOL_NAMES" ]]; then
     echo -e "  ${C_YELLOW}🛡  ZFS HAVUZ DURUMU${NC}"
-    echo -e "  ${DIM}┌───────────────┬──────────┬──────────────────────────┐${NC}"
-    # header paddings for ZFS (inner widths = borderWidth - 2)
-    hp_pool=$(vpad "HAVUZ / NODE" 13)
-    hp_durum=$(vpad "DURUM" 8)
-    hp_cap=$(vpad "KAPASITE ANALIZI" 24)
-    echo -e "  ${DIM}│${NC} ${C_BLUE}${hp_pool}${NC} ${DIM}│${NC} ${C_BLUE}${hp_durum}${NC} ${DIM}│${NC} ${C_BLUE}${hp_cap}${NC} ${DIM}│${NC}"
-    echo -e "  ${DIM}├───────────────┼──────────┼──────────────────────────┤${NC}"
-    echo -e "  ${DIM}│${NC} ${f_pool} ${DIM}│${NC} ${COLOR_H}${f_health}${NC} ${DIM}│${NC} ${COLOR_C}${bar}${NC}${spaces} ${DIM}│${NC}"
-    echo -e "  ${DIM}├───────────────┼──────────┼──────────────────────────┤${NC}"
-    # build total column: pad plain text first, then colorize only the free-size part
-    total_plain=$(vpad "BOS ALAN: ${f_free}" 24)
-    total_col="${total_plain/${f_free}/${C_GREEN}${f_free}${NC}}"
-    echo -e "  ${DIM}│${NC} ${C_YELLOW}TOPLAM BOYUT ${NC} ${DIM}│${NC} ${C_CYAN}${f_size}${NC} ${DIM}│${NC} ${total_col} ${DIM}│${NC}"
-    echo -e "  ${DIM}└───────────────┴──────────┴──────────────────────────┘${NC}\n"
+    echo -e "  ${DIM}┌───────────────┬──────────┬──────────┬──────────┬──────────────────────┐${NC}"
+    echo -e "  ${DIM}│${NC} ${C_BLUE}$(vpad "HAVUZ / NODE" 13)${NC} ${DIM}│${NC} ${C_BLUE}$(vpad "DURUM" 8)${NC} ${DIM}│${NC} ${C_BLUE}$(vpad "BOYUT" 8)${NC} ${DIM}│${NC} ${C_BLUE}$(vpad "BOS ALAN" 8)${NC} ${DIM}│${NC} ${C_BLUE}$(vpad "KAPASITE ANALIZI" 20)${NC} ${DIM}│${NC}"
+    echo -e "  ${DIM}├───────────────┼──────────┼──────────┼──────────┼──────────────────────┤${NC}"
+
+    while read -r POOL_NAME; do
+        Z_HEALTH=$(zpool list -H -o health "$POOL_NAME")
+        Z_SIZE=$(zpool list -H -o size "$POOL_NAME")
+        Z_CAP=$(zpool list -H -o capacity "$POOL_NAME" | sed 's/%//')
+        Z_FREE=$(zpool list -H -o free "$POOL_NAME")
+
+        [[ "$Z_HEALTH" == "ONLINE" ]] && COLOR_H=$C_GREEN || COLOR_H=$C_RED
+        [[ $Z_CAP -gt 80 ]] && COLOR_C=$C_RED || COLOR_C=$C_YELLOW
+
+        bar=""; spaces=""
+        limit=$(( Z_CAP * 18 / 100 )); [[ $limit -gt 18 ]] && limit=18
+        for ((i=0; i<limit; i++)); do bar+="■"; done
+        for ((i=limit; i<18; i++)); do spaces+=" "; done
+
+        f_pool=$(vpad "${POOL_NAME:0:13}" 13)
+        f_health=$(vpad "${Z_HEALTH:0:8}" 8)
+        f_size=$(vpad "${Z_SIZE:0:8}" 8)
+        f_free=$(vpad "${Z_FREE:0:8}" 8)
+        f_bar=$(vpad "${bar}${spaces}" 20)
+
+        echo -e "  ${DIM}│${NC} ${f_pool} ${DIM}│${NC} ${COLOR_H}${f_health}${NC} ${DIM}│${NC} ${C_CYAN}${f_size}${NC} ${DIM}│${NC} ${C_GREEN}${f_free}${NC} ${DIM}│${NC} ${COLOR_C}${f_bar}${NC} ${DIM}│${NC}"
+    done <<< "$POOL_NAMES"
+
+    echo -e "  ${DIM}└───────────────┴──────────┴──────────┴──────────┴──────────────────────┘${NC}\n"
 fi
 
 # ==========================================
@@ -229,35 +223,46 @@ while read -r vmid status name; do
     CONF_MISMATCH=0
 
     if [[ "$storage" != "---" ]]; then
-        zfs_ds=$(zfs list -H -o name 2>/dev/null | grep "$storage/subvol-$vmid-disk" | head -n 1)
+        refer_bytes=0; quota_bytes=0; zfs_ds=""; refquota_bytes=0
+
+        quota_num=$(echo "$size" | tr -d 'GKM')
+        if [[ "$size" == *G* ]]; then quota_bytes=$(awk "BEGIN {print $quota_num * 1024 * 1024 * 1024}")
+        elif [[ "$size" == *M* ]]; then quota_bytes=$(awk "BEGIN {print $quota_num * 1024 * 1024}")
+        fi
+
+        zfs_ds=$(zfs list -H -o name 2>/dev/null | grep "subvol-$vmid-disk" | head -n 1)
         if [[ -n "$zfs_ds" ]]; then
             refer_bytes=$(zfs get -H -p -o value refer "$zfs_ds" 2>/dev/null)
             refquota_bytes=$(zfs get -H -p -o value refquota "$zfs_ds" 2>/dev/null)
-            quota_num=$(echo "$size" | tr -d 'GKM')
-            if [[ "$size" == *G* ]]; then quota_bytes=$(awk "BEGIN {print $quota_num * 1024 * 1024 * 1024}")
-            elif [[ "$size" == *M* ]]; then quota_bytes=$(awk "BEGIN {print $quota_num * 1024 * 1024}")
-            else quota_bytes=0; fi
-
-            if [[ "$refquota_bytes" =~ ^[0-9]+$ && "$quota_bytes" -gt 0 ]]; then
-                if [[ "$quota_bytes" -ne "$refquota_bytes" ]]; then
-                    CONF_MISMATCH=1; HAS_ANY_MISMATCH=1
-                fi
+        else
+            vol_id=$(echo "$rootfs" | awk '{print $2}' | cut -d',' -f1)
+            dir_path=$(pvesm path "$vol_id" 2>/dev/null)
+            [[ -z "$dir_path" ]] && dir_path="/var/lib/vz/private/$vmid"
+            if [[ -d "$dir_path" ]]; then
+                refer_bytes=$(timeout 5 du -sb "$dir_path" 2>/dev/null | cut -f1)
+            elif [[ -f "$dir_path" && "$status" == "running" ]]; then
+                used_kb=$(pct exec "$vmid" -- df -k / 2>/dev/null | awk 'NR==2 {print $3}')
+                [[ -n "$used_kb" ]] && refer_bytes=$(( used_kb * 1024 ))
             fi
+            zfs_ds="dir:"
+        fi
 
-            if [[ -n "$refer_bytes" && "$quota_bytes" -gt 0 ]]; then
-                pct_val=$(awk "BEGIN {printf \"%d\", ($refer_bytes / $quota_bytes) * 100}")
-                f_pct=$(printf "%3s%%" "$pct_val")
-                bar=""; spaces=""
-                limit=$(( pct_val * 10 / 100 )); [[ $limit -gt 10 ]] && limit=10
-                U_COLOR=$C_CYAN; [[ $pct_val -gt 70 ]] && U_COLOR=$C_YELLOW; [[ $pct_val -gt 90 ]] && U_COLOR=$C_RED
-                for ((i=0; i<limit; i++)); do bar+="■"; done
-                for ((i=limit; i<10; i++)); do spaces+=" "; done
-
-                # build plain usage string and pad to visible width (inside column width = 20)
-                plain_usage="${f_pct} ${bar}${spaces}"
-                padded_usage=$(vpad "$plain_usage" 20)
-                USAGE_TXT="${U_COLOR}${padded_usage}${NC}"
+        if [[ "$refquota_bytes" =~ ^[0-9]+$ && "$quota_bytes" -gt 0 && -n "$zfs_ds" && "$zfs_ds" != dir:* ]]; then
+            if [[ "$quota_bytes" -ne "$refquota_bytes" ]]; then
+                CONF_MISMATCH=1; HAS_ANY_MISMATCH=1
             fi
+        fi
+
+        if [[ "$refer_bytes" -gt 0 && "$quota_bytes" -gt 0 ]]; then
+            pct_val=$(awk "BEGIN {printf \"%d\", ($refer_bytes / $quota_bytes) * 100}")
+            f_pct=$(printf "%3s%%" "$pct_val")
+            bar=""; spaces=""
+            limit=$(( pct_val * 10 / 100 )); [[ $limit -gt 10 ]] && limit=10
+            U_COLOR=$C_CYAN; [[ $pct_val -gt 70 ]] && U_COLOR=$C_YELLOW; [[ $pct_val -gt 90 ]] && U_COLOR=$C_RED
+            for ((i=0; i<limit; i++)); do bar+="■"; done
+            for ((i=limit; i<10; i++)); do spaces+=" "; done
+            padded_usage=$(vpad "${f_pct} ${bar}${spaces}" 20)
+            USAGE_TXT="${U_COLOR}${padded_usage}${NC}"
         fi
     fi
 
@@ -311,6 +316,33 @@ zfs list -H -o name,used -t filesystem | grep "/" | while read -r name used; do
     f_name=$(vpad "${short_name:0:22}" 22)
 
     echo -e "  ${ICON} ${f_name} ${C_MAGENTA}→${NC} ${C_YELLOW}${f_size}${NC}  ${DIM}${lib_bar}${NC} ${DIM}[${parent_pool}]${NC}"
+done
+
+# Raw image files on dir-type storage (e.g. local:198/vm-198-disk-0.raw)
+pct list 2>/dev/null | tail -n +2 | while read -r vmid ct_status _name; do
+    rootfs=$(pct config "$vmid" 2>/dev/null | grep "^rootfs:")
+    vol_id=$(echo "$rootfs" | awk '{print $2}' | cut -d',' -f1)
+    raw_path=$(pvesm path "$vol_id" 2>/dev/null)
+    [[ -f "$raw_path" ]] || continue
+
+    # Use df inside container for actual usage (not du which = virtual size on ZFS)
+    size_bytes=0
+    if [[ "$ct_status" == "running" ]]; then
+        used_kb=$(pct exec "$vmid" -- df -k / 2>/dev/null | awk 'NR==2 {print $3}')
+        [[ -n "$used_kb" ]] && size_bytes=$(( used_kb * 1024 ))
+    fi
+    [[ "$size_bytes" -le 0 ]] && continue
+
+    size_gb=$(awk "BEGIN {printf \"%.2fG\", $size_bytes/1073741824}")
+    int_val=$(awk "BEGIN {printf \"%d\", $size_bytes/1073741824}")
+    lib_bar=""
+    limit=$int_val; [[ $limit -gt 20 ]] && limit=20
+    for ((i=0; i<limit; i++)); do lib_bar+="■"; done
+    storage=$(echo "$vol_id" | cut -d':' -f1)
+    img_name=$(basename "$raw_path")
+    f_name=$(vpad "${img_name:0:22}" 22)
+    f_size=$(vpad "$size_gb" 7)
+    echo -e "  🗂  ${f_name} ${C_MAGENTA}→${NC} ${C_YELLOW}${f_size}${NC}  ${DIM}${lib_bar}${NC} ${DIM}[${storage}]${NC}"
 done
 
 echo -e "  ${DIM}──────────────────────────────────────────────────────${NC}"
