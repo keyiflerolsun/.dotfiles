@@ -29,6 +29,7 @@ echo "vm.swappiness=10" >> /etc/sysctl.conf
 
 # ZFS Kurulum ise
 # ZFS Optimizasyonları
+zfs set compression=lz4 rpool
 zfs set atime=off rpool
 zfs set xattr=sa rpool
 
@@ -58,4 +59,45 @@ git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-m
 rm -rf ~/.zshrc && wget -qO ~/.zshrc https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/.dots/.zshrc
 gem install colorls
 chsh -s "$(which zsh)"
+```
+
+## 🔔 4. Akıllı Bildirim Sistemi (Telegram Entegrasyonu)
+
+Proxmox (PVE) ve Backup Server (PBS) bildirimlerini Telegram üzerinden almak için bu yapılandırmayı kullanın.
+
+### A. Proxmox VE Log Temizliği
+Telegram bildirimlerinde mesaj limitine takılmamak ve daha temiz bir çıktı almak için varsayılan mail şablonunu sıfırlayın:
+
+```bash
+/usr/share/pve-manager/templates/default/vzdump-body.txt.hbs
+```
+
+> https://forum.proxmox.com/threads/telegram-webhook-notifications.161217/#post-749388
+
+### B. HTTP Target Yapılandırması
+`Datacenter > Notifications > ADD > WebHook` yolunu izleyerek aşağıdaki ayarları uygulayın.
+
+**Ortak Bağlantı Bilgileri:**
+- **URL:** `https://api.telegram.org/bot{{ secrets.bot_token }}/sendMessage`
+- **Method:** `POST`
+- **Header:** `Content-Type: application/json`
+
+**PVE için Body Payload:**
+```json
+{
+  "chat_id": "{{ secrets.chat_id }}",
+  "text": "<b>{{#if (eq severity 'info')}}ℹ️{{else if (eq severity 'notice')}}🔔{{else if (eq severity 'warning')}}⚠️{{else if (eq severity 'error')}}🚨{{else}}❓{{/if}} [{{severity}}] {{title}}</b>\n\n🏠 <b>:</b> <code>{{fields.hostname}}</code>\n🛠 <b>:</b> <code>{{fields.type}}</code>\n\n<pre>{{message}}</pre>",
+  "parse_mode": "HTML",
+  "disable_web_page_preview": true
+}
+```
+
+**PBS için Body Payload:**
+```json
+{
+  "chat_id": "{{ secrets.chat_id }}",
+  "text": "<b>{{#if (eq severity 'info')}}ℹ️{{else if (eq severity 'notice')}}✅{{else if (eq severity 'warning')}}⚠️{{else if (eq severity 'error')}}🚨{{else}}❓{{/if}} [{{severity}}] {{title}}</b>\n\n🖥 <b>:</b> <code>{{fields.hostname}}</code>\n🛠 <b>:</b> <code>{{fields.type}}</code>\n\n<pre>{{message}}</pre>",
+  "parse_mode": "HTML",
+  "disable_web_page_preview": true
+}
 ```
