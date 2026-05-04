@@ -295,11 +295,12 @@ fi
 echo -e "  ${C_YELLOW}📂 ZFS DATASET DAGILIMI${NC}"
 echo -e "  ${DIM}──────────────────────────────────────────────────────${NC}"
 
-zfs list -H -o name,used -t filesystem | grep "/" | while read -r name used; do
+declare -a DS_SUBVOLS=()
+declare -a DS_OTHERS=()
+
+while read -r name used; do
     short_name=$(echo "$name" | awk -F'/' '{print $NF}')
     parent_pool=$(echo "$name" | cut -d'/' -f1)
-
-    if [[ "$short_name" == subvol* ]]; then ICON="📦"; else ICON="💾"; fi
 
     clean_used=$(echo "$used" | sed 's/[a-zA-Z]//g; s/,/./')
     int_val=${clean_used%.*}
@@ -309,14 +310,22 @@ zfs list -H -o name,used -t filesystem | grep "/" | while read -r name used; do
     if [[ "$used" == *T* ]]; then limit=20
     elif [[ "$used" == *G* ]]; then limit=$int_val; [[ $limit -gt 20 ]] && limit=20
     else limit=0; lib_bar="·"; fi
-
     for ((i=0; i<limit; i++)); do lib_bar+="■"; done
 
     f_size=$(vpad "$used" 7)
     f_name=$(vpad "${short_name:0:22}" 22)
+    line="  📦 ${f_name} ${C_MAGENTA}→${NC} ${C_YELLOW}${f_size}${NC}  ${DIM}${lib_bar}${NC} ${DIM}[${parent_pool}]${NC}"
 
-    echo -e "  ${ICON} ${f_name} ${C_MAGENTA}→${NC} ${C_YELLOW}${f_size}${NC}  ${DIM}${lib_bar}${NC} ${DIM}[${parent_pool}]${NC}"
-done
+    if [[ "$short_name" == subvol* ]]; then
+        DS_SUBVOLS+=("$line")
+    else
+        line="  💾 ${f_name} ${C_MAGENTA}→${NC} ${C_YELLOW}${f_size}${NC}  ${DIM}${lib_bar}${NC} ${DIM}[${parent_pool}]${NC}"
+        DS_OTHERS+=("$line")
+    fi
+done <<< "$(zfs list -H -o name,used -t filesystem | grep "/")"
+
+for line in "${DS_SUBVOLS[@]}"; do echo -e "$line"; done
+for line in "${DS_OTHERS[@]}"; do echo -e "$line"; done
 
 # Raw image files on dir-type storage (e.g. local:198/vm-198-disk-0.raw)
 pct list 2>/dev/null | tail -n +2 | while read -r vmid ct_status _name; do
