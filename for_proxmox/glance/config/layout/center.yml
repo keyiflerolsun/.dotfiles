@@ -31,6 +31,11 @@
               check-url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
               allow-insecure: true
               icon: di:proxmox
+            - title: HDD (PBS2)
+              url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+              check-url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+              allow-insecure: true
+              icon: di:proxmox
 
         - type: monitor
           title: 🗄️ Apps
@@ -55,6 +60,10 @@
               url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
               check-url: http://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
               icon: di:immich
+            - title: Keenetic
+              url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+              check-url: http://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+              icon: si:keenetic
 
     - type: group
       widgets:

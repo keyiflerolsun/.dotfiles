@@ -22,13 +22,13 @@
 
     <div class="proxy-totals">
       <div>
-        <div class="proxy-totals-value">{{ .JSON.Int "total" }}</div>
+        <div class="proxy-totals-value">{{ .JSON.Int "total" | formatNumber }}</div>
         <div class="proxy-totals-label">TOTAL</div>
       </div>
       {{ range $index, $stat := .JSON.Array "stats" }}
         {{ if lt $index 2 }}
           <div>
-            <div class="proxy-stat-value">{{ $stat.Int "count" }}</div>
+            <div class="proxy-stat-value">{{ $stat.Int "count" | formatNumber }}</div>
             <div class="proxy-totals-label">{{ $stat.String "category" }}</div>
           </div>
         {{ end }}

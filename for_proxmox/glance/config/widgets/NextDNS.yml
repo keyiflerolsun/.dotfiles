@@ -41,22 +41,30 @@
 
     <div>
       {{ if $statusResp.JSON }}
-        {{ $total := 0.0 }}{{ $blocked := 0.0 }}
+        {{ $total := 0 }}{{ $blocked := 0 }}
         {{ range $statusResp.JSON.Array "data" }}
-          {{ $total = add $total (.Int "queries" | toFloat) }}
-          {{ if eq (.String "status") "blocked" }}{{ $blocked = add $blocked (.Int "queries" | toFloat) }}{{ end }}
+          {{ $total = add $total (.Int "queries") }}
+          {{ if eq (.String "status") "blocked" }}
+            {{ $blocked = add $blocked (.Int "queries") }}
+          {{ end }}
         {{ end }}
         <div class="ndns-totals">
           <div>
-            <div class="ndns-totals-value">{{ printf "%.0f" $total }}</div>
+            <div class="ndns-totals-value">{{ $total | formatNumber }}</div>
             <div class="ndns-totals-label">QUERIES</div>
           </div>
           <div>
-            <div class="ndns-totals-value text-red">{{ printf "%.0f" $blocked }}</div>
+            <div class="ndns-totals-value text-red">{{ $blocked | formatNumber }}</div>
             <div class="ndns-totals-label">BLOCKED</div>
           </div>
           <div>
-            <div class="ndns-totals-value text-primary">{{ if gt $total 0.0 }}{{ div (mul $blocked 100) $total | printf "%.1f" }}%{{ else }}0.0%{{ end }}</div>
+            <div class="ndns-totals-value text-primary">
+              {{ if gt $total 0 }}
+                {{ div (mul $blocked 100.0) $total | printf "%.1f" }}%
+              {{ else }}
+                0.0%
+              {{ end }}
+            </div>
             <div class="ndns-totals-label">RATE</div>
           </div>
         </div>

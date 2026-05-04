@@ -19,6 +19,7 @@
     sv2: proxmox
     sv3: proxmox
     pbs: proxmox
+    pbs2: proxmox
     meili: meilisearch
     mongo: mongodb
     bitwarden: bitwarden
