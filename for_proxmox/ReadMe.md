@@ -32,6 +32,7 @@ echo "vm.swappiness=10" >> /etc/sysctl.conf
 zfs set compression=lz4 rpool
 zfs set atime=off rpool
 zfs set xattr=sa rpool
+zpool upgrade -a
 
 # Default (ext4) Kurulum ise
 # LVM Alan Genişletme (Local-LVM'yi kaldırıp Root'a ekler)
