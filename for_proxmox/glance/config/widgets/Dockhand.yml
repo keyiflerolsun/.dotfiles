@@ -1,32 +1,29 @@
 - type: custom-api
   title: Dockhand
   title-url: ${DOCKHAND_URL}
-  cache: 1m
-  url: ${DOCKHAND_URL}/api/dashboard/stats
+  cache: 10m
+  url: ${DOCKHAND_URL}/api/environments
   template: |
     <style>
       .dh-container { display: flex; flex-direction: column; gap: 1.25rem; }
-      .dh-card {
-        background: var(--color-widget-background-highlight);
-        border-radius: var(--border-radius);
-        padding: 1.25rem;
-        border: 1px solid var(--color-background);
-        transition: all 0.2s ease;
-      }
+      .dh-card { background: var(--color-widget-background-highlight); border-radius: var(--border-radius); padding: 1.25rem; border: 1px solid var(--color-background); transition: all 0.2s ease; }
       .dh-card:hover { background-color: var(--color-background); }
 
-      /* Header Style - Infrastructure Focus */
-      .dh-header-card {
-        background: linear-gradient(145deg, var(--color-widget-background-highlight) 0%, var(--color-background) 100%);
-        border-bottom: 2px solid var(--color-background);
-        padding: 1.5rem;
-      }
+      /* Header Style */
+      .dh-header-card { order: 1; background: linear-gradient(145deg, var(--color-widget-background-highlight) 0%, var(--color-background) 100%); border-bottom: 2px solid var(--color-background); padding: 1.5rem; }
       .dh-title { font-size: var(--font-size-h4); font-weight: 800; color: var(--color-primary); text-transform: uppercase; letter-spacing: 0.1em; display: flex; align-items: center; gap: 0.6rem; }
       .dh-subtitle { font-size: var(--font-size-h6); opacity: 0.5; margin-top: 0.25rem; font-weight: 600; }
+      .dh-header-bottom { display: flex; justify-content: space-between; align-items: flex-end; }
+
+      /* Global Health Bar */
+      .dh-health-track { width: 100%; height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px; margin-top: 1rem; overflow: hidden; }
+      .dh-health-fill { height: 100%; transition: width 0.5s ease; }
+      .dh-health-good { background-color: var(--color-positive); }
+      .dh-health-bad { background-color: var(--color-negative); }
 
       /* Stats Grid */
-      .dh-stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
-      .dh-mini-card { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 1.25rem; position: relative; }
+      .dh-stats-grid { order: 2; display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+      .dh-mini-card { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 1.25rem; position: relative; cursor: help; }
       .dh-mini-icon svg { width: 1.5rem; height: 1.5rem; stroke: var(--color-primary); fill: none; stroke-width: 2; margin-bottom: 0.5rem; }
       .dh-mini-val { font-size: var(--font-size-h2); font-weight: 900; color: var(--color-text-highlight); line-height: 1; }
       .dh-mini-label { font-size: var(--font-size-h6); text-transform: uppercase; opacity: 0.6; font-weight: 800; letter-spacing: 0.05em; margin-top: 0.3rem; }
@@ -36,82 +33,300 @@
       .status-up { background-color: var(--color-positive); box-shadow: 0 0 0.375rem var(--color-positive); }
       .status-down { background-color: var(--color-negative); box-shadow: 0 0 0.375rem var(--color-negative); }
 
-      /* Nodes List */
-      .dh-nodes-section { background: var(--color-background); border-radius: var(--border-radius); padding: 1rem; }
+      /* Nodes List & Mini Progress */
+      .dh-nodes-section { order: 3; background: var(--color-background); border-radius: var(--border-radius); padding: 1rem; }
       .dh-nodes-header { font-size: var(--font-size-h6); font-weight: 800; text-transform: uppercase; opacity: 0.4; letter-spacing: 0.1em; margin-bottom: 0.75rem; border-left: 3px solid var(--color-primary); padding-left: 0.5rem; }
-      .dh-node-row { display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+      .dh-node-row { display: flex; flex-direction: column; padding: 1rem 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
       .dh-node-row:last-child { border-bottom: none; }
+      .dh-node-row.offline { opacity: 0.5; }
+
+      .dh-node-top { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 0.5rem; }
+      .dh-node-title-group { display: flex; align-items: center; gap: 0.6rem; }
       .dh-node-name { font-weight: 700; font-size: var(--font-size-h5); color: var(--color-text-highlight); }
-      .dh-badge { font-size: var(--font-size-h6); text-transform: uppercase; padding: 0.2rem 0.5rem; border-radius: 0.375rem; background-color: var(--color-background); color: var(--color-primary); font-weight: 800; }
-      .dh-node-stats { font-size: var(--font-size-h6); opacity: 0.6; font-weight: 600; display: flex; gap: 0.5rem; }
+
+      .dh-badge { font-size: var(--font-size-h6); text-transform: uppercase; padding: 0.2rem 0.5rem; border-radius: 0.375rem; background-color: var(--color-background); color: var(--color-primary); font-weight: 800; cursor: help; }
+      .offline-badge { color: var(--color-negative); font-weight: 800; font-size: var(--font-size-h6); letter-spacing: 0.05em; }
+
+      .dh-bar-track { width: 100%; height: 0.25rem; background-color: rgba(255,255,255,0.05); border-radius: 0.2rem; overflow: hidden; margin-top: 0.2rem; margin-bottom: 0.5rem;}
+      .dh-bar-fill { height: 100%; background-color: var(--color-primary); border-radius: 0.2rem; }
+      .dh-bar-warning { background-color: var(--color-negative) !important; }
+
+      /* Node İçindeki İkonlu İstatistikler */
+      .dh-node-icon-stats { display: flex; justify-content: space-between; gap: 12px; margin-top: 0.2rem; }
+      .dh-node-icon-item { flex: 1; display: flex; flex-direction: column; align-items: center; cursor: help; }
+      .dh-node-icon-val { font-size: var(--font-size-h4); color: var(--color-highlight); font-weight: 700; }
+      .dh-node-icon-svg { height: 1.2em; stroke: gray; fill: none; margin-bottom: 0.1em; }
+
+      /* Popover Styles */
+      .dh-popover-title { margin-bottom: 0.6rem; font-weight: bold; color: var(--color-primary); text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em; }
+      .dh-popover-row { display: flex; justify-content: space-between; gap: 1.5rem; margin-bottom: 0.25rem; align-items: center; }
+      .dh-popover-list-row { display: flex; justify-content: space-between; gap: 1rem; min-width: 220px; margin-bottom: 0.25rem; }
+      .dh-popover-divider { border: 0; border-bottom: 1px solid rgba(255,255,255,0.1); margin: 0.4rem 0; }
+      .text-compact { max-width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     </style>
 
-    {{ $nodes := .JSON.Array "" }}
-    {{ $totalRunning := 0 }}
-    {{ $totalImages := 0 }}
-    {{ $totalVols := 0 }}
-    {{ $totalNets := 0 }}
-    {{ $onlineCount := 0 }}
-
-    {{ range $nodes }}
-      {{ $totalRunning = add $totalRunning (.Int "containers.running") }}
-      {{ $totalImages = add $totalImages (.Int "images.total") }}
-      {{ $totalVols = add $totalVols (.Int "volumes.total") }}
-      {{ $totalNets = add $totalNets (.Int "networks.total") }}
-      {{ if .Bool "online" }}{{ $onlineCount = add $onlineCount 1 }}{{ end }}
-    {{ end }}
-
     <div class="dh-container">
+      {{ $totalNodes := len (.JSON.Array "") }}
+      {{ $onlineCount := 0 }}
+
+      {{ $totalContainers := 0 }}
+      {{ $totalRunning := 0 }}
+      {{ $totalStopped := 0 }}
+
+      {{ $totalImages := 0 }}
+      {{ $usedImages := 0 }}
+      {{ $unusedImages := 0 }}
+      {{ $totalImgBytes := 0 }}
+      {{ $usedImgBytes := 0 }}
+      {{ $unusedImgBytes := 0 }}
+
+      {{ $totalVols := 0 }}
+      {{ $totalNets := 0 }}
+
+      <!-- Nodes Breakdown -->
+      <div class="dh-nodes-section">
+        <div class="dh-nodes-header">Nodes Breakdown</div>
+
+        {{ range .JSON.Array "" }}
+          {{ $envId := .Int "id" }}
+          {{ $envName := .String "name" }}
+
+          {{ $nodeRunning := 0 }}
+          {{ $nodeTotalCTN := 0 }}
+          {{ $isOnline := false }}
+
+          {{/* Container İsteği */}}
+          {{ $cReq := newRequest (concat "${DOCKHAND_URL}/api/containers?env=" (printf "%d" $envId)) | getResponse }}
+
+          {{ if eq $cReq.Response.StatusCode 200 }}
+            {{ $isOnline = true }}
+            {{ $onlineCount = add $onlineCount 1 }}
+
+            {{ $containers := $cReq.JSON.Array "" }}
+            {{ $nodeTotalCTN = len $containers }}
+            {{ range $containers }}
+              {{ if eq (.String "state") "running" }}
+                {{ $nodeRunning = add $nodeRunning 1 }}
+              {{ end }}
+            {{ end }}
+
+            {{ $totalContainers = add $totalContainers $nodeTotalCTN }}
+            {{ $totalRunning = add $totalRunning $nodeRunning }}
+            {{ $totalStopped = add $totalStopped (sub $nodeTotalCTN $nodeRunning) }}
+          {{ end }}
+
+          <div class="dh-node-row {{ if not $isOnline }}offline{{ end }}">
+            <div class="dh-node-top">
+              <div class="dh-node-title-group">
+                <span class="status-indicator {{ if $isOnline }}status-up{{ else }}status-down{{ end }}"></span>
+                <span class="dh-node-name">{{ $envName }}</span>
+              </div>
+
+              {{ if $isOnline }}
+                <div class="dh-badge" data-popover-type="html" data-popover-position="left">
+                  {{ $nodeRunning }}/{{ $nodeTotalCTN }} CTN
+                  <div data-popover-html>
+                    <div class="dh-popover-title">Containers</div>
+                    <div class="dh-popover-row"><span>Running:</span> <span style="color: var(--color-positive); font-weight: bold;">{{ $nodeRunning }}</span></div>
+                    <div class="dh-popover-row"><span>Stopped:</span> <span style="color: var(--color-negative); font-weight: bold;">{{ sub $nodeTotalCTN $nodeRunning }}</span></div>
+                  </div>
+                </div>
+              {{ else }}
+                <div class="offline-badge">OFFLINE</div>
+              {{ end }}
+            </div>
+
+            {{ if $isOnline }}
+              {{ if gt $nodeTotalCTN 0 }}
+                {{ $percentCTN := mul (div (toFloat $nodeRunning) (toFloat $nodeTotalCTN)) 100 | toInt }}
+                <div class="dh-bar-track">
+                  <div class="dh-bar-fill {{ if lt $percentCTN 50 }}dh-bar-warning{{ end }}" style="width: {{ $percentCTN }}%;"></div>
+                </div>
+              {{ end }}
+
+              <div class="dh-node-icon-stats">
+
+                {{/* Images */}}
+                {{ $iReq := newRequest (concat "${DOCKHAND_URL}/api/images?env=" (printf "%d" $envId)) | getResponse }}
+                {{ if eq $iReq.Response.StatusCode 200 }}
+                  {{ $images := $iReq.JSON.Array "" }}
+                  {{ $nodeImages := len $images }}
+                  {{ $totalImages = add $totalImages $nodeImages }}
+
+                  {{ $nodeUsedImg := 0 }}
+                  {{ $nodeUnusedImg := 0 }}
+                  {{ $nodeUsedImgBytes := 0 }}
+                  {{ $nodeUnusedImgBytes := 0 }}
+                  {{ $nodeImgBytes := 0 }}
+
+                  {{ range $images }}
+                    {{ $size := .Int "size" }}
+                    {{ if eq (.Int "containers") 0 }}
+                      {{ $nodeUnusedImg = add $nodeUnusedImg 1 }}
+                      {{ $unusedImages = add $unusedImages 1 }}
+                      {{ $nodeUnusedImgBytes = add $nodeUnusedImgBytes $size }}
+                      {{ $unusedImgBytes = add $unusedImgBytes $size }}
+                    {{ else }}
+                      {{ $nodeUsedImg = add $nodeUsedImg 1 }}
+                      {{ $usedImages = add $usedImages 1 }}
+                      {{ $nodeUsedImgBytes = add $nodeUsedImgBytes $size }}
+                      {{ $usedImgBytes = add $usedImgBytes $size }}
+                    {{ end }}
+                    {{ $nodeImgBytes = add $nodeImgBytes $size }}
+                    {{ $totalImgBytes = add $totalImgBytes $size }}
+                  {{ end }}
+
+                  <div class="dh-node-icon-item" data-popover-type="html" data-popover-position="bottom" data-popover-margin="0.2rem">
+                    <div class="dh-node-icon-val">{{ $nodeImages }}</div>
+                    <div data-popover-html>
+                      <div class="dh-popover-title">Images BreakDown</div>
+                      <div class="dh-popover-row">
+                        <span>Used ({{ $nodeUsedImg }}):</span>
+                        <span class="color-highlight">{{ printf "%.2f GB" (div (toFloat $nodeUsedImgBytes) (toFloat 1073741824)) }}</span>
+                      </div>
+                      <div class="dh-popover-row">
+                        <span>Unused ({{ $nodeUnusedImg }}):</span>
+                        <span class="color-highlight" style="opacity:0.7;">{{ printf "%.2f GB" (div (toFloat $nodeUnusedImgBytes) (toFloat 1073741824)) }}</span>
+                      </div>
+                      <hr class="dh-popover-divider">
+                      <div class="dh-popover-row" style="font-weight:bold;">
+                        <span>Total ({{ $nodeImages }}):</span>
+                        <span class="color-highlight">{{ printf "%.2f GB" (div (toFloat $nodeImgBytes) (toFloat 1073741824)) }}</span>
+                      </div>
+                    </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="dh-node-icon-svg" viewBox="0 0 24 24" stroke-width="2">
+                      <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
+                    </svg>
+                  </div>
+                {{ end }}
+
+                {{/* Volumes */}}
+                {{ $vReq := newRequest (concat "${DOCKHAND_URL}/api/volumes?env=" (printf "%d" $envId)) | getResponse }}
+                {{ if eq $vReq.Response.StatusCode 200 }}
+                  {{ $volumes := $vReq.JSON.Array "" }}
+                  {{ $nodeVols := len $volumes }}
+                  {{ $totalVols = add $totalVols $nodeVols }}
+
+                  <div class="dh-node-icon-item" data-popover-type="html" data-popover-position="bottom" data-popover-margin="0.2rem">
+                    <div class="dh-node-icon-val">{{ $nodeVols }}</div>
+                    <div data-popover-html>
+                      <div class="dh-popover-title">Volumes</div>
+                      {{ range $idx, $vol := $volumes }}
+                        {{ if lt $idx 5 }}
+                          <div class="dh-popover-list-row">
+                            <div class="text-compact">{{ .String "name" }}</div>
+                            <div class="color-highlight" style="opacity:0.6; font-size:10px;">{{ .String "driver" }}</div>
+                          </div>
+                        {{ end }}
+                      {{ end }}
+                      {{ if gt $nodeVols 5 }}
+                        <div class="dh-popover-list-row" style="justify-content:center; opacity:0.5; font-size:11px; margin-top:0.4rem;">
+                          + {{ sub $nodeVols 5 }} more...
+                        </div>
+                      {{ end }}
+                      {{ if eq $nodeVols 0 }}
+                        <div style="opacity:0.5;">No volumes</div>
+                      {{ end }}
+                    </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="dh-node-icon-svg" viewBox="0 0 24 24" stroke-width="2">
+                      <ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/>
+                    </svg>
+                  </div>
+                {{ end }}
+
+                {{/* Networks */}}
+                {{ $nReq := newRequest (concat "${DOCKHAND_URL}/api/networks?env=" (printf "%d" $envId)) | getResponse }}
+                {{ if eq $nReq.Response.StatusCode 200 }}
+                  {{ $nets := $nReq.JSON.Array "" }}
+                  {{ $nodeNets := len $nets }}
+                  {{ $totalNets = add $totalNets $nodeNets }}
+
+                  <div class="dh-node-icon-item" data-popover-type="html" data-popover-margin="0.2rem" data-popover-position="bottom">
+                    <div class="dh-node-icon-val">{{ $nodeNets }}</div>
+                    <div data-popover-html>
+                      <div class="dh-popover-title">Networks</div>
+                      {{ range $nets }}
+                        <div class="dh-popover-list-row">
+                          <div class="text-compact">{{ .String "name" }}</div>
+                          <div class="color-highlight">
+                            {{ $cfg := .Array "ipam.config" }}{{ if gt (len $cfg) 0 }}{{ (index $cfg 0).String "subnet" }}{{ else }}—{{ end }}
+                          </div>
+                        </div>
+                      {{ end }}
+                    </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="dh-node-icon-svg" viewBox="0 0 24 24" stroke-width="2">
+                      <rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"/><path d="M12 12V8"/>
+                    </svg>
+                  </div>
+                {{ end }}
+
+              </div>
+            {{ end }}
+          </div>
+        {{ end }}
+      </div>
+
       <!-- Infrastructure Header -->
       <div class="dh-card dh-header-card">
         <div class="dh-title">
-          <span class="status-indicator {{ if eq $onlineCount (len $nodes) }}status-up{{ else }}status-down{{ end }}"></span>
+          <span class="status-indicator {{ if eq $onlineCount $totalNodes }}status-up{{ else }}status-down{{ end }}"></span>
           Infrastructure
         </div>
-        <div class="dh-subtitle">{{ $onlineCount }} of {{ len $nodes }} nodes online</div>
+        <div class="dh-header-bottom">
+          <div class="dh-subtitle">{{ $onlineCount }} of {{ $totalNodes }} nodes online</div>
+        </div>
+        <div class="dh-health-track">
+          <div class="dh-health-fill {{ if eq $onlineCount $totalNodes }}dh-health-good{{ else }}dh-health-bad{{ end }}" style="width: {{ if gt $totalNodes 0 }}{{ div (mul $onlineCount 100) $totalNodes }}{{ else }}0{{ end }}%;"></div>
+        </div>
       </div>
 
       <!-- Global Stats Grid -->
       <div class="dh-stats-grid">
-        <div class="dh-card dh-mini-card">
+        <div class="dh-card dh-mini-card" data-popover-type="html" data-popover-position="bottom">
+          <div data-popover-html>
+            <div class="dh-popover-title">Containers Breakdown</div>
+            <div class="dh-popover-row"><span>Running:</span> <span style="color: var(--color-positive); font-weight:bold;">{{ $totalRunning }}</span></div>
+            <div class="dh-popover-row"><span>Stopped:</span> <span style="color: var(--color-negative); font-weight:bold;">{{ $totalStopped }}</span></div>
+            <hr class="dh-popover-divider">
+            <div class="dh-popover-row" style="font-weight:bold;"><span>Total:</span> <span class="color-highlight">{{ $totalContainers }}</span></div>
+          </div>
           <div class="dh-mini-icon"><svg viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></div>
-          <div class="dh-mini-val">{{ $totalRunning }}</div>
+          <div class="dh-mini-val">{{ formatNumber $totalRunning }}</div>
           <div class="dh-mini-label">Running</div>
         </div>
 
-        <div class="dh-card dh-mini-card">
+        <div class="dh-card dh-mini-card" data-popover-type="html" data-popover-position="bottom">
+          <div data-popover-html>
+            <div class="dh-popover-title">Global Image Details</div>
+            <div class="dh-popover-row">
+              <span>Used ({{ $usedImages }}):</span>
+              <span class="color-highlight">{{ printf "%.2f GB" (div (toFloat $usedImgBytes) (toFloat 1073741824)) }}</span>
+            </div>
+            <div class="dh-popover-row">
+              <span>Unused ({{ $unusedImages }}):</span>
+              <span class="color-highlight" style="opacity:0.7;">{{ printf "%.2f GB" (div (toFloat $unusedImgBytes) (toFloat 1073741824)) }}</span>
+            </div>
+            <hr class="dh-popover-divider">
+            <div class="dh-popover-row" style="font-weight:bold;">
+              <span>Total ({{ $totalImages }}):</span>
+              <span class="color-highlight">{{ printf "%.2f GB" (div (toFloat $totalImgBytes) (toFloat 1073741824)) }}</span>
+            </div>
+          </div>
           <div class="dh-mini-icon"><svg viewBox="0 0 24 24"><path d="M12 2 3 7l9 5 9-5-9-5z"/><path d="M3 12l9 5 9-5"/><path d="M3 17l9 5 9-5"/></svg></div>
-          <div class="dh-mini-val">{{ $totalImages }}</div>
+          <div class="dh-mini-val">{{ formatNumber $totalImages }}</div>
           <div class="dh-mini-label">Images</div>
         </div>
 
         <div class="dh-card dh-mini-card">
           <div class="dh-mini-icon"><svg viewBox="0 0 24 24"><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"/><path d="M12 12V8"/></svg></div>
-          <div class="dh-mini-val">{{ $totalNets }}</div>
+          <div class="dh-mini-val">{{ formatNumber $totalNets }}</div>
           <div class="dh-mini-label">Networks</div>
         </div>
 
         <div class="dh-card dh-mini-card">
           <div class="dh-mini-icon"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg></div>
-          <div class="dh-mini-val">{{ $totalVols }}</div>
+          <div class="dh-mini-val">{{ formatNumber $totalVols }}</div>
           <div class="dh-mini-label">Volumes</div>
         </div>
-      </div>
-
-      <!-- Nodes Breakdown -->
-      <div class="dh-nodes-section">
-        <div class="dh-nodes-header">Nodes Breakdown</div>
-        {{ range $nodes }}
-          <div class="dh-node-row">
-            <div style="display:flex; align-items:center; gap: 0.6rem;">
-              <span class="status-indicator {{ if .Bool "online" }}status-up{{ else }}status-down{{ end }}"></span>
-              <span class="dh-node-name">{{ .String "name" }}</span>
-            </div>
-            <div class="dh-node-stats">
-              <span class="dh-badge">{{ .Int "containers.running" }} RUN</span>
-              <span style="opacity: 0.5;">{{ .Int "images.total" }} IMG</span>
-            </div>
-          </div>
-        {{ end }}
       </div>
     </div>
