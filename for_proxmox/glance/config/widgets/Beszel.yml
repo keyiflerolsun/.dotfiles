@@ -31,7 +31,12 @@
     {{ $apiKey  := .Options.StringOr "api-key" "" }}
     {{ $token   := concat "Bearer " $apiKey }}
 
-    {{ $systemsResp := newRequest (print $baseURL "/api/collections/systems/records") | withHeader "Authorization" $token | getResponse }}
+    {{
+      $systemsResp := newRequest (print $baseURL "/api/collections/systems/records")
+      | withHeader "Authorization" $token
+      | withParameter "sort" "name"
+      | getResponse
+    }}
 
     <div class="beszel-container">
       {{ if $systemsResp.JSON }}
