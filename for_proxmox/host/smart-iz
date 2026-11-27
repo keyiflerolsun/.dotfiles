@@ -1,0 +1,9 @@
+#!/bin/sh
+# Günlük disk aşınma kaydı: her NVMe için bir satır.
+# Biçim: <tarih> <aygıt> <smartctl alanları, ';' ile> temp=<°C>
+for d in /dev/nvme?n1; do
+  s=$(smartctl -a "$d")
+  printf '%s %s %stemp=%s\n' "$(date +%F)" "$d" \
+    "$(printf '%s\n' "$s" | grep -E 'Model Number|Critical Warning|Percentage Used|Data Units Written|Media and Data Integrity' | sed 's/  */ /g' | tr '\n' ';')" \
+    "$(printf '%s\n' "$s" | awk '/^Temperature:/{print $2; exit}')"
+done >> /var/log/smart-iz.log

@@ -1,68 +1,54 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # Bu araç @keyiflerolsun tarafından | @KekikAkademi için yazılmıştır.
 
 # WSL Debian Temel Kurulum Paketi
 
 # Yüklemek İçin: `curl https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/WSL.sh | bash`
 
+# ? Güncelleme
 sudo apt-get update -y && sudo apt-get -y upgrade && sudo apt-get dist-upgrade -y
 
-# temel
-sudo apt install wget -y
-sudo apt install git -y
-sudo apt install zsh -y
-sudo apt install python3-dev -y
-sudo apt install python3-pip -y
-sudo apt install htop -y
-pip3 install --upgrade pip
+# ? Paketler
+# * Temel: ağ, git, kabuk
+sudo apt install -y wget curl git zsh htop
+# * Kabuk araçları (Debian'da fdfind/batcat; .zshrc batcat'i tanır)
+sudo apt install -y fzf fd-find bat zoxide tmux jq ffmpeg
+# * fastfetch Debian 13'te var, 12'de yok; neofetch Debian 13'te yok
+sudo apt install -y fastfetch || sudo apt install -y neofetch
+# * Editörler (xclip/xsel: micro'nun pano desteği; clangd: vim'de C dil sunucusu)
+sudo apt install -y vim ripgrep clangd micro xclip xsel
+# * Python (venv: vim dil sunucusu kurulumu için; tk: tkinter)
+sudo apt install -y python3-dev python3-venv python3-tk
+# * Ruby ve derleyici (colorls için; libncurses5-dev Debian 13'te yok, colorls'a yalnız derleyici gerekir)
+sudo apt install -y ruby ruby-dev build-essential
 
-# for tkinter;
-    # »» https://sourceforge.net/projects/xming/?source=typ_redirect
-sudo apt install python3-tk -y
-echo "export DISPLAY=:0;" >> ~/.bashrc
+# ? uv (pip kullanılmıyor; yt/mp3 takma adları uvx ile çalışır)
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# zsh
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-git clone https://github.com/zsh-users/zsh-completions ${ZSH_CUSTOM:=~/.oh-my-zsh/custom}/plugins/zsh-completions
-git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+# ? fd: Debian'daki fdfind adını fd olarak bağla
+mkdir -p ~/.local/bin && ln -sf /usr/bin/fdfind ~/.local/bin/fd
 
-# thefuck
-pip3 install thefuck
-sudo apt install thefuck -y
-
-# micro
-curl https://getmic.ro | bash
-sudo mv micro /usr/local/bin
-sudo apt install xclip -y
-sudo apt install xsel -y
-
-# colorls
-sudo apt install ruby rbenv ruby-dev ruby-colorize -y
-sudo apt install build-essential -y
-sudo apt install libncurses5-dev -y
+# ? Ruby: colorls
 sudo gem install colorls
 
-# docker
-sudo apt install docker docker-compose -y
+# ? Docker (Debian'da "docker" paketi bir pencere yöneticisi aracıdır; motor docker.io)
+# * systemctl için WSL'de systemd açık olmalı (aşağıdaki wsl.conf; etkisi `wsl --shutdown` sonrası)
+sudo apt install -y docker.io docker-compose
 sudo systemctl start docker.service
 sudo systemctl enable docker.service
 sudo usermod -aG docker $USER
 
-# keyif
-rm -rf ~/.zshrc && wget https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/.dots/.zshrc
-echo "KekikAkademi" > /etc/hostname
-sudo apt install screenfetch -y
-sudo apt install neofetch -y
-sudo apt install tmux -y
-wget https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/.dots/.tmux.conf
-sudo apt install jq -y
-sudo apt install ffmpeg -y
-sudo chsh -s $(which zsh) && zsh
-ulimit -n 4096
-git config --global user.email "keyiflerolsun@gmail.com"
-git config --global user.name "keyiflerolsun"
-git config --global credential.helper "cache --timeout=36000"
-echo "export DISPLAY=:0;" >> ~/.zshrc
+# ? WSL: /etc/hostname her açılışta yeniden yazılır; ad ve systemd wsl.conf'tan
+printf '[boot]\nsystemd = true\n\n[network]\nhostname = KekikAkademi\n' | sudo tee /etc/wsl.conf >/dev/null
+
+# ? Kabuk ortamı: Oh My Zsh, zsh/tmux/Vim dotfile'ları, Vim eklentileri, git (ortak betik)
+curl -fsSL https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/Kabuk.sh | bash
+
+# ? Makineye özgü kabuk ayarları .zshrc.local'a (ortak .zshrc her cihazda aynı kalır)
+# * DISPLAY: tkinter penceresi Windows'taki X sunucusuna (Xming) gider
+grep -qs DISPLAY ~/.zshrc.local || printf 'export DISPLAY=:0\nulimit -n 4096\n' >> ~/.zshrc.local
+
+# ? Varsayılan kabuk zsh en sonda: araya girerse betiğin kalanı zsh kapanana dek çalışmaz
+sudo chsh -s $(which zsh) $USER
 
 # usermod -aG sudo keyiflerolsun

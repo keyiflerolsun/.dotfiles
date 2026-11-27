@@ -2,10 +2,16 @@
   title: Beszel Resources
   title-url: ${BESZEL_PUBLIC}
   cache: 1m
+  # Sabit oturum token'ı süresi dolunca ve parola değişince geçersizleşir: her yenilemede giriş yapılır (NPM widget'ı gibi)
+  url: ${BESZEL_URL}/api/collections/users/auth-with-password
+  method: POST
+  body-type: json
+  body:
+    identity: ${BESZEL_USER}
+    password: ${BESZEL_PASS}
   options:
     public-url: ${BESZEL_PUBLIC}
     base-url: ${BESZEL_URL}
-    api-key: ${BESZEL_API}
   template: |
     <style>
       .beszel-container { background: var(--color-widget-background-highlight); border-radius: var(--border-radius); padding: 1.25rem; border: 1px solid var(--color-background); overflow-x: auto; }
@@ -28,10 +34,14 @@
 
     {{ $baseURL := .Options.StringOr "base-url" "" }}
     {{ $publicURL := .Options.StringOr "public-url" "" }}
-    {{ $apiKey  := .Options.StringOr "api-key" "" }}
-    {{ $token   := concat "Bearer " $apiKey }}
+    {{ $token   := concat "Bearer " (.JSON.String "token") }}
 
-    {{ $systemsResp := newRequest (print $baseURL "/api/collections/systems/records") | withHeader "Authorization" $token | getResponse }}
+    {{
+      $systemsResp := newRequest (print $baseURL "/api/collections/systems/records")
+      | withHeader "Authorization" $token
+      | withParameter "sort" "name"
+      | getResponse
+    }}
 
     <div class="beszel-container">
       {{ if $systemsResp.JSON }}

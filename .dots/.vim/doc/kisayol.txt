@@ -1,0 +1,164 @@
+*kisayol.txt*	Az tuşla Vim: Türkçe kısayol kâğıdı
+
+Açmak: boşluk ? ya da :help kisayol   Bölüme git: adın üstünde Ctrl-]   Kapat: :q
+
+Ezberlenecek bir dil yok. Dört şey bil, gerisini menü ve fare söyler:
+
+	Esc      komut kipine dön (ne olduğunu bilmiyorsan Esc)
+	i        yazmaya başla
+	v        seçmeye başla
+	boşluk   menü: basıp bekle, ne yapabileceğin listelenir
+
+Fare açık: tıkla, sürükleyip seç, tekerle kaydır, pencere kenarını çek.
+
+==============================================================================
+İÇİNDEKİLER                                                 *kisayol*
+
+  1. Hedefe gitmek ................................... |kisayol-hedef|
+  2. Seçmek, kopyalamak, kesmek ...................... |kisayol-sec|
+  3. Aramak ve değiştirmek ........................... |kisayol-ara|
+  4. Dosyalar, sekmeler, bölmeler ................... |kisayol-dosya|
+  5. Kod ............................................. |kisayol-kod|
+  6. Git ............................................. |kisayol-surum|
+  7. Listede ve ağaçta ............................... |kisayol-liste|
+  8. Türkçe klavye ................................... |kisayol-klavye|
+
+==============================================================================
+1. Hedefe gitmek                                            *kisayol-hedef*
+
+Gözün gördüğü yere: fareyle tıkla.
+
+Gözün görmediği yere: aranır.
+	/kelime Enter   dosyada ara, ilk eşleşmeye gider (yazarken gösterilir)
+	n  N            sonraki / önceki eşleşme
+	*               imlecin altındaki kelimenin sonraki geçtiği yer
+	boşluk /        bu dosyanın satırlarında ara, listeden seç
+	boşluk s        bu dosyadaki işlev ve sınıflar (dil sunucusu)
+	gd              tanımına git (dil sunucusu)
+
+Geri dönmek:
+	Ctrl-o   geldiğin yere dön (atlamadan, aramadan, gd'den sonra)
+	Ctrl-i   yeniden ileri
+
+Büyük adımlar:
+	gg  G         dosya başı / sonu
+	Ctrl-d Ctrl-u yarım sayfa aşağı / yukarı
+	Home  End     satır başı / sonu (0 ve $ de olur; $ AltGr ister)
+
+Kısa mesafe için oklar ya da h j k l yeter; uzak hedefe / ya da boşluk /.
+
+==============================================================================
+2. Seçmek, kopyalamak, kesmek                               *kisayol-sec*
+
+Seçim büyüyerek yapılır: v ile başla, v'ye bastıkça büyür.
+	v          seçime başla
+	v v ...    kelime → tırnak içi → parantez içi → paragraf
+	Geri sil   bir adım küçült
+	V          bütün satırı seç (sonra j k ile satır ekle)
+	v /kelime Enter   buradan o kelimeye kadar seç
+	Fareyle sürüklemek de seçer.
+
+Seçiliyken:
+	y   kopyala (terminalin panosuna da gider, başka programa yapıştırılır)
+	d   kes          p   yerine yapıştır
+	>  <  girinti (seçim kalır)      J  K  satırları aşağı / yukarı taşı
+	gc  yorum yap / kaldır           S"    seçimi tırnağa al
+	Esc  seçimden çık
+
+Seçmeden:
+	p        imleçten sonra yapıştır
+	yy  dd   bu satırı kopyala / kes
+	u        geri al        Ctrl-r   yeniden yap
+	.        son değişikliği burada tekrarla
+
+Terminalden yapıştırmak: Ctrl-Shift-v (yazma kipindeyken).
+
+==============================================================================
+3. Aramak ve değiştirmek                                    *kisayol-ara*
+
+	boşluk /           bu dosyada ara
+	boşluk g           bütün dosyalarda metin ara (rg), listeden aç
+	:%s/eski/yeni/g    dosyada hepsini değiştir
+	:%s/eski/yeni/gc   tek tek sorarak değiştir (y evet, n hayır)
+	boşluk r           değişkeni her yerde yeniden adlandır (dil sunucusu)
+
+Arama vurgusu imleç eşleşmeden ayrılınca kendiliğinden söner.
+Aramada büyük harf yazarsan büyük/küçüğe bakılır.
+
+==============================================================================
+4. Dosyalar, sekmeler, bölmeler                             *kisayol-dosya*
+
+Dosya:
+	boşluk f    adıyla dosya aç           boşluk o   son açılanlar
+	boşluk b    açık dosyalar arasında    boşluk e   bu dosyayı ağaçta göster
+	Ctrl-n      dosya ağacını aç / kapat
+	Ctrl-^      bir önceki dosyaya dön
+	boşluk w    kaydet           :q   kapat        :q!   kaydetmeden kapat
+
+Sekme (üstte adlarıyla görünür):
+	boşluk t      yeni sekme (sonra boşluk f ile dosya aç)
+	gt  gT        sonraki / önceki sekme (fareyle sekmeye tıklamak da olur)
+	3gt           3. sekmeye git
+	:tabclose     sekmeyi kapat
+	Listede (boşluk f, g ...) Ctrl-t: seçileni yeni sekmede aç.
+
+Bölme (aynı ekranda yan yana ya da alt alta):
+	boşluk v      yanda böl (sonra boşluk f ile öbür dosyayı aç)
+	:sp           alta böl
+	Ctrl + ok     o yöndeki bölmeye geç (Ctrl-h j k l de aynı; tıklamak da)
+	boşluk q      bu bölmeyi kapat     Ctrl-w o   yalnız bu kalsın
+	Ctrl-w =      eşit boyut (kenarı fareyle sürüklemek de olur)
+	Listede Ctrl-v: seçileni yanda, Ctrl-x: altta aç.
+
+==============================================================================
+5. Kod                                                      *kisayol-kod*
+
+Dil sunucusu (C: clangd, Python: pylsp) açıkken:
+	gd         tanıma git (dönüş Ctrl-o)
+	gr         kullanıldığı yerler
+	K          imlecin altındakinin açıklaması
+	üd  ğd     sonraki / önceki hata
+	boşluk r   yeniden adlandır      boşluk a   kod eylemi
+	boşluk s   dosyadaki işlev ve sınıflar
+Yazarken çıkan listede Tab / Shift-Tab gezin, Enter seç.
+Başka dil için: o dilde dosya aç, :LspInstallServer
+
+	gcc        satırı yorum yap / kaldır (seçiliyken gc)
+	cs"'       çevreleyen " işaretini ' yap     ds(   çevreleyen ( ) kaldır
+
+==============================================================================
+6. Git                                                      *kisayol-surum*
+
+Değişen satırların başında işaret var.
+	üc  ğc        sonraki / önceki değişiklik
+	boşluk hp     bu değişikliğin farkını göster
+	boşluk hs     git add (yalnız bu blok)     boşluk hu   bu bloğu geri al
+	:Git          durum: s ekle, u çıkar, = fark, cc commit
+	:Git blame    satır satır kim yazdı
+
+==============================================================================
+7. Listede ve ağaçta                                        *kisayol-liste*
+
+Arama listesi (boşluk f, g, b, o, /):
+	yaz       süzer          Ctrl-j  Ctrl-k   gezin (oklar da olur)
+	Enter     aç             Ctrl-v  yanda    Ctrl-t  yeni sekmede
+	Esc       kapat
+
+Dosya ağacı (Ctrl-n):
+	Enter ya da çift tık   aç            s   yanda aç
+	m   menü: a ekle (sonu / ise dizin), m taşı, d sil, c kopyala
+	I   gizli dosyalar     R   yenile    ?   yardım
+
+==============================================================================
+8. Türkçe klavye                                            *kisayol-klavye*
+
+İngilizce klavyedeki [ ] ve i'nin yerindeki ğ ü ı, Vim komutlarında onların
+işini görür (yazma kipinde Türkçe harf olarak kalır):
+	ğ  ü     [ ]  yerine: üd sonraki hata, ğc önceki git değişikliği ...
+	ı        i  yerine: ı yazmaya başlar, cıw = ciw, vıp = vip
+
+	- Satır başı / sonu: Home / End ($ AltGr+4).
+	- Esc uzaksa: Ctrl-c.
+	- Kalan AltGr'liler ({ } | \ ~ ` @) bu düzende gerekmez.
+
+ vim:tw=78:ts=8:noet:ft=help:norl:

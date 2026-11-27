@@ -1,0 +1,10 @@
+[Unit]
+Description=GitHub depolarını Gitea'ya ayna olarak kur (hub2tea)
+After=docker.service network-online.target
+Wants=network-online.target
+ConditionPathExists=/root/hub2tea.env
+
+[Service]
+Type=oneshot
+EnvironmentFile=/root/hub2tea.env
+ExecStart=/usr/local/sbin/hub2tea

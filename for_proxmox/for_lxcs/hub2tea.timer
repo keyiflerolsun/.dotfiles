@@ -1,0 +1,10 @@
+[Unit]
+Description=hub2tea, günde bir
+
+[Timer]
+# 00–07 ağır iş penceresi ve 07:15–09:00 yedekleri dışında
+OnCalendar=*-*-* 12:17
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,47 @@
+#!/opt/bin/sh
+# Bu araç @keyiflerolsun tarafından | @KekikAkademi için yazılmıştır.
+
+# Keenetic router'da (Entware, UPS'te) elektrik dönünce kapalı sunucuları Wake-on-LAN ile uyandırır; node'lardaki host/kesinti-izle
+# kesintide kapatır. UPS'e bağlı olmayan iki cihaz (HEDEFLER) en az YOK_ESIK dakika görünmeyip geri gelince PENCERE dakika boyunca
+# listede olmayan sunuculara (SUNUCULAR) uyandırma paketi gider. Elektrik kesintisi olmadıkça elle kapatılan sunucuya dokunmaz.
+# Cron'la dakikada bir koşar; router'ın yerel RCI'si (127.0.0.1:79) içeriden parolasız.
+# Ayar /opt/etc/kesinti-uyandir.conf: HEDEFLER, SUNUCULAR (boşlukla MAC), YOK_ESIK, PENCERE.
+AYAR=${AYAR:-/opt/etc/kesinti-uyandir.conf}
+DURUM=${DURUM:-/opt/var/kesinti-uyandir}
+GUNLUK=${GUNLUK:-/opt/var/log/kesinti-uyandir.log}
+RCI=${RCI:-http://127.0.0.1:79/rci}  # yollar sınamada ortamla ezilir
+
+YOK_ESIK=10 PENCERE=30
+. "$AYAR"
+yok=0 bitis=0
+[ -f "$DURUM" ] && . "$DURUM"
+simdi=$(date +%s)
+iz() { echo "$(date '+%F %T') $*" >>"$GUNLUK"; }
+
+tablo=$(curl -s -m 10 "$RCI/show/ip/hotspot") || exit 0
+
+# Cihaz bağlı: router onu etkin görüyor ve son 3 dk içinde görmüş (kapanan makinenin "active"i geç düşer)
+acik() {
+    echo "$tablo" | jq -e --arg m "$1" \
+        '.host[]? | select((.mac | ascii_downcase) == $m and .active and (."last-seen" // 999999) <= 180)' >/dev/null
+}
+
+hedef=0
+for m in $HEDEFLER; do acik "$m" && hedef=1; done
+if [ "$hedef" = 0 ]; then
+    yok=$((yok + 1))
+else
+    [ "$yok" -ge "$YOK_ESIK" ] && { bitis=$((simdi + PENCERE * 60)); iz "elektrik geldi ($yok dk yoktu), $PENCERE dk uyandırma"; }
+    yok=0
+fi
+
+if [ "$simdi" -lt "$bitis" ]; then
+    for m in $SUNUCULAR; do
+        acik "$m" || { curl -s -m 10 -d "{\"ip\":{\"hotspot\":{\"wake\":{\"mac\":\"$m\"}}}}" "$RCI/" >/dev/null; iz "uyandır $m"; }
+    done
+fi
+
+printf 'yok=%s\nbitis=%s\n' "$yok" "$bitis" >"$DURUM"
+# Günlük yalnız olaylarda yazılır; 200 satırı geçerse son 100 kalır
+[ -f "$GUNLUK" ] && [ "$(wc -l <"$GUNLUK")" -gt 200 ] && { tail -n 100 "$GUNLUK" >"$GUNLUK.y" && mv "$GUNLUK.y" "$GUNLUK"; }
+exit 0

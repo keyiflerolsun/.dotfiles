@@ -1,0 +1,22 @@
+[Added Associations]
+application/octet-stream=org.kde.kate.desktop;
+video/mp4=mpv.desktop;
+x-scheme-handler/unityhub=unityhub.desktop;
+
+[Default Applications]
+application/octet-stream=org.kde.kate.desktop;
+application/x-bittorrent=freedownloadmanager_torrent.desktop
+text/html=brave-browser.desktop
+video/mp4=mpv.desktop;
+x-scheme-handler/fdm=freedownloadmanager_fdm_up.desktop
+x-scheme-handler/heroic=com.heroicgameslauncher.hgl.desktop
+x-scheme-handler/http=brave-browser.desktop
+x-scheme-handler/https=brave-browser.desktop
+x-scheme-handler/magnet=freedownloadmanager_magnet_up.desktop
+x-scheme-handler/mailto=brave-browser.desktop
+x-scheme-handler/mongodb=mongodb-compass.desktop
+x-scheme-handler/mongodb+srv=mongodb-compass.desktop
+x-scheme-handler/antigravity=antigravity.desktop
+x-scheme-handler/claude-cli=claude-code-url-handler.desktop
+x-scheme-handler/unityhub=unityhub.desktop
+x-scheme-handler/ao-app=Agent Orchestrator.desktop

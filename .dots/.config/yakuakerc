@@ -1,0 +1,10 @@
+[Appearance]
+Skin=materia-dark
+SkinInstalledWithKns=true
+
+[Dialogs]
+FirstRun=false
+
+[Window]
+Height=82
+Width=80

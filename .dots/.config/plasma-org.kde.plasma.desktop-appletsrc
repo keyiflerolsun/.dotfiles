@@ -18,12 +18,8 @@ wallpaperplugin=org.kde.image
 immutability=1
 plugin=org.kde.plasma.icontasks
 
-[Containments][121][Applets][101][Configuration][ConfigDialog]
-DialogHeight=630
-DialogWidth=810
-
 [Containments][121][Applets][101][Configuration][General]
-launchers=preferred://filemanager,applications:systemsettings.desktop,preferred://browser,applications:code.desktop,applications:org.telegram.desktop.desktop,applications:org.remmina.Remmina.desktop,applications:mongodb-compass.desktop,applications:freedownloadmanager.desktop
+launchers=preferred://filemanager,applications:org.kde.konsole.desktop,applications:systemsettings.desktop,preferred://browser,applications:com.microsoft.VSCode.desktop,applications:org.telegram.desktop.desktop,applications:org.remmina.Remmina.desktop,applications:mongodb-compass.desktop,applications:freedownloadmanager.desktop
 showOnlyCurrentScreen=true
 wheelEnabled=TaskOnly
 
@@ -47,7 +43,7 @@ plugin=org.kde.plasma.trash
 activityId=
 formfactor=0
 immutability=1
-lastScreen=-1
+lastScreen=0
 location=0
 plugin=org.kde.plasma.folder
 wallpaperplugin=
@@ -56,16 +52,10 @@ wallpaperplugin=
 activityId=
 formfactor=0
 immutability=1
-lastScreen=-1
+lastScreen=0
 location=0
 plugin=org.kde.plasma.folder
-popupHeight=400
-popupWidth=560
 wallpaperplugin=
-
-[Containments][121][Applets][127][Configuration][ConfigDialog]
-DialogHeight=630
-DialogWidth=810
 
 [Containments][121][Applets][127][Configuration][General]
 url=file:///home/keyiflerolsun/İndirilenler
@@ -86,12 +76,10 @@ wallpaperplugin=org.kde.image
 immutability=1
 plugin=org.kde.plasma.kickoff
 
-[Containments][137][Applets][138][Configuration]
-popupHeight=517
-popupWidth=665
-
 [Containments][137][Applets][138][Configuration][General]
 favoritesPortedToKAstats=true
+icon=org.cachyos.hello
+systemFavorites=suspend\\,hibernate\\,reboot\\,shutdown
 
 [Containments][137][Applets][139]
 immutability=1
@@ -105,11 +93,9 @@ plugin=org.kde.plasma.marginsseparator
 activityId=
 formfactor=0
 immutability=1
-lastScreen=-1
+lastScreen=0
 location=0
 plugin=org.kde.plasma.systemtray
-popupHeight=432
-popupWidth=432
 wallpaperplugin=org.kde.image
 
 [Containments][137][Applets][141][Applets][136]
@@ -148,10 +134,6 @@ plugin=org.kde.plasma.keyboardindicator
 immutability=1
 plugin=org.kde.plasma.weather
 
-[Containments][137][Applets][141][Applets][149][Configuration][ConfigDialog]
-DialogHeight=630
-DialogWidth=810
-
 [Containments][137][Applets][141][Applets][149][Configuration][WeatherStation]
 placeDisplayName=Istanbul, Turkey, TR
 placeInfo=Istanbul, Turkey, TR|745044
@@ -163,24 +145,29 @@ plugin=org.kde.kscreen
 
 [Containments][137][Applets][141][Applets][151]
 immutability=1
-plugin=org.kde.plasma.keyboardlayout
+plugin=org.kde.plasma.dwellclicker
 
 [Containments][137][Applets][141][Applets][152]
 immutability=1
-plugin=org.kde.plasma.networkmanagement
+plugin=org.kde.plasma.keyboardlayout
+
+[Containments][137][Applets][141][Applets][152][Configuration][General]
+currentDetailsTab=details
 
 [Containments][137][Applets][141][Applets][153]
 immutability=1
-plugin=org.kde.plasma.volume
+plugin=org.kde.plasma.networkmanagement
 
 [Containments][137][Applets][141][Applets][153][Configuration][General]
+currentDetailsTab=details
 migrated=true
 
 [Containments][137][Applets][141][Applets][154]
 immutability=1
-plugin=org.kde.plasma.battery
+plugin=org.kde.plasma.volume
 
 [Containments][137][Applets][141][Applets][154][Configuration][General]
+migrated=true
 showPercentage=true
 
 [Containments][137][Applets][141][Applets][155]
@@ -191,22 +178,21 @@ plugin=org.kde.plasma.brightness
 immutability=1
 plugin=org.kde.plasma.bluetooth
 
-[Containments][137][Applets][141][ConfigDialog]
-DialogHeight=630
-DialogWidth=810
+[Containments][137][Applets][141][Applets][224]
+immutability=1
+plugin=org.kde.plasma.battery
 
 [Containments][137][Applets][141][General]
-extraItems=org.kde.kdeconnect,org.kde.plasma.bluetooth,org.kde.plasma.cameraindicator,org.kde.plasma.clipboard,org.kde.plasma.devicenotifier,org.kde.plasma.manage-inputmethod,org.kde.plasma.mediacontroller,org.kde.plasma.notifications,org.kde.plasma.keyboardindicator,org.kde.plasma.weather,org.kde.kscreen,org.kde.plasma.battery,org.kde.plasma.brightness,org.kde.plasma.keyboardlayout,org.kde.plasma.networkmanagement,org.kde.plasma.volume
+extraItems=org.kde.kdeconnect,org.kde.plasma.bluetooth,org.kde.plasma.cameraindicator,org.kde.plasma.clipboard,org.kde.plasma.devicenotifier,org.kde.plasma.manage-inputmethod,org.kde.plasma.mediacontroller,org.kde.plasma.notifications,org.kde.plasma.keyboardindicator,org.kde.plasma.weather,org.kde.kscreen,org.kde.plasma.battery,org.kde.plasma.brightness,org.kde.plasma.keyboardlayout,org.kde.plasma.networkmanagement,org.kde.plasma.volume,org.kde.plasma.dwellclicker
 hiddenItems=Arch-Update,Free Download Manager,remmina-icon,Yakuake,TelegramDesktop
-knownItems=org.kde.kdeconnect,org.kde.plasma.bluetooth,org.kde.plasma.cameraindicator,org.kde.plasma.clipboard,org.kde.plasma.devicenotifier,org.kde.plasma.manage-inputmethod,org.kde.plasma.mediacontroller,org.kde.plasma.notifications,org.kde.plasma.keyboardindicator,org.kde.plasma.weather,org.kde.kscreen,org.kde.plasma.battery,org.kde.plasma.brightness,org.kde.plasma.keyboardlayout,org.kde.plasma.networkmanagement,org.kde.plasma.volume
+knownItems=org.kde.kdeconnect,org.kde.plasma.bluetooth,org.kde.plasma.cameraindicator,org.kde.plasma.clipboard,org.kde.plasma.devicenotifier,org.kde.plasma.manage-inputmethod,org.kde.plasma.mediacontroller,org.kde.plasma.notifications,org.kde.plasma.keyboardindicator,org.kde.plasma.weather,org.kde.kscreen,org.kde.plasma.battery,org.kde.plasma.brightness,org.kde.plasma.keyboardlayout,org.kde.plasma.networkmanagement,org.kde.plasma.volume,org.kde.plasma.dwellclicker
 
 [Containments][137][Applets][157]
 immutability=1
 plugin=org.kde.plasma.digitalclock
 
-[Containments][137][Applets][157][Configuration]
-popupHeight=400
-popupWidth=560
+[Containments][137][Applets][157][Configuration][Appearance]
+selectedTimeZones=America/New_York,Local
 
 [Containments][137][Applets][158]
 immutability=1
@@ -224,10 +210,6 @@ plugin=org.kde.plasma.minimizeall
 immutability=1
 plugin=org.kde.plasma.lock_logout
 
-[Containments][137][Applets][161][Configuration][ConfigDialog]
-DialogHeight=630
-DialogWidth=810
-
 [Containments][137][Applets][161][Configuration][General]
 actionsOrder=lockScreen,switchUser,requestShutDown,requestReboot,requestLogout,requestLogoutScreen,suspendToRam,suspendToDisk
 show_requestLogoutScreen=false
@@ -240,19 +222,12 @@ plugin=org.kde.plasma.appmenu
 immutability=1
 plugin=org.kde.windowtitle
 
-[Containments][137][Applets][163][Configuration]
-popupHeight=433
-popupWidth=432
-
 [Containments][137][Applets][163][Configuration][Appearance]
 altTxt=keyiflerolsun
+lengthKind=2
 
 [Containments][137][Applets][163][Configuration][Behavior]
 filterByScreen=true
-
-[Containments][137][Applets][163][Configuration][ConfigDialog]
-DialogHeight=630
-DialogWidth=810
 
 [Containments][137][Applets][164]
 immutability=1
@@ -261,10 +236,6 @@ plugin=org.kde.plasma.panelspacer
 [Containments][137][Applets][165]
 immutability=1
 plugin=org.kde.netspeedWidget
-
-[Containments][137][Applets][165][Configuration][ConfigDialog]
-DialogHeight=630
-DialogWidth=810
 
 [Containments][137][Applets][165][Configuration][General]
 fontSize=120
@@ -285,12 +256,10 @@ wallpaperplugin=org.kde.image
 immutability=1
 plugin=org.kde.plasma.kickoff
 
-[Containments][166][Applets][167][Configuration]
-popupHeight=517
-popupWidth=665
-
 [Containments][166][Applets][167][Configuration][General]
 favoritesPortedToKAstats=true
+icon=org.cachyos.hello
+systemFavorites=suspend\\,hibernate\\,reboot\\,shutdown
 
 [Containments][166][Applets][168]
 immutability=1
@@ -304,11 +273,9 @@ plugin=org.kde.plasma.marginsseparator
 activityId=
 formfactor=0
 immutability=1
-lastScreen=-1
+lastScreen=0
 location=0
 plugin=org.kde.plasma.systemtray
-popupHeight=432
-popupWidth=432
 wallpaperplugin=org.kde.image
 
 [Containments][166][Applets][170][Applets][136]
@@ -347,10 +314,6 @@ plugin=org.kde.plasma.keyboardindicator
 immutability=1
 plugin=org.kde.plasma.weather
 
-[Containments][166][Applets][170][Applets][178][Configuration][ConfigDialog]
-DialogHeight=630
-DialogWidth=810
-
 [Containments][166][Applets][170][Applets][178][Configuration][WeatherStation]
 placeDisplayName=Istanbul, Turkey, TR
 placeInfo=Istanbul, Turkey, TR|745044
@@ -362,24 +325,25 @@ plugin=org.kde.kscreen
 
 [Containments][166][Applets][170][Applets][180]
 immutability=1
-plugin=org.kde.plasma.keyboardlayout
+plugin=org.kde.plasma.dwellclicker
 
 [Containments][166][Applets][170][Applets][181]
 immutability=1
-plugin=org.kde.plasma.networkmanagement
+plugin=org.kde.plasma.keyboardlayout
 
 [Containments][166][Applets][170][Applets][182]
 immutability=1
-plugin=org.kde.plasma.volume
+plugin=org.kde.plasma.networkmanagement
 
 [Containments][166][Applets][170][Applets][182][Configuration][General]
 migrated=true
 
 [Containments][166][Applets][170][Applets][183]
 immutability=1
-plugin=org.kde.plasma.battery
+plugin=org.kde.plasma.volume
 
 [Containments][166][Applets][170][Applets][183][Configuration][General]
+migrated=true
 showPercentage=true
 
 [Containments][166][Applets][170][Applets][184]
@@ -390,22 +354,21 @@ plugin=org.kde.plasma.brightness
 immutability=1
 plugin=org.kde.plasma.bluetooth
 
-[Containments][166][Applets][170][ConfigDialog]
-DialogHeight=630
-DialogWidth=810
+[Containments][166][Applets][170][Applets][223]
+immutability=1
+plugin=org.kde.plasma.battery
 
 [Containments][166][Applets][170][General]
-extraItems=org.kde.kdeconnect,org.kde.plasma.bluetooth,org.kde.plasma.cameraindicator,org.kde.plasma.clipboard,org.kde.plasma.devicenotifier,org.kde.plasma.manage-inputmethod,org.kde.plasma.mediacontroller,org.kde.plasma.notifications,org.kde.plasma.keyboardindicator,org.kde.plasma.weather,org.kde.kscreen,org.kde.plasma.battery,org.kde.plasma.brightness,org.kde.plasma.keyboardlayout,org.kde.plasma.networkmanagement,org.kde.plasma.volume
+extraItems=org.kde.kdeconnect,org.kde.plasma.bluetooth,org.kde.plasma.cameraindicator,org.kde.plasma.clipboard,org.kde.plasma.devicenotifier,org.kde.plasma.manage-inputmethod,org.kde.plasma.mediacontroller,org.kde.plasma.notifications,org.kde.plasma.keyboardindicator,org.kde.plasma.weather,org.kde.kscreen,org.kde.plasma.battery,org.kde.plasma.brightness,org.kde.plasma.keyboardlayout,org.kde.plasma.networkmanagement,org.kde.plasma.volume,org.kde.plasma.dwellclicker
 hiddenItems=Arch-Update,Free Download Manager,remmina-icon,Yakuake,TelegramDesktop
-knownItems=org.kde.kdeconnect,org.kde.plasma.bluetooth,org.kde.plasma.cameraindicator,org.kde.plasma.clipboard,org.kde.plasma.devicenotifier,org.kde.plasma.manage-inputmethod,org.kde.plasma.mediacontroller,org.kde.plasma.notifications,org.kde.plasma.keyboardindicator,org.kde.plasma.weather,org.kde.kscreen,org.kde.plasma.battery,org.kde.plasma.brightness,org.kde.plasma.keyboardlayout,org.kde.plasma.networkmanagement,org.kde.plasma.volume
+knownItems=org.kde.kdeconnect,org.kde.plasma.bluetooth,org.kde.plasma.cameraindicator,org.kde.plasma.clipboard,org.kde.plasma.devicenotifier,org.kde.plasma.manage-inputmethod,org.kde.plasma.mediacontroller,org.kde.plasma.notifications,org.kde.plasma.keyboardindicator,org.kde.plasma.weather,org.kde.kscreen,org.kde.plasma.battery,org.kde.plasma.brightness,org.kde.plasma.keyboardlayout,org.kde.plasma.networkmanagement,org.kde.plasma.volume,org.kde.plasma.dwellclicker
 
 [Containments][166][Applets][186]
 immutability=1
 plugin=org.kde.plasma.digitalclock
 
-[Containments][166][Applets][186][Configuration]
-popupHeight=400
-popupWidth=560
+[Containments][166][Applets][186][Configuration][Appearance]
+selectedTimeZones=America/New_York,Local
 
 [Containments][166][Applets][187]
 immutability=1
@@ -423,10 +386,6 @@ plugin=org.kde.plasma.minimizeall
 immutability=1
 plugin=org.kde.plasma.lock_logout
 
-[Containments][166][Applets][190][Configuration][ConfigDialog]
-DialogHeight=630
-DialogWidth=810
-
 [Containments][166][Applets][190][Configuration][General]
 actionsOrder=lockScreen,switchUser,requestShutDown,requestReboot,requestLogout,requestLogoutScreen,suspendToRam,suspendToDisk
 show_requestLogoutScreen=false
@@ -439,19 +398,12 @@ plugin=org.kde.plasma.appmenu
 immutability=1
 plugin=org.kde.windowtitle
 
-[Containments][166][Applets][192][Configuration]
-popupHeight=433
-popupWidth=432
-
 [Containments][166][Applets][192][Configuration][Appearance]
 altTxt=keyiflerolsun
+lengthKind=2
 
 [Containments][166][Applets][192][Configuration][Behavior]
 filterByScreen=true
-
-[Containments][166][Applets][192][Configuration][ConfigDialog]
-DialogHeight=630
-DialogWidth=810
 
 [Containments][166][Applets][193]
 immutability=1
@@ -461,156 +413,14 @@ plugin=org.kde.plasma.panelspacer
 immutability=1
 plugin=org.kde.netspeedWidget
 
-[Containments][166][Applets][194][Configuration][ConfigDialog]
-DialogHeight=630
-DialogWidth=810
-
 [Containments][166][Applets][194][Configuration][General]
 fontSize=120
 
 [Containments][166][General]
 AppletOrder=167;168;169;192;193;191;187;194;188;170;186;190;189
 
-[Containments][195]
-activityId=
-formfactor=2
-immutability=1
-lastScreen=1
-location=4
-plugin=org.kde.panel
-wallpaperplugin=org.kde.image
-
-[Containments][195][Applets][196]
-immutability=1
-plugin=org.kde.plasma.icontasks
-
-[Containments][195][Applets][196][Configuration][ConfigDialog]
-DialogHeight=630
-DialogWidth=810
-
-[Containments][195][Applets][196][Configuration][General]
-launchers=preferred://filemanager,applications:org.kde.konsole.desktop,applications:systemsettings.desktop,preferred://browser,applications:code.desktop,applications:org.telegram.desktop.desktop,applications:org.remmina.Remmina.desktop,applications:mongodb-compass.desktop,applications:freedownloadmanager.desktop
-showOnlyCurrentScreen=true
-wheelEnabled=TaskOnly
-
-[Containments][195][Applets][197]
-immutability=1
-plugin=org.kde.plasma.panelspacer
-
-[Containments][195][Applets][197][Configuration][General]
-expanding=false
-length=200
-
-[Containments][195][Applets][198]
-immutability=1
-plugin=org.kde.plasma.minimizeall
-
-[Containments][195][Applets][199]
-immutability=1
-plugin=org.kde.plasma.trash
-
-[Containments][195][Applets][200]
-activityId=
-formfactor=0
-immutability=1
-lastScreen=-1
-location=0
-plugin=org.kde.plasma.folder
-wallpaperplugin=
-
-[Containments][195][Applets][200][Configuration]
-activityId=
-formfactor=0
-immutability=1
-lastScreen=-1
-location=0
-plugin=org.kde.plasma.folder
-popupHeight=400
-popupWidth=560
-wallpaperplugin=
-
-[Containments][195][Applets][200][Configuration][ConfigDialog]
-DialogHeight=630
-DialogWidth=810
-
-[Containments][195][Applets][200][Configuration][General]
-url=file:///home/keyiflerolsun/İndirilenler
-
-[Containments][195][General]
-AppletOrder=196;197;200;199;198
-
-[Containments][201]
-activityId=
-formfactor=2
-immutability=1
-lastScreen=2
-location=4
-plugin=org.kde.panel
-wallpaperplugin=org.kde.image
-
-[Containments][201][Applets][202]
-immutability=1
-plugin=org.kde.plasma.icontasks
-
-[Containments][201][Applets][202][Configuration][ConfigDialog]
-DialogHeight=630
-DialogWidth=810
-
-[Containments][201][Applets][202][Configuration][General]
-launchers=preferred://filemanager,applications:systemsettings.desktop,preferred://browser,applications:code.desktop,applications:org.telegram.desktop.desktop,applications:org.remmina.Remmina.desktop,applications:mongodb-compass.desktop,applications:freedownloadmanager.desktop
-showOnlyCurrentScreen=true
-wheelEnabled=TaskOnly
-
-[Containments][201][Applets][203]
-immutability=1
-plugin=org.kde.plasma.panelspacer
-
-[Containments][201][Applets][203][Configuration][General]
-expanding=false
-length=200
-
-[Containments][201][Applets][204]
-immutability=1
-plugin=org.kde.plasma.minimizeall
-
-[Containments][201][Applets][205]
-immutability=1
-plugin=org.kde.plasma.trash
-
-[Containments][201][Applets][206]
-activityId=
-formfactor=0
-immutability=1
-lastScreen=-1
-location=0
-plugin=org.kde.plasma.folder
-wallpaperplugin=
-
-[Containments][201][Applets][206][Configuration]
-activityId=
-formfactor=0
-immutability=1
-lastScreen=-1
-location=0
-plugin=org.kde.plasma.folder
-popupHeight=400
-popupWidth=560
-wallpaperplugin=
-
-[Containments][201][Applets][206][Configuration][ConfigDialog]
-DialogHeight=630
-DialogWidth=810
-
-[Containments][201][Applets][206][Configuration][General]
-url=file:///home/keyiflerolsun/İndirilenler
-
-[Containments][201][General]
-AppletOrder=202;203;206;205;204
-
-[Containments][95]
-ItemGeometries-1920x1200=
-ItemGeometriesHorizontal=
-activityId=ae27a5c7-f7df-4523-8962-53c08bea8b3a
+[Containments][207]
+activityId=c9d77b7d-da06-491d-95b4-c0fff431ecde
 formfactor=0
 immutability=1
 lastScreen=0
@@ -618,18 +428,15 @@ location=0
 plugin=org.kde.plasma.folder
 wallpaperplugin=org.kde.image
 
-[Containments][95][ConfigDialog]
-DialogHeight=630
-DialogWidth=810
+[Containments][207][General]
+arrangement=1
 
-[Containments][95][Wallpaper][org.kde.image][General]
+[Containments][207][Wallpaper][org.kde.image][General]
 Image=file:///home/keyiflerolsun/Resimler/Astronot.png
 SlidePaths=/home/keyiflerolsun/.local/share/wallpapers/,/usr/share/wallpapers/
 
-[Containments][96]
-ItemGeometries-1920x1080=
-ItemGeometriesHorizontal=
-activityId=ae27a5c7-f7df-4523-8962-53c08bea8b3a
+[Containments][208]
+activityId=c9d77b7d-da06-491d-95b4-c0fff431ecde
 formfactor=0
 immutability=1
 lastScreen=1
@@ -637,18 +444,12 @@ location=0
 plugin=org.kde.plasma.folder
 wallpaperplugin=org.kde.image
 
-[Containments][96][ConfigDialog]
-DialogHeight=630
-DialogWidth=810
-
-[Containments][96][Wallpaper][org.kde.image][General]
+[Containments][208][Wallpaper][org.kde.image][General]
 Image=file:///home/keyiflerolsun/Resimler/volkswagen-van-anime-girl-art-sky-scenery-4k-wallpaper-uhdpaper.com-681@1@k.jpg
 SlidePaths=/home/keyiflerolsun/.local/share/wallpapers/,/usr/share/wallpapers/
 
-[Containments][97]
-ItemGeometries-1920x1080=
-ItemGeometriesHorizontal=
-activityId=ae27a5c7-f7df-4523-8962-53c08bea8b3a
+[Containments][209]
+activityId=c9d77b7d-da06-491d-95b4-c0fff431ecde
 formfactor=0
 immutability=1
 lastScreen=2
@@ -656,13 +457,125 @@ location=0
 plugin=org.kde.plasma.folder
 wallpaperplugin=org.kde.image
 
-[Containments][97][ConfigDialog]
-DialogHeight=630
-DialogWidth=810
-
-[Containments][97][Wallpaper][org.kde.image][General]
+[Containments][209][Wallpaper][org.kde.image][General]
 Image=file:///home/keyiflerolsun/Resimler/volkswagen-van-anime-girl-art-sky-scenery-4k-wallpaper-uhdpaper.com-681@1@k.jpg
 SlidePaths=/home/keyiflerolsun/.local/share/wallpapers/,/usr/share/wallpapers/
+
+[Containments][210]
+activityId=
+formfactor=2
+immutability=1
+lastScreen=1
+location=4
+plugin=org.kde.panel
+wallpaperplugin=org.kde.image
+
+[Containments][210][Applets][211]
+immutability=1
+plugin=org.kde.plasma.icontasks
+
+[Containments][210][Applets][211][Configuration][General]
+launchers=preferred://filemanager,applications:org.kde.konsole.desktop,applications:systemsettings.desktop,preferred://browser,applications:com.microsoft.VSCode.desktop,applications:org.telegram.desktop.desktop,applications:org.remmina.Remmina.desktop,applications:mongodb-compass.desktop,applications:freedownloadmanager.desktop
+showOnlyCurrentScreen=true
+wheelEnabled=TaskOnly
+
+[Containments][210][Applets][212]
+immutability=1
+plugin=org.kde.plasma.panelspacer
+
+[Containments][210][Applets][212][Configuration][General]
+expanding=false
+length=200
+
+[Containments][210][Applets][213]
+immutability=1
+plugin=org.kde.plasma.minimizeall
+
+[Containments][210][Applets][214]
+immutability=1
+plugin=org.kde.plasma.trash
+
+[Containments][210][Applets][215]
+activityId=
+formfactor=0
+immutability=1
+lastScreen=0
+location=0
+plugin=org.kde.plasma.folder
+wallpaperplugin=
+
+[Containments][210][Applets][215][Configuration]
+activityId=
+formfactor=0
+immutability=1
+lastScreen=0
+location=0
+plugin=org.kde.plasma.folder
+wallpaperplugin=
+
+[Containments][210][Applets][215][Configuration][General]
+url=file:///home/keyiflerolsun/İndirilenler
+
+[Containments][210][General]
+AppletOrder=211;212;215;214;213
+
+[Containments][216]
+activityId=
+formfactor=2
+immutability=1
+lastScreen=2
+location=4
+plugin=org.kde.panel
+wallpaperplugin=org.kde.image
+
+[Containments][216][Applets][217]
+immutability=1
+plugin=org.kde.plasma.icontasks
+
+[Containments][216][Applets][217][Configuration][General]
+launchers=preferred://filemanager,applications:org.kde.konsole.desktop,applications:systemsettings.desktop,preferred://browser,applications:com.microsoft.VSCode.desktop,applications:org.telegram.desktop.desktop,applications:org.remmina.Remmina.desktop,applications:mongodb-compass.desktop,applications:freedownloadmanager.desktop
+showOnlyCurrentScreen=true
+wheelEnabled=TaskOnly
+
+[Containments][216][Applets][218]
+immutability=1
+plugin=org.kde.plasma.panelspacer
+
+[Containments][216][Applets][218][Configuration][General]
+expanding=false
+length=200
+
+[Containments][216][Applets][219]
+immutability=1
+plugin=org.kde.plasma.minimizeall
+
+[Containments][216][Applets][220]
+immutability=1
+plugin=org.kde.plasma.trash
+
+[Containments][216][Applets][221]
+activityId=
+formfactor=0
+immutability=1
+lastScreen=0
+location=0
+plugin=org.kde.plasma.folder
+wallpaperplugin=
+
+[Containments][216][Applets][221][Configuration]
+activityId=
+formfactor=0
+immutability=1
+lastScreen=0
+location=0
+plugin=org.kde.plasma.folder
+wallpaperplugin=
+
+[Containments][216][Applets][221][Configuration][General]
+url=file:///home/keyiflerolsun/İndirilenler
+
+[Containments][216][General]
+AppletOrder=217;218;221;220;219
 
 [Containments][98]
 activityId=
@@ -685,11 +598,9 @@ plugin=org.kde.plasma.marginsseparator
 activityId=
 formfactor=0
 immutability=1
-lastScreen=-1
+lastScreen=0
 location=0
 plugin=org.kde.plasma.systemtray
-popupHeight=432
-popupWidth=432
 wallpaperplugin=org.kde.image
 
 [Containments][98][Applets][103][Applets][104]
@@ -724,10 +635,6 @@ plugin=org.kde.plasma.keyboardindicator
 immutability=1
 plugin=org.kde.plasma.weather
 
-[Containments][98][Applets][103][Applets][111][Configuration][ConfigDialog]
-DialogHeight=630
-DialogWidth=810
-
 [Containments][98][Applets][103][Applets][111][Configuration][WeatherStation]
 placeDisplayName=Istanbul, Turkey, TR
 placeInfo=Istanbul, Turkey, TR|745044
@@ -744,6 +651,9 @@ plugin=org.kde.plasma.keyboardlayout
 [Containments][98][Applets][103][Applets][114]
 immutability=1
 plugin=org.kde.plasma.networkmanagement
+
+[Containments][98][Applets][103][Applets][114][Configuration][General]
+currentDetailsTab=details
 
 [Containments][98][Applets][103][Applets][115]
 immutability=1
@@ -771,22 +681,21 @@ plugin=org.kde.plasma.bluetooth
 immutability=1
 plugin=org.kde.plasma.mediacontroller
 
-[Containments][98][Applets][103][ConfigDialog]
-DialogHeight=630
-DialogWidth=810
+[Containments][98][Applets][103][Applets][222]
+immutability=1
+plugin=org.kde.plasma.dwellclicker
 
 [Containments][98][Applets][103][General]
-extraItems=org.kde.kdeconnect,org.kde.plasma.bluetooth,org.kde.plasma.cameraindicator,org.kde.plasma.clipboard,org.kde.plasma.devicenotifier,org.kde.plasma.manage-inputmethod,org.kde.plasma.mediacontroller,org.kde.plasma.notifications,org.kde.plasma.keyboardindicator,org.kde.plasma.weather,org.kde.kscreen,org.kde.plasma.battery,org.kde.plasma.brightness,org.kde.plasma.keyboardlayout,org.kde.plasma.networkmanagement,org.kde.plasma.volume
+extraItems=org.kde.kdeconnect,org.kde.plasma.bluetooth,org.kde.plasma.cameraindicator,org.kde.plasma.clipboard,org.kde.plasma.devicenotifier,org.kde.plasma.manage-inputmethod,org.kde.plasma.mediacontroller,org.kde.plasma.notifications,org.kde.plasma.keyboardindicator,org.kde.plasma.weather,org.kde.kscreen,org.kde.plasma.battery,org.kde.plasma.brightness,org.kde.plasma.keyboardlayout,org.kde.plasma.networkmanagement,org.kde.plasma.volume,org.kde.plasma.dwellclicker
 hiddenItems=Arch-Update,Free Download Manager,remmina-icon,Yakuake,TelegramDesktop
-knownItems=org.kde.kdeconnect,org.kde.plasma.bluetooth,org.kde.plasma.cameraindicator,org.kde.plasma.clipboard,org.kde.plasma.devicenotifier,org.kde.plasma.manage-inputmethod,org.kde.plasma.mediacontroller,org.kde.plasma.notifications,org.kde.plasma.keyboardindicator,org.kde.plasma.weather,org.kde.kscreen,org.kde.plasma.battery,org.kde.plasma.brightness,org.kde.plasma.keyboardlayout,org.kde.plasma.networkmanagement,org.kde.plasma.volume
+knownItems=org.kde.kdeconnect,org.kde.plasma.bluetooth,org.kde.plasma.cameraindicator,org.kde.plasma.clipboard,org.kde.plasma.devicenotifier,org.kde.plasma.manage-inputmethod,org.kde.plasma.mediacontroller,org.kde.plasma.notifications,org.kde.plasma.keyboardindicator,org.kde.plasma.weather,org.kde.kscreen,org.kde.plasma.battery,org.kde.plasma.brightness,org.kde.plasma.keyboardlayout,org.kde.plasma.networkmanagement,org.kde.plasma.volume,org.kde.plasma.dwellclicker
 
 [Containments][98][Applets][116]
 immutability=1
 plugin=org.kde.plasma.digitalclock
 
-[Containments][98][Applets][116][Configuration]
-popupHeight=400
-popupWidth=560
+[Containments][98][Applets][116][Configuration][Appearance]
+selectedTimeZones=America/New_York,Local
 
 [Containments][98][Applets][122]
 immutability=1
@@ -804,10 +713,6 @@ plugin=org.kde.plasma.minimizeall
 immutability=1
 plugin=org.kde.plasma.lock_logout
 
-[Containments][98][Applets][129][Configuration][ConfigDialog]
-DialogHeight=630
-DialogWidth=810
-
 [Containments][98][Applets][129][Configuration][General]
 actionsOrder=lockScreen,switchUser,requestShutDown,requestReboot,requestLogout,requestLogoutScreen,suspendToRam,suspendToDisk
 show_requestLogoutScreen=false
@@ -820,19 +725,12 @@ plugin=org.kde.plasma.appmenu
 immutability=1
 plugin=org.kde.windowtitle
 
-[Containments][98][Applets][134][Configuration]
-popupHeight=433
-popupWidth=432
-
 [Containments][98][Applets][134][Configuration][Appearance]
 altTxt=keyiflerolsun
+lengthKind=1
 
 [Containments][98][Applets][134][Configuration][Behavior]
 filterByScreen=true
-
-[Containments][98][Applets][134][Configuration][ConfigDialog]
-DialogHeight=630
-DialogWidth=810
 
 [Containments][98][Applets][135]
 immutability=1
@@ -842,10 +740,6 @@ plugin=org.kde.plasma.panelspacer
 immutability=1
 plugin=org.kde.netspeedWidget
 
-[Containments][98][Applets][136][Configuration][ConfigDialog]
-DialogHeight=630
-DialogWidth=810
-
 [Containments][98][Applets][136][Configuration][General]
 fontSize=120
 
@@ -853,16 +747,10 @@ fontSize=120
 immutability=1
 plugin=org.kde.plasma.kickoff
 
-[Containments][98][Applets][99][Configuration]
-popupHeight=517
-popupWidth=665
-
 [Containments][98][Applets][99][Configuration][General]
 favoritesPortedToKAstats=true
+icon=org.cachyos.hello
+systemFavorites=suspend\\,hibernate\\,reboot\\,shutdown
 
 [Containments][98][General]
 AppletOrder=99;100;102;134;135;133;122;136;123;103;116;129;128
-
-[ScreenMapping]
-itemsOnDisabledScreens=
-screenMapping=

@@ -1,0 +1,169 @@
+#!/usr/bin/env bash
+# Bu araç @keyiflerolsun tarafından | @KekikAkademi için yazılmıştır.
+# İnternete açık dış sunucular için: OpenSSH'ı yalnız Tailscale adresi ve localhost'ta dinletir; root yalnız anahtarla, parola ve
+# klavye etkileşimli giriş kapalı. LAN'daki makinelerde kullanılmaz (LAN'dan SSH kapanır).
+# Uzak hedefe betiğin kendisini --yerel ile gönderir: sertleştirme mantığı tek yerde.
+set -euo pipefail
+
+KALIN=$'\033[1m' SOLUK=$'\033[2m' SON=$'\033[0m'
+KIRMIZI=$'\033[1;31m' YESIL=$'\033[1;32m' SARI=$'\033[1;33m' CAMGOBEGI=$'\033[0;36m'
+
+SSH_KULLANICI="${SSH_KULLANICI:-root}"
+SSH_SURE="${SSH_SURE:-8}"
+AYAR=/etc/ssh/sshd_config.d/00-tailnet.conf
+SOKET=/etc/systemd/system/ssh.socket.d/tailscale-only.conf
+DINLE=/etc/ssh/sshd_config.d/99-tailscale-listen.conf
+SYSCTL=/etc/sysctl.d/90-tailnet-ssh.conf
+
+yardim() {
+    cat <<EOF
+${KALIN}Kullanım:${SON} $(basename "$0") [SEÇENEKLER] HEDEF...
+         $(basename "$0") --durum HEDEF...
+         $(basename "$0") --yerel            (hedefin kendisinde, root olarak)
+
+${SARI}Yalnız internete açık dış sunucular içindir;${SON} LAN'daki makinelerde (küme node'ları, kaplar) kullanılmaz: LAN'dan SSH kapanır.
+
+OpenSSH'ı yalnız ${CAMGOBEGI}Tailscale adresi${SON} ve ${CAMGOBEGI}localhost${SON}'ta dinletir (dış ağ ve LAN'dan kapanır);
+${SARI}PermitRootLogin prohibit-password${SON}, ${SARI}PasswordAuthentication no${SON}, ${SARI}KbdInteractiveAuthentication no${SON}.
+Tekrar çalıştırmak güvenlidir. Açılışta Tailscale'den önce başlasa da SSH açılır (socket: FreeBind, klasik: ip_nonlocal_bind).
+
+HEDEF: Tailscale makine adı ya da IP'si.
+  -u, --kullanici <ad>   SSH kullanıcısı (varsayılan: root)
+  -t, --sure <sn>        Bağlantı zaman aşımı (varsayılan: 8)
+  -f, --zorla            OpenSSH ile Tailscale dışı adresten bağlıyken de uygula (bağlantı kopar)
+  -h, --yardim
+EOF
+    exit 0
+}
+
+# Hedefte çalışır: kökte, Tailscale bağlıyken
+yerel_sikilastir() {
+    local zorla="$1" ip4 ip6 sunucu_ip yedek
+    [[ $EUID -eq 0 ]] || { echo "HATA: root gerekli" >&2; exit 1; }
+    command -v tailscale >/dev/null || { echo "HATA: tailscale yok" >&2; exit 1; }
+    ip4=$(tailscale ip -4 2>/dev/null || true); ip6=$(tailscale ip -6 2>/dev/null || true)
+    [[ -n $ip4 ]] || { echo "HATA: Tailscale IPv4 adresi yok (bağlı mı?)" >&2; exit 1; }
+
+    # OpenSSH ile Tailscale dışı bir adresten bağlıysak yeniden başlatma bu oturumu keser
+    sunucu_ip=$(awk '{print $3}' <<<"${SSH_CONNECTION:-}")
+    if [[ -n $sunucu_ip && $sunucu_ip != "$ip4" && $sunucu_ip != "$ip6" && $sunucu_ip != 127.0.0.1 && $sunucu_ip != ::1 && $zorla != 1 ]]; then
+        echo "DUR: bu oturum $sunucu_ip üzerinden; uygulanırsa kopar. Tailscale'den bağlanın ya da --zorla verin." >&2
+        exit 2
+    fi
+
+    yedek=$(mktemp -d)
+    trap 'rm -rf "$yedek"' RETURN
+    for f in "$AYAR" "$SOKET" "$DINLE" "$SYSCTL"; do [[ -f $f ]] && cp -a --parents "$f" "$yedek/"; done
+    geri_al() {
+        rm -f "$AYAR" "$SOKET" "$DINLE" "$SYSCTL"
+        cp -a "$yedek"/. / 2>/dev/null || true
+        systemctl daemon-reload
+    }
+
+    mkdir -p /etc/ssh/sshd_config.d /run/sshd
+    # Eski sürümün dosyası: tek ayar dosyası kalsın
+    rm -f /etc/ssh/sshd_config.d/00-tailscale-security.conf
+    cat >"$AYAR" <<'C'
+# tailnet-ssh-sikilastir: ilk okunan değer geçerlidir, 00 ile ana dosyadakilerden önce gelir
+PermitRootLogin prohibit-password
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+C
+
+    if systemctl is-enabled ssh.socket >/dev/null 2>&1 || systemctl is-active ssh.socket >/dev/null 2>&1; then
+        mkdir -p "$(dirname "$SOKET")"
+        {
+            echo "[Socket]"
+            echo "# Tailscale adresi açılışta henüz yokken de bağlanabilsin"
+            echo "FreeBind=yes"
+            echo "ListenStream="
+            echo "ListenStream=127.0.0.1:22"
+            echo "ListenStream=[::1]:22"
+            echo "ListenStream=$ip4:22"
+            [[ -n $ip6 ]] && echo "ListenStream=[$ip6]:22"
+        } >"$SOKET"
+        rm -f "$DINLE"
+        kip="socket"
+    else
+        {
+            echo "# tailnet-ssh-sikilastir: yalnız localhost ve Tailscale"
+            echo "ListenAddress 127.0.0.1"
+            echo "ListenAddress ::1"
+            echo "ListenAddress $ip4"
+            [[ -n $ip6 ]] && echo "ListenAddress $ip6"
+        } >"$DINLE"
+        # sshd, Tailscale adresi gelmeden başlarsa bağlanamaz; yerel olmayan adrese bağlanmaya izin ver
+        printf 'net.ipv4.ip_nonlocal_bind = 1\nnet.ipv6.ip_nonlocal_bind = 1\n' >"$SYSCTL"
+        sysctl -q -p "$SYSCTL"
+        rm -f "$SOKET"
+        kip="klasik"
+    fi
+
+    if ! sshd -t; then
+        echo "HATA: sshd yapılandırması geçersiz, eski hale dönüldü" >&2
+        geri_al; exit 1
+    fi
+    # sshd ilk okuduğu değeri kullanır: daha önce okunan bir dosya bu ayarları ezebilir
+    local etkin
+    etkin=$(sshd -T 2>/dev/null | awk '$1=="permitrootlogin"||$1=="passwordauthentication"||$1=="kbdinteractiveauthentication"{printf "%s=%s ", $1, $2}')
+    if [[ $etkin != *"permitrootlogin=without-password"* || $etkin != *"passwordauthentication=no"* || $etkin != *"kbdinteractiveauthentication=no"* ]]; then
+        echo "HATA: etkin değerler beklenenden farklı ($etkin); ezen satırlar:" >&2
+        grep -nE "^\s*(PermitRootLogin|PasswordAuthentication|KbdInteractiveAuthentication)" /etc/ssh/sshd_config /etc/ssh/sshd_config.d/*.conf >&2
+        geri_al; exit 1
+    fi
+    systemctl daemon-reload
+    if [[ $kip == socket ]]; then
+        systemctl restart ssh.socket
+        systemctl is-active ssh.service >/dev/null 2>&1 && systemctl restart ssh.service
+    else
+        systemctl restart ssh.service 2>/dev/null || systemctl restart sshd.service
+    fi
+
+    echo "tamam ($kip): $ip4${ip6:+ $ip6}"
+    durum_yaz
+}
+
+# Hedefte çalışır: dinleme adresleri ve etkin kimlik doğrulama ayarları
+durum_yaz() {
+    mkdir -p /run/sshd 2>/dev/null || true
+    echo "  dinlenen :22  $(ss -Hltn 'sport = :22' 2>/dev/null | awk '{print $4}' | sort -u | tr '\n' ' ')"
+    echo "  sshd          $(sshd -T 2>/dev/null | awk '/^(permitrootlogin|passwordauthentication|kbdinteractiveauthentication) /{printf "%s=%s ", $1, $2}')"
+    echo "  Tailscale SSH $(tailscale debug prefs 2>/dev/null | sed -n 's/.*"RunSSH": *\([a-z]*\).*/\1/p')"
+}
+
+uzak() {
+    local islem="$1" hedef="$2" zorla="$3"
+    printf "${CAMGOBEGI}▸ %s${SON}\n" "$hedef"
+    if [[ $islem == durum ]]; then
+        ssh -o BatchMode=yes -o ConnectTimeout="$SSH_SURE" "$SSH_KULLANICI@$hedef" \
+            "bash -s -- --durum-yerel" <"$0"
+    else
+        ssh -o BatchMode=yes -o ConnectTimeout="$SSH_SURE" "$SSH_KULLANICI@$hedef" \
+            "bash -s -- --yerel $([[ $zorla == 1 ]] && echo --zorla)" <"$0"
+    fi
+}
+
+islem=sikilastir zorla=0 yerel=0 hedefler=()
+while (($#)); do
+    case "$1" in
+        -h | --yardim) yardim ;;
+        --yerel) yerel=1 ;;
+        --durum) islem=durum ;;
+        --durum-yerel) durum_yaz; exit 0 ;;
+        -f | --zorla) zorla=1 ;;
+        -u | --kullanici) SSH_KULLANICI="$2"; shift ;;
+        -t | --sure) SSH_SURE="$2"; shift ;;
+        -*) echo "bilinmeyen seçenek: $1" >&2; exit 1 ;;
+        *) hedefler+=("$1") ;;
+    esac
+    shift
+done
+
+if ((yerel)); then yerel_sikilastir "$zorla"; exit; fi
+((${#hedefler[@]})) || yardim
+
+hata=0
+for h in "${hedefler[@]}"; do
+    uzak "$islem" "$h" "$zorla" || { printf "${KIRMIZI}  başarısız: %s${SON}\n" "$h"; hata=1; }
+done
+exit "$hata"

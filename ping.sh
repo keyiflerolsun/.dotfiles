@@ -1,130 +1,62 @@
 #!/bin/bash
 # Bu araç @keyiflerolsun tarafından | @KekikAkademi için yazılmıştır.
 
-renkreset="\e[0m"
-mavi="\e[1;94m"
-cyan="\e[1;96m"
-yesil="\e[1;92m"
-kirmizi="\e[1;91m"
-beyaz="\e[1;77m"
-sari="\e[1;93m"
-mor="\e[0;35m"
+# Bilinen servis, DNS ve oyun sunucularına tek ping atıp gecikmeyi listeler; yanıt yoksa "yok" yazar.
+# Satır biçimi: "# Başlık" bölüm açar, "» Alt başlık" alt bölüm, "Ad|adres" ölçülen hedef.
 
-tarih=$(date +"%d-%m-%Y")
-saat=$(date +"%H:%M:%S")
+HEDEFLER='
+# GIBIRNet Pop Noktaları
+GIBIRNet Istanbul|100.127.254.1
+# Dijital Servisler
+Google|google.com
+Netflix|45.12.55.34
+BluTV|195.87.177.143
+Disney+ IPv6|2001:1900:2322:c00f::1fc
+Discord|discord.gg
+Twitch|twitch.tv
+# DNS Sunucuları
+Google DNS|8.8.8.8
+Google DNS IPv6|2001:4860:4860::8888
+CloudFlare (WARP)|1.1.1.1
+CloudFlare IPv6|2606:4700:4700::1111
+AdGuard DNS|dns.adguard.com
+Next DNS|dns1.nextdns.io
+# Amazon Sunucuları
+AWS Frankfurt|52.29.63.252
+AWS Londra|52.94.15.16
+AWS Ireland|54.72.255.252
+# Oyun Sunucuları
+» Valve
+Viyana|146.66.155.69
+Polonya|155.133.226.71
+Fransa|155.133.226.68
+Frankfurt|162.254.197.52
+» Riot Games
+Türkiye|104.160.143.212
+Avrupa|104.160.143.124
+» PUBG
+PUBG PC Frankfurt|35.156.63.252
+PUBG Mobile|162.62.97.238
+'
 
-if command -v ping6 &>/dev/null; then
-  ping6="ping6"
-else
-  ping6="ping -6"
-fi
+sifir="\e[0m" mavi="\e[1;94m" cyan="\e[1;96m" yesil="\e[1;92m" kirmizi="\e[1;91m" sari="\e[1;93m" mor="\e[0;35m"
+cizgi="$mor------------------------------------------------$sifir"
 
-echo -e ""
-echo -e "       $cyan$tarih | Ping Testi | $saat$renkreset"
-echo -e ""
+# Eski iputils ve Termux'ta IPv6 adresi ayrı komutla
+if command -v ping6 &>/dev/null; then ping6=(ping6); else ping6=(ping -6); fi
 
+echo -e "\n       $cyan$(date +'%d-%m-%Y') | Ping Testi | $(date +'%H:%M:%S')$sifir"
 
-echo -e "$mor------------------------------------------------$renkreset"
-echo -e "\t$yesil     GIBIRNet Pop Noktaları$renkreset"
-echo -e "$mor------------------------------------------------$renkreset"
-ping_ms=$(ping -c 1 100.127.254.1 | awk -F/ '/^rtt/ { print $5 }')
-echo -e "$sari- GIBIRNet Istanbul   :$kirmizi $ping_ms ms$renkreset"
-
-
-
-echo -e "\n\n$mor------------------------------------------------$renkreset"
-echo -e "\t\t$yesil Dijital Servisler$renkreset"
-echo -e "$mor------------------------------------------------$renkreset"
-ping_ms=$(ping -c 1 google.com | awk -F/ '/^rtt/ { print $5 }')
-echo -e "$sari- Google              :$kirmizi $ping_ms ms$renkreset"
-
-ping_ms=$(ping -c 1 45.12.55.34 | awk -F/ '/^rtt/ { print $5 }')
-echo -e "$sari- Netfix              :$kirmizi $ping_ms ms$renkreset"
-
-ping_ms=$(ping -c 1 195.87.177.143 | awk -F/ '/^rtt/ { print $5 }')
-echo -e "$sari- BluTV               :$kirmizi $ping_ms ms$renkreset"
-
-ping_ms=$($ping6 -c 1 2001:1900:2322:c00f::1fc | awk -F/ '/^rtt/ { print $5 }')
-echo -e "$sari- Disney+ IPv6        :$kirmizi $ping_ms ms$renkreset"
-
-ping_ms=$(ping -c 1 discord.gg | awk -F/ '/^rtt/ { print $5 }')
-echo -e "$sari- Discord             :$kirmizi $ping_ms ms$renkreset"
-
-ping_ms=$(ping -c 1 twitch.tv | awk -F/ '/^rtt/ { print $5 }')
-echo -e "$sari- Twitch              :$kirmizi $ping_ms ms$renkreset"
-
-
-
-echo -e "\n\n$mor------------------------------------------------$renkreset"
-echo -e "\t\t$yesil DNS Sunucuları$renkreset"
-echo -e "$mor------------------------------------------------$renkreset"
-ping_ms=$(ping -c 1 8.8.8.8 | awk -F/ '/^rtt/ { print $5 }')
-echo -e "$sari- Google DNS          :$kirmizi $ping_ms ms$renkreset"
-
-ping_ms=$($ping6 -c 1 2001:4860:4860::8888 | awk -F/ '/^rtt/ { print $5 }')
-echo -e "$sari- Google DNS IPv6     :$kirmizi $ping_ms ms$renkreset"
-
-ping_ms=$(ping -c 1 1.1.1.1 | awk -F/ '/^rtt/ { print $5 }')
-echo -e "$sari- CloudFlare (WARP)   :$kirmizi $ping_ms ms$renkreset"
-
-ping_ms=$($ping6 -c 1 2606:4700:4700::1111 | awk -F/ '/^rtt/ { print $5 }')
-echo -e "$sari- CloudFlare IPv6     :$kirmizi $ping_ms ms$renkreset"
-
-ping_ms=$(ping -c 1 dns.adguard.com | awk -F/ '/^rtt/ { print $5 }')
-echo -e "$sari- AdGuard DNS         :$kirmizi $ping_ms ms$renkreset"
-
-ping_ms=$(ping -c 1 dns1.nextdns.io | awk -F/ '/^rtt/ { print $5 }')
-echo -e "$sari- Next DNS            :$kirmizi $ping_ms ms$renkreset"
-
-
-
-echo -e "\n\n$mor------------------------------------------------$renkreset"
-echo -e "\t\t$yesil Amazon Sunucuları$renkreset"
-echo -e "$mor------------------------------------------------$renkreset"
-ping_ms=$(ping -c 1 52.29.63.252 | awk -F/ '/^rtt/ { print $5 }')
-echo -e "$sari- AWS Frankfurt       :$kirmizi $ping_ms ms$renkreset"
-
-ping_ms=$(ping -c 1 52.94.15.16 | awk -F/ '/^rtt/ { print $5 }')
-echo -e "$sari- AWS Londra          :$kirmizi $ping_ms ms$renkreset"
-
-ping_ms=$(ping -c 1 54.72.255.252 | awk -F/ '/^rtt/ { print $5 }')
-echo -e "$sari- AWS Ireland         :$kirmizi $ping_ms ms$renkreset"
-
-
-
-echo -e "\n\n$mor------------------------------------------------$renkreset"
-echo -e "\t\t$yesil Oyun Sunucuları$renkreset"
-echo -e "$mor------------------------------------------------$renkreset"
-echo -e " $mavi» Valve$renkreset"
-echo -e "$mor------------------------------------------------$renkreset"
-ping_ms=$(ping -c 1 146.66.155.69 | awk -F/ '/^rtt/ { print $5 }')
-echo -e "$sari- Viyana              :$kirmizi $ping_ms ms$renkreset"
-
-ping_ms=$(ping -c 1 155.133.226.71 | awk -F/ '/^rtt/ { print $5 }')
-echo -e "$sari- Polonya             :$kirmizi $ping_ms ms$renkreset"
-
-ping_ms=$(ping -c 1 155.133.226.68 | awk -F/ '/^rtt/ { print $5 }')
-echo -e "$sari- Fransa              :$kirmizi $ping_ms ms$renkreset"
-
-ping_ms=$(ping -c 1 162.254.197.52 | awk -F/ '/^rtt/ { print $5 }')
-echo -e "$sari- Franfurt            :$kirmizi $ping_ms ms$renkreset"
-
-
-echo -e "\n$mor------------------------------------------------$renkreset"
-echo -e " $mavi» Riot Games$renkreset"
-echo -e "$mor------------------------------------------------$renkreset"
-ping_ms=$(ping -c 1 104.160.143.212 | awk -F/ '/^rtt/ { print $5 }')
-echo -e "$sari- Türkiye             :$kirmizi $ping_ms ms$renkreset"
-
-ping_ms=$(ping -c 1 104.160.143.124 | awk -F/ '/^rtt/ { print $5 }')
-echo -e "$sari- Avrupa              :$kirmizi $ping_ms ms$renkreset"
-
-
-echo -e "\n$mor------------------------------------------------$renkreset"
-echo -e " $mavi» PUBG$renkreset"
-echo -e "$mor------------------------------------------------$renkreset"
-ping_ms=$(ping -c 1 35.156.63.252 | awk -F/ '/^rtt/ { print $5 }')
-echo -e "$sari- PUBG PC Frankfurt   :$kirmizi $ping_ms ms$renkreset"
-
-ping_ms=$(ping -c 1 162.62.97.238 | awk -F/ '/^rtt/ { print $5 }')
-echo -e "$sari- PUBG Mobile         :$kirmizi $ping_ms ms$renkreset"
+while IFS= read -r satir; do
+  case $satir in
+    '') ;;
+    '# '*) echo -e "\n\n$cizgi\n\t\t$yesil ${satir#\# }$sifir\n$cizgi" ;;
+    '» '*) echo -e " $mavi$satir$sifir\n$cizgi" ;;
+    *)
+      ad=${satir%%|*} adres=${satir#*|}
+      komut=(ping); [[ $adres == *:* ]] && komut=("${ping6[@]}")
+      ms=$("${komut[@]}" -c 1 -W 2 "$adres" 2>/dev/null | awk -F/ '/^rtt|^round-trip/ { print $5 " ms" }')
+      printf "$sari- %-20s:$kirmizi %s$sifir\n" "$ad" "${ms:-yok}"
+      ;;
+  esac
+done <<< "$HEDEFLER"

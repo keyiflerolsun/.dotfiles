@@ -1,0 +1,6 @@
+matches:
+- trigger: ":br"
+  replace: "Best Regards,\nkeyiflerolsun\nÖmer Faruk Sancak"
+
+- trigger: ":format"
+  replace: "p ~/WatchBuddy/scripts/kekik_format.py ."

@@ -1,0 +1,118 @@
+#!/usr/bin/env python3
+# Bu araç @keyiflerolsun tarafından | @KekikAkademi için yazılmıştır.
+
+# Elektrik kesintisinde düzgün kapanış: UPS'e bağlı olmayan, şebekede sürekli açık iki cihaz Keenetic router'ın (UPS'te) istemci
+# listesinde yoksa kesinti sayılır; SURE dakika üst üste sürerse makine kapanır. Elektrik dönünce makineyi router uyandırır
+# (Wake-on-LAN, router/kesinti-uyandir). Router'a ulaşılamazsa karar verilmez (ağ sorunu elektrik kesintisi sayılmaz, makine
+# kapanmaz). Her dakika systemd zamanlayıcısıyla koşar.
+#   kesinti-izle           bir yoklama (zamanlayıcı)
+#   kesinti-izle --kuru    karar verir, kapatmaz
+#   kesinti-izle --sina    karar mantığının denetimi
+# Ayar /etc/kesinti-izle.conf (600, root): ROUTER, KULLANICI, PAROLA, HEDEFLER (boşlukla MAC), SURE.
+import hashlib, http.cookiejar, json, socket, subprocess, sys, urllib.error, urllib.request
+
+AYAR  = "/etc/kesinti-izle.conf"
+DURUM = "/run/kesinti-izle.json"  # tmpfs: her açılışta sıfırdan sayılır
+
+
+def ayar_oku(yol=AYAR):
+    a = {"SURE": "300", "KULLANICI": "admin"}
+    with open(yol) as f:
+        for satir in f:
+            satir = satir.strip()
+            if satir and not satir.startswith("#") and "=" in satir:
+                k, v = satir.split("=", 1)
+                a[k.strip()] = v.strip().strip('"').strip("'")
+    a["HEDEFLER"] = [m.lower() for m in a.get("HEDEFLER", "").split()]
+    return a
+
+
+# Keenetic NDM kimlik doğrulaması: /auth 401 ile realm ve challenge verir; parola md5(kullanıcı:realm:parola), yanıt sha256(challenge+md5)
+def istemciler(a):
+    cerez = urllib.request.HTTPCookieProcessor(http.cookiejar.CookieJar())
+    ac    = urllib.request.build_opener(cerez).open
+    try:
+        ac(a["ROUTER"] + "/auth", timeout=5)
+    except urllib.error.HTTPError as e:
+        if e.code != 401:
+            raise
+        realm, challenge = e.headers["X-NDM-Realm"], e.headers["X-NDM-Challenge"]
+        md5 = hashlib.md5(f"{a['KULLANICI']}:{realm}:{a['PAROLA']}".encode()).hexdigest()
+        govde = json.dumps({"login" : a["KULLANICI"], "password" : hashlib.sha256((challenge + md5).encode()).hexdigest()}).encode()
+        ac(urllib.request.Request(a["ROUTER"] + "/auth", data=govde, headers={"Content-Type": "application/json"}), timeout=5)
+    with ac(a["ROUTER"] + "/rci/show/ip/hotspot", timeout=5) as y:
+        return json.load(y).get("host", [])
+
+
+# Cihaz bağlı sayılır: router onu etkin görüyor ve son 3 dk içinde görmüş (kablosuz istemci kapanınca "active" geç düşer)
+def acik_mi(host):
+    return bool(host.get("active")) and int(host.get("last-seen", 10**9)) <= 180
+
+
+# Saf karar: (yeni sayaç, eylem). eylem: None, "basladi", "geldi", "kapan". router_var False ise sayaç değişmez.
+def karar(sayac, hedefler_acik, router_var, sinir):
+    if not router_var:
+        return sayac, None
+    if any(hedefler_acik):
+        return 0, ("geldi" if sayac else None)
+    sayac += 1
+    if sayac >= sinir:
+        return sayac, "kapan"
+    return sayac, ("basladi" if sayac == 1 else None)
+
+
+def bildir(konu, metin):
+    # root postası .forward ile Telegram'a gider (smartd ile aynı yol)
+    try:
+        subprocess.run(["/usr/sbin/sendmail", "root"], input=f"Subject: {konu}\n\n{metin}\n", text=True, timeout=30)
+    except Exception as e:
+        print(f"bildirim gitmedi: {e}", file=sys.stderr)
+
+
+def sina():
+    s, e = karar(0, [False, False], True, 3); assert (s, e) == (1, "basladi")
+    s, e = karar(1, [False, False], True, 3); assert (s, e) == (2, None)
+    s, e = karar(2, [False, False], True, 3); assert (s, e) == (3, "kapan")
+    s, e = karar(2, [True, False], True, 3); assert (s, e) == (0, "geldi")       # tek cihaz yeter
+    s, e = karar(0, [True, True], True, 3); assert (s, e) == (0, None)
+    s, e = karar(2, [False, False], False, 3); assert (s, e) == (2, None)        # router yok: karar yok
+    assert acik_mi({"active": True, "last-seen": 12}) and not acik_mi({"active": True, "last-seen": 600})
+    assert not acik_mi({"active": False, "last-seen": 5}) and not acik_mi({})
+    print("tamam")
+
+
+def main():
+    if "--sina" in sys.argv:
+        return sina()
+    kuru  = "--kuru" in sys.argv
+    a     = ayar_oku()
+    sinir = int(a["SURE"])
+    try:
+        d = json.load(open(DURUM))
+    except (OSError, ValueError):
+        d = {"sayac": 0}
+    try:
+        tablo = {h.get("mac", "").lower() : h for h in istemciler(a)}
+        hedefler_acik, router_var = [acik_mi(tablo.get(m, {})) for m in a["HEDEFLER"]], True
+    except Exception as e:
+        hedefler_acik, router_var = [], False
+        print(f"router'a ulaşılamadı, karar yok: {e}", file=sys.stderr)
+    sayac, eylem = karar(d["sayac"], hedefler_acik, router_var, sinir)
+    ad = socket.gethostname()
+    print(f"hedefler={hedefler_acik} router={router_var} sayaç={sayac}/{sinir} eylem={eylem}")
+    if kuru:
+        return
+    if eylem == "basladi":
+        bildir(f"{ad}: elektrik kesintisi", f"İki hedef de yanıtsız; {sinir} dk sürerse {ad} kapanacak.")
+    elif eylem == "geldi":
+        bildir(f"{ad}: elektrik geldi", f"Kesinti {d['sayac']} dk sürdü, kapanmadan döndü.")
+    elif eylem == "kapan":
+        bildir(f"{ad}: kesinti sürüyor, kapanıyor", f"{sinir} dk kesinti; elektrik dönünce router uyandıracak.")
+        json.dump({"sayac": 0}, open(DURUM, "w"))
+        subprocess.run(["shutdown", "-h", "now", "elektrik kesintisi (kesinti-izle)"], check=False)
+        return
+    json.dump({"sayac": sayac}, open(DURUM, "w"))
+
+
+if __name__ == "__main__":
+    main()

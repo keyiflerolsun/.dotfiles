@@ -1,0 +1,17 @@
+matches:
+
+- trigger: ":tarih"
+  replace: "{{current_date}}"
+  vars:
+    - name: current_date
+      type: date
+      params:
+        format: "%d/%m/%Y"
+
+- trigger: ":saat"
+  replace: "{{current_time}}"
+  vars:
+    - name: current_time
+      type: date
+      params:
+        format: "%H:%M"

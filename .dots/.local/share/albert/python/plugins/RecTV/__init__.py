@@ -23,7 +23,7 @@ class Plugin(PluginInstance, TriggerQueryHandler):
         self.fbh = FBH(self)
 
         self.oturum = Client()
-        cs = CloudScraper()
+        cs          = CloudScraper()
         self.oturum.headers.update(cs.headers)
         self.oturum.cookies.update(cs.cookies)
 
@@ -118,11 +118,11 @@ class Plugin(PluginInstance, TriggerQueryHandler):
 
         api_url     = "http://127.0.0.1:3310/api/v1"
         plugin_name = "RecTV"
-        icerikler   =  self.oturum.get(f"{api_url}/load_links?plugin={plugin_name}&encoded_url={url}").json()
+        icerikler   = self.oturum.get(f"{api_url}/load_links?plugin={plugin_name}&encoded_url={url}").json()
 
         for icerik in icerikler.get("result", []):
             self.headers = icerik.get("headers")
-            self.headers.update({"Referrer": icerik.get("referer")})
+            self.headers.update({"Referrer" : icerik.get("referer")})
             return self.oynat(icerik.get("url"))
 
     def oynat(self, url):

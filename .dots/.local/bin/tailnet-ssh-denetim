@@ -1,0 +1,219 @@
+#!/usr/bin/env bash
+# Bu araç @keyiflerolsun tarafından | @KekikAkademi için yazılmıştır.
+# Tailscale ağındaki çevrimiçi Linux cihazlarda SSH denetimi (salt okunur): başarılı/başarısız girişler, saldıran adresler,
+# denenen kullanıcılar, OpenSSH'ın dinlediği adresler ve parola/root girişi ayarı. Cihazlar eşzamanlı taranır.
+set -uo pipefail
+
+KALIN=$'\033[1m' SON=$'\033[0m' GRI=$'\033[0;90m' BEYAZ=$'\033[1;37m'
+KIRMIZI=$'\033[1;31m' YESIL=$'\033[1;32m' SARI=$'\033[1;33m' CAMGOBEGI=$'\033[0;36m'
+
+SSH_KULLANICI="${SSH_KULLANICI:-root}"
+SSH_SURE="${SSH_SURE:-8}"
+PENCERE="${PENCERE:-30 days ago}"
+HEDEFLI=""
+
+yardim() {
+    cat <<EOF
+${KALIN}Kullanım:${SON} $(basename "$0") [SEÇENEKLER]
+
+Tailscale'deki çevrimiçi Linux cihazlara bağlanıp sshd günlüğünden girişleri, başarısız denemeleri ve saldıran adresleri,
+yapılandırmadan da OpenSSH'ın dinlediği adresleri ve parola/root girişi ayarını raporlar. Hiçbir şey değiştirmez.
+
+  -s, --pencere <süre>     Günlük penceresi, journalctl biçiminde (varsayılan: "30 days ago")
+  -k, --hedefli <a,b,..>   Bu kullanıcı adlarıyla denenen girişleri "hedefli saldırı" say (ör. uygulama kullanıcıları)
+  -u, --kullanici <ad>     SSH kullanıcısı (varsayılan: root)
+  -t, --sure <sn>          Cihaz başına zaman aşımı (varsayılan: 8)
+  -h, --yardim
+
+Not: Tailscale SSH ile yapılan girişler sshd günlüğüne düşmez; yalnız OpenSSH girişleri sayılır.
+EOF
+    exit 0
+}
+
+while (($#)); do
+    case "$1" in
+        -s | --pencere) PENCERE="$2"; shift ;;
+        -k | --hedefli) HEDEFLI="$2"; shift ;;
+        -u | --kullanici) SSH_KULLANICI="$2"; shift ;;
+        -t | --sure) SSH_SURE="$2"; shift ;;
+        -h | --yardim) yardim ;;
+        *) printf "${KIRMIZI}bilinmeyen seçenek: %s${SON}\n" "$1"; exit 1 ;;
+    esac
+    shift
+done
+
+command -v jq >/dev/null || { echo "jq gerekli" >&2; exit 1; }
+
+# ad|IP: yalnız çevrimiçi Linux cihazlar (kendisi dahil)
+mapfile -t CIHAZLAR < <(tailscale status --json 2>/dev/null | jq -r '
+    [.Self] + [.Peer[]?] | .[] | select(.OS == "linux" and (.Online // true)) | "\(.HostName)|\(.TailscaleIPs[0])"' | sort)
+((${#CIHAZLAR[@]})) || { printf "${KIRMIZI}Tailscale'de çevrimiçi Linux cihaz yok${SON}\n"; exit 1; }
+
+ag_turu() {
+    case "$1" in
+        127.* | ::1) echo yerel ;;
+        10.* | 192.168.* | 172.1[6-9].* | 172.2[0-9].* | 172.3[01].*) echo LAN ;;
+        100.6[4-9].* | 100.[7-9][0-9].* | 100.1[01][0-9].* | 100.12[0-7].* | fd7a:115c:a1e0:*) echo Tailnet ;;
+        *) echo WAN ;;
+    esac
+}
+binlik() { sed -E ':a;s/([0-9])([0-9]{3})($|[^0-9])/\1.\2\3/;ta' <<<"$1"; }
+zaman() { sed -E 's/T/ /; s/([+-][0-9]{2}:?[0-9]{2}|Z)$//' <<<"$1"; }
+cizgi() { printf "${GRI}%s${SON}\n" "$(printf '─%.0s' {1..104})"; }
+
+gecici=$(mktemp -d)
+trap 'rm -rf "$gecici"' EXIT
+
+printf "\n${CAMGOBEGI}⏳ %d çevrimiçi Linux cihaz taranıyor...${SON}\n\n" "${#CIHAZLAR[@]}"
+
+# Hedefte çalışır: TÜR|alanlar... satırları basar
+toplayici=$(cat <<'UZAK'
+mkdir -p /run/sshd 2>/dev/null
+echo "DINLEME|$(ss -Hltn 'sport = :22' 2>/dev/null | awk '{print $4}' | sed -E 's/:22$//; s/^\[|\]$//g' | sort -u | tr '\n' ' ')"
+echo "AYAR|$(sshd -T 2>/dev/null | awk '$1=="passwordauthentication"{p=$2} $1=="permitrootlogin"{r=$2} END{print p"|"r}')"
+birim=""
+for u in ssh sshd; do [ -n "$(journalctl -u "$u" -n1 --no-pager -q 2>/dev/null)" ] && { birim=$u; break; }; done
+if [ -n "$birim" ]; then
+    KAYIT=$(journalctl -u "$birim" --since "$PENCERE" --no-pager -q -o short-iso 2>/dev/null)
+    # Pencerede başarılı giriş yoksa en son bilinen girişi de getir
+    grep -q "Accepted " <<<"$KAYIT" || KAYIT="$KAYIT"$'\n'"$(journalctl -u "$birim" -n 2000 --no-pager -q -o short-iso 2>/dev/null | grep "Accepted " | tail -1)"
+    echo "KAYNAK|journal"
+elif [ -r /var/log/auth.log ]; then
+    KAYIT=$(tail -n 20000 /var/log/auth.log); echo "KAYNAK|auth.log (pencere uygulanmadı)"
+else
+    echo "HATA|günlük okunamadı"; exit 0
+fi
+echo "OZET|$(grep -c 'Accepted ' <<<"$KAYIT")|$(grep -cE 'Failed (password|publickey)' <<<"$KAYIT")|$(grep -c 'Invalid user' <<<"$KAYIT")"
+grep -E 'Failed (password|publickey)|Invalid user|authentication failure' <<<"$KAYIT" |
+    grep -oE 'from [0-9a-f:.]+' | awk '{print $2}' | sort | uniq -c | sort -rn | head -5 |
+    while read -r c a; do echo "SALDIRAN|$c|$a"; done
+grep -oE 'Invalid user [^ ]+' <<<"$KAYIT" | awk '{print $3}' | sort | uniq -c | sort -rn | head -5 |
+    while read -r c k; do echo "KULLANICI|$c|$k"; done
+[ -n "$HEDEFLI" ] && grep -iE "Invalid user ($HEDEFLI) " <<<"$KAYIT" |
+    sed -nE 's/^([0-9T:+-]+).*Invalid user ([^ ]+) from ([0-9a-f:.]+).*/HEDEFLI|\1|\2|\3/p' | tail -5
+grep 'Accepted ' <<<"$KAYIT" |
+    sed -nE 's/^([0-9T:+-]+).*Accepted ([a-zA-Z0-9_-]+) for ([^ ]+) from ([0-9a-f:.]+).*/GIRIS|\1|\2|\3|\4/p' | tail -5
+UZAK
+)
+
+hedefli_re=$(tr ',' '|' <<<"$HEDEFLI")
+for c in "${CIHAZLAR[@]}"; do
+    ad=${c%%|*} ip=${c##*|}
+    (
+        cikti=$(timeout "$((SSH_SURE + 20))" ssh -n -o BatchMode=yes -o ConnectTimeout="$SSH_SURE" -o StrictHostKeyChecking=accept-new \
+            "$SSH_KULLANICI@$ip" "PENCERE='$PENCERE' HEDEFLI='$hedefli_re' bash --noprofile --norc -c $(printf '%q' "$toplayici")" \
+            2>"$gecici/$ad.hata")
+        kod=$?
+        if ((kod)) || [[ -z $cikti ]]; then
+            neden="erişilemedi"
+            ((kod == 124)) && neden="zaman aşımı"
+            grep -qi "refused" "$gecici/$ad.hata" && neden="22 kapalı"
+            grep -qi "denied" "$gecici/$ad.hata" && neden="anahtar reddedildi"
+            echo "HATA|$neden" >"$gecici/$ad"
+        else
+            echo "$cikti" >"$gecici/$ad"
+        fi
+    ) &
+done
+wait
+
+temiz=0 uyari=0 tehdit=0 kapali=0
+ayrintilar=() son24=()
+simdi=$(date +%s)
+
+printf "${KALIN}${BEYAZ} TAILNET SSH DENETİMİ${SON}  ${GRI}•${SON}  ${CAMGOBEGI}%d cihaz${SON}  ${GRI}•  pencere: %s  •  %s${SON}\n" \
+    "${#CIHAZLAR[@]}" "$PENCERE" "$(date '+%Y-%m-%d %H:%M')"
+cizgi
+printf " ${KALIN}%-18s %-15s %-7s %8s %9s %8s  %-8s %-7s %-18s${SON}\n" CİHAZ IP DURUM BAŞARILI BAŞARISIZ GEÇERSİZ DİNLEME PAROLA "SON GİRİŞ"
+cizgi
+
+for c in "${CIHAZLAR[@]}"; do
+    ad=${c%%|*} ip=${c##*|}
+    basarili=0 basarisiz=0 gecersiz=0 hata="" dinleme="" parola="-" kaynak=""
+    saldiran=() kullanici=() hedefli=() giris=()
+    while IFS='|' read -r tur a b d e; do
+        case "$tur" in
+            HATA) hata=$a ;;
+            DINLEME) dinleme=$a ;;
+            AYAR) parola=${a:--} ;;
+            KAYNAK) kaynak=$a ;;
+            OZET) basarili=$a basarisiz=$b gecersiz=$d ;;
+            SALDIRAN) saldiran+=("$a|$b") ;;
+            KULLANICI) kullanici+=("$a|$b") ;;
+            HEDEFLI) hedefli+=("$a|$b|$d") ;;
+            GIRIS) giris+=("$a|$b|$d|$e") ;;
+        esac
+    done <"$gecici/$ad"
+
+    if [[ -n $hata ]]; then
+        ((kapali++))
+        printf " %-18s %-15s ${GRI}%-7s${SON} %8s %9s %8s  %-8s %-7s %-18s\n" "$ad" "$ip" KAPALI - - - - - "$hata"
+        continue
+    fi
+
+    # OpenSSH yalnız yerel/Tailscale adreslerde mi dinliyor
+    acik="tailnet"
+    for a in $dinleme; do
+        case "$a" in 0.0.0.0 | ::) acik="hepsi" ;; *) [[ $(ag_turu "$a") =~ ^(yerel|Tailnet)$ ]] || acik="hepsi" ;; esac
+    done
+    [[ -z $dinleme ]] && acik="yok"
+
+    if ((${#hedefli[@]})) || ((basarisiz >= 50)); then durum=TEHDİT renk=$KIRMIZI; ((tehdit++))
+    elif ((basarisiz > 0 || gecersiz > 0)); then durum=UYARI renk=$SARI; ((uyari++))
+    else durum=TEMİZ renk=$YESIL; ((temiz++)); fi
+
+    son="-"
+    if ((${#giris[@]})); then
+        IFS='|' read -r z _ _ a <<<"${giris[-1]}"
+        son="${z:0:10} [$(ag_turu "$a")]"
+        for g in "${giris[@]}"; do
+            IFS='|' read -r z y k a <<<"$g"
+            t=$(date -d "$z" +%s 2>/dev/null || echo 0)
+            ((t >= simdi - 86400)) && son24+=("$ad|$z|$y|$k|$a")
+        done
+    fi
+    printf " %-18s %-15s ${renk}%-7s${SON} %8s %9s %8s  %-8s %-7s %-18s\n" \
+        "$ad" "$ip" "$durum" "$(binlik "$basarili")" "$(binlik "$basarisiz")" "$(binlik "$gecersiz")" "$acik" "${parola%%|*}" "$son"
+
+    [[ $durum == TEMİZ ]] && continue
+    satirlar=()
+    for h in "${hedefli[@]}"; do IFS='|' read -r z k a <<<"$h"; satirlar+=("${KIRMIZI}hedefli: $k ($(zaman "$z") @ $a)${SON}"); done
+    if ((${#saldiran[@]})); then
+        s=""; for x in "${saldiran[@]}"; do IFS='|' read -r n a <<<"$x"; s+="${s:+, }${n}× $a [$(ag_turu "$a")]"; done
+        satirlar+=("kaynak:  $s")
+    fi
+    if ((${#kullanici[@]})); then
+        s=""; for x in "${kullanici[@]}"; do IFS='|' read -r n k <<<"$x"; s+="${s:+, }${n}× $k"; done
+        satirlar+=("denenen: $s")
+    fi
+    for g in "${giris[@]}"; do
+        IFS='|' read -r z y k a <<<"$g"
+        [[ $(ag_turu "$a") == WAN ]] && satirlar+=("${SARI}WAN girişi: $(zaman "$z") $k @ $a ($y)${SON}")
+    done
+    [[ -n $kaynak && $kaynak != journal ]] && satirlar+=("${GRI}günlük: $kaynak${SON}")
+    blok="${renk}● $ad${SON} ${GRI}($ip)${SON} — $(binlik "$basarisiz") başarısız deneme"
+    for i in "${!satirlar[@]}"; do
+        ((i == ${#satirlar[@]} - 1)) && dal="└─" || dal="├─"
+        blok+=$'\n'"   ${GRI}${dal}${SON} ${satirlar[i]}"
+    done
+    ayrintilar+=("$blok")
+done
+cizgi
+
+if ((${#ayrintilar[@]})); then
+    printf "\n${KALIN}${BEYAZ} AYRINTILAR${SON}\n"; cizgi
+    for b in "${ayrintilar[@]}"; do printf " %b\n\n" "$b"; done
+    cizgi
+fi
+if ((${#son24[@]})); then
+    printf "${KALIN} Son 24 saatte OpenSSH girişleri:${SON}\n"
+    for g in "${son24[@]}"; do
+        IFS='|' read -r ad z y k a <<<"$g"
+        printf "    • ${CAMGOBEGI}%-16s${SON} %s  %-6s %-15s [%s] (%s)\n" "$ad" "$(zaman "$z")" "$k" "$a" "$(ag_turu "$a")" "$y"
+    done
+    cizgi
+fi
+printf " ${KALIN}ÖZET:${SON} %d cihaz  ${GRI}│${SON}  ${YESIL}%d temiz${SON}  ${GRI}│${SON}  ${SARI}%d uyarı${SON}  ${GRI}│${SON}  ${KIRMIZI}%d tehdit${SON}  ${GRI}│${SON}  ${GRI}%d erişilemedi${SON}\n" \
+    "${#CIHAZLAR[@]}" "$temiz" "$uyari" "$tehdit" "$kapali"
+printf " ${GRI}DİNLEME: tailnet = OpenSSH yalnız yerel/Tailscale adreste; hepsi = her arayüzde. Tailscale SSH girişleri sayılmaz.${SON}\n"
+cizgi

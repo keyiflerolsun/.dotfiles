@@ -26,12 +26,12 @@
               check-url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
               allow-insecure: true
               icon: di:proxmox
-            - title: Yedek (PBS)
+            - title: Yedek (SSD)
               url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
               check-url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
               allow-insecure: true
               icon: di:proxmox
-            - title: HDD (PBS2)
+            - title: Yedek (HDD)
               url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
               check-url: https://🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
               allow-insecure: true
@@ -68,6 +68,7 @@
     - type: group
       widgets:
         - $include: ../widgets/Proxmox.yml
+        - $include: ../widgets/Yedek.yml
         - $include: ../widgets/Beszel.yml
         - $include: ../widgets/Immich.yml
         - $include: ../widgets/NPM.yml

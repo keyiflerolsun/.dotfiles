@@ -1,0 +1,172 @@
+#!/usr/bin/env python3
+# Bu araç @keyiflerolsun tarafından | @KekikAkademi için yazılmıştır.
+
+import argparse, os, re, shutil, subprocess
+
+HEADER        = "// Bu araç @keyiflerolsun tarafından | @KekikAkademi için yazılmıştır.\n"
+GOIMPORTS     = os.path.expanduser("~/go/bin/goimports")
+EXCLUDE_DIRS  = {".git", "vendor", "node_modules"}
+FILE_LIMIT    = 500  # go_style.md §3 sert sınır; hedef ~400 uyarılmaz (Python'daki gibi yalnız "artık böl" seviyesi)
+FUNC_LIMIT    = 150  # hedef ~80; formatter yalnız açıkça bölünmesi gereken fonksiyonları gösterir
+TOP_DECL_RE   = re.compile(r"^(const|var)\b")
+FUNC_START_RE = re.compile(r"^func\b")
+FUNC_NAME_RE  = re.compile(r"^func\s+(?:\([^)]*\)\s*)?(\w+)")
+
+
+def get_module_info(path):
+    """Bulunulan dizinden yukarı doğru go.mod dosyasını arar."""
+    current = os.path.abspath(path)
+    if os.path.isfile(current):
+        current = os.path.dirname(current)
+
+    while current != os.path.dirname(current):
+        mod_file = os.path.join(current, "go.mod")
+        if os.path.exists(mod_file):
+            with open(mod_file, "r", encoding="utf-8") as f:
+                match = re.search(r"module\s+(\S+)", f.read())
+            if match:
+                return match.group(1), current
+        current = os.path.dirname(current)
+    return None, None
+
+
+def ensure_header(content):
+    """Başlık yoksa ekler; ardından boş satır şart (yoksa başlık package doc yorumu olur)."""
+    if content.startswith(HEADER):
+        rest = content[len(HEADER):]
+    elif content.split("\n", 1)[0].startswith("//") and "@keyiflerolsun" in content.split("\n", 1)[0]:
+        rest = content.split("\n", 1)[1] if "\n" in content else ""
+    else:
+        rest = content
+    return HEADER + "\n" + rest.lstrip("\n")
+
+
+def run_formatter(file_path, module_name):
+    """goimports (yerel modül importlarını ayrı gruba alır) yoksa gofmt; ikisi de gofmt biçimini üretir."""
+    if os.path.exists(GOIMPORTS):
+        cmd = [GOIMPORTS, "-w"] + (["-local", module_name] if module_name else []) + [file_path]
+    elif shutil.which("gofmt"):
+        cmd = ["gofmt", "-w", file_path]
+    else:
+        print("[-] goimports/gofmt bulunamadı: go install golang.org/x/tools/cmd/goimports@latest")
+        return False
+    proc = subprocess.run(cmd, capture_output=True, text=True)
+    if proc.returncode != 0:
+        print(f"  ❌ {file_path}\n      {proc.stderr.strip()}")
+        return False
+    return True
+
+
+def format_go_file(file_path):
+    """Dosyayı formatlar, değiştiyse 'Formatted' basar; lint için son içeriği döner."""
+    with open(file_path, "r", encoding="utf-8") as f:
+        old_content = f.read()
+
+    new_content = ensure_header(old_content)
+    if new_content != old_content:
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write(new_content)
+
+    module_name, _ = get_module_info(file_path)
+    if not run_formatter(file_path, module_name):
+        return None
+
+    with open(file_path, "r", encoding="utf-8") as f:
+        final = f.read()
+    if final != old_content:
+        print(f"Formatted: {file_path}")
+    return final.splitlines()
+
+
+def lint_warnings(file_path, lines):
+    """Formatlayıcının düzeltmediği go_style.md ihlallerini gruplayıp basar."""
+    oversize   = len(lines) if len(lines) > FILE_LIMIT else 0
+    long_funcs = []
+    mid_decls  = []
+    seen_func  = False
+    func_name  = func_start = None
+
+    for no, line in enumerate(lines, 1):
+        if FUNC_START_RE.match(line):
+            seen_func = True
+            if line.rstrip().endswith("}"):  # tek satırlık fonksiyon
+                continue
+            m         = FUNC_NAME_RE.match(line)
+            func_name, func_start = (m.group(1) if m else "?"), no
+        elif line == "}" and func_start:
+            if no - func_start > FUNC_LIMIT:
+                long_funcs.append(f"{func_name} ({no - func_start} satır, satır {func_start})")
+            func_name = func_start = None
+        # §2: const/var import bloğunun altında toplanır; ilk fonksiyondan sonra gelen tanım dosya ortasındadır
+        elif seen_func and TOP_DECL_RE.match(line):
+            mid_decls.append(no)
+
+    if not (oversize or long_funcs or mid_decls):
+        return
+
+    print(f"  ⚠️  {file_path}")
+    if oversize:
+        print(f"      {oversize} satır → çok büyük, parçalanması gerekebilir (sınır {FILE_LIMIT})")
+    if long_funcs:
+        print(f"      uzun fonksiyon (>{FUNC_LIMIT}) → aşamalarına böl → {', '.join(long_funcs)}")
+    if mid_decls:
+        print(f"      dosya ortasında const/var → import bloğunun altına taşı → satır {', '.join(map(str, mid_decls))}")
+
+
+def _git_ignored(paths):
+    """git check-ignore ile yok sayılan yolları küme olarak döndürür (git yok / repo değilse boş)."""
+    if not paths:
+        return set()
+    try:
+        proc = subprocess.run(
+            ["git", "-c", "core.quotePath=false", "check-ignore", "--stdin"],
+            input          = "\n".join(paths),
+            capture_output = True,
+            text           = True,
+        )
+    except (FileNotFoundError, OSError):
+        return set()
+    return set(proc.stdout.split("\n")) - {""}
+
+
+def process_path(path):
+    """Verilen yolu dosya mı dizin mi otomatik algılayıp formatlar."""
+    path = os.path.abspath(path)
+    if os.path.isfile(path):
+        if not path.endswith(".go"):
+            print(f"Go dosyası değil, atlanıyor: {path}")
+            return
+        lines = format_go_file(path)
+        if lines is not None:
+            lint_warnings(path, lines)
+    elif os.path.isdir(path):
+        for root, dirs, files in os.walk(path):
+            kalan   = [d for d in dirs if d not in EXCLUDE_DIRS]
+            go_dosy = [os.path.join(root, f) for f in sorted(files) if f.endswith(".go")]
+            ignored = _git_ignored([os.path.join(root, d) for d in kalan] + go_dosy)
+            dirs[:] = [d for d in kalan if os.path.join(root, d) not in ignored]
+            for fp in go_dosy:
+                if fp in ignored:
+                    continue
+                lines = format_go_file(fp)
+                if lines is not None:
+                    lint_warnings(fp, lines)
+    else:
+        print(f"Hatalı yol: {path}")
+
+
+def main():
+    parser = argparse.ArgumentParser(description="KekikStyle Go Formatter")
+    parser.add_argument(
+        "paths",
+        nargs   = "*",
+        default = ["."],
+        help    = "Formatlanacak dosya veya dizin yolları (varsayılan: mevcut dizin)",
+    )
+    args = parser.parse_args()
+    for path in args.paths:
+        process_path(path)
+
+
+if __name__ == "__main__":
+    main()

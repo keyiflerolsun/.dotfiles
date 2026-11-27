@@ -1,0 +1,36 @@
+# Stalwart posta sunucusu ve Bulwark webmail (mail CT'si). Dışarıdan gelen bağlantı aktarıcı sunucudaki HAProxy'den
+# Tailscale ile, PROXY protocol başlığıyla gelir; ayarlar (domain, kutular, rota) Stalwart'ın kendi veritabanındadır.
+# .env (izin 600): CLOUDFLARE_TOKEN, MAIL_HOSTNAME (mail.<domain>), TS_IP (CT'nin Tailscale IP'si)
+services:
+  stalwart:
+    container_name: stalwart
+    image: stalwartlabs/stalwart:v1
+    init: true
+    restart: unless-stopped
+    # Sırlar Stalwart'ta değer değil ortam değişkeni adıyla tutulur (CLOUDFLARE_TOKEN: DNS ve ACME)
+    env_file: .env
+    # Port yayınlama kaynak IP'yi Docker ağ geçidine çevirir; aktarıcı güvenilir ağda tanınmaz, PROXY başlığı
+    # okunmaz. Host ağında dinleyiciler doğrudan CT'nin arayüzlerindedir (25, 465, 587, 993, 8080).
+    network_mode: host
+    # Kap uid 2000 ile çalışır; ilk kurulumdan önce: chown 2000:2000 etc data
+    volumes:
+      - ./etc:/etc/stalwart
+      - ./data:/var/lib/stalwart
+
+  # Webmail (JMAP): lab hostu (NPM, yalnız Tailscale) üzerinden açılır; port yalnız Tailscale adresinde. Tarayıcı JMAP'e genel
+  # adresten gider (Stalwart'ta CORS açık), sunucu tarafı giriş denetimi extra_hosts ile doğrudan yerel Stalwart'a (443, aynı sertifika)
+  bulwark:
+    container_name: bulwark
+    image: ghcr.io/bulwarkmail/webmail:1
+    restart: unless-stopped
+    ports:
+      - ${TS_IP:?}:3000:3000
+    environment:
+      JMAP_SERVER_URL: https://${MAIL_HOSTNAME:?}
+      # Güncellemeleri Dockhand izler; telemetri ve yönetim paneli (ADMIN_PASSWORD yok) zaten kapalı
+      BULWARK_UPDATE_CHECK: "off"
+    extra_hosts:
+      - ${MAIL_HOSTNAME:?}:host-gateway
+    # Oturum anahtarı ve yönetim ayarları ilk açılışta burada üretilir; kap uid 1001: chown 1001 bulwark
+    volumes:
+      - ./bulwark:/app/data

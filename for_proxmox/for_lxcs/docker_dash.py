@@ -1,7 +1,5 @@
-# Bu araç @keyiflerolsun tarafından | @KekikAkademi için yazılmıştır.
-
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+# Bu araç @keyiflerolsun tarafından | @KekikAkademi için yazılmıştır.
 
 import argparse
 import json
@@ -81,30 +79,30 @@ def heat(p: str, warn: float, crit: float) -> str:
 # ---------------- models ---------------- #
 @dataclass(slots=True)
 class PSRow:
-    cid: str
-    name: str
-    image: str
-    size_real: str
-    size_virtual: str
-    status: str
+    cid          : str
+    name         : str
+    image        : str
+    size_real    : str
+    size_virtual : str
+    status       : str
 
 
 @dataclass(slots=True)
 class StatsRow:
-    cid: str
-    name: str
-    cpu: str
-    mem_perc: str
-    mem_used: str
-    mem_limit: str
+    cid       : str
+    name      : str
+    cpu       : str
+    mem_perc  : str
+    mem_used  : str
+    mem_limit : str
 
 
 @dataclass(slots=True)
 class MountRow:
-    name: str
-    type: str
-    source: str
-    dest: str
+    name   : str
+    type   : str
+    source : str
+    dest   : str
 
 
 # ---------------- collectors ---------------- #
@@ -158,9 +156,9 @@ def docker_mount_rows(names: list[str]) -> list[MountRow]:
     rows: list[MountRow] = []
 
     def one(name: str) -> list[MountRow]:
-        out    = sh("docker", "inspect", name, "--format", "{{json .Mounts}}")
-        mounts = json.loads(out) if out else []
-        res: list[MountRow] = []
+        out                     = sh("docker", "inspect", name, "--format", "{{json .Mounts}}")
+        mounts                  = json.loads(out) if out else []
+        res    : list[MountRow] = []
         for m in mounts:
             res.append(
                 MountRow(

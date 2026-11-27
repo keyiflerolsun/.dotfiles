@@ -1,0 +1,9 @@
+[Unit]
+Description=Elektrik kesintisi yoklaması (kesinti-izle)
+After=network-online.target
+Wants=network-online.target
+ConditionPathExists=/etc/kesinti-izle.conf
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/kesinti-izle

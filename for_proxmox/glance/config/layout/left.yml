@@ -15,6 +15,8 @@
         - symbol: USDTRY=X
           name: USD/TRY
 
+    - $include: ../widgets/Dockhand.yml
+
     - type: repository
       hide-header: true
       token: ${GITHUB_TOKEN}

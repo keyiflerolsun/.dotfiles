@@ -1,0 +1,4 @@
+.dots/.config/espanso/match/kisisel.yml
+.dots/.config/espanso/match/buddy.yml
+# Vim: eklentiler ilk açılışta vim-plug ile iner
+.dots/.vim/plugged/

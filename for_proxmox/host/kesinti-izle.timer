@@ -1,0 +1,11 @@
+[Unit]
+Description=Elektrik kesintisi yoklaması, dakikada bir
+
+[Timer]
+# Açılıştan 2 dk sonra ilk yoklama (ağ ve router hazır olsun)
+OnBootSec=2min
+OnUnitActiveSec=1min
+AccuracySec=5s
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,92 @@
+- type: custom-api
+  title: Yedek ve Çoğaltma
+  # çoğaltma (kaynak node PROXMOX_NODE), node başına son yedek ve hatalı görevler; Proxmox jetonu yalnız okur
+  title-url: ${PROXMOX_URL}
+  cache: 5m
+  url: ${PROXMOX_URL}/api2/json/cluster/tasks
+  allow-insecure: true
+  headers:
+    Accept: application/json
+    Authorization: ${PROXMOX_TOKEN}
+  subrequests:
+    cogaltma:
+      url: ${PROXMOX_URL}/api2/json/nodes/${PROXMOX_NODE}/replication
+      allow-insecure: true
+      headers:
+        Accept: application/json
+        Authorization: ${PROXMOX_TOKEN}
+  template: |
+    <style>
+      .yd-section { font-size: var(--font-size-h5); color: var(--color-text-subdue); text-transform: uppercase; margin: 0.75rem 0 0.25rem; }
+      .yd-section:first-child { margin-top: 0; }
+      .yd-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); gap: 1rem; padding: 0.5rem 0; }
+      .yd-card { background: var(--color-widget-background-highlight); border-radius: var(--border-radius); padding: 1rem; border: 1px solid rgba(255, 255, 255, 0.06); display: flex; flex-direction: column; transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease; }
+      .yd-card:hover { background: rgba(255, 255, 255, 0.08); transform: translateY(-0.1875rem); border-color: var(--color-primary); }
+      .yd-header { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.625rem; }
+      .yd-icon-name { display: flex; align-items: center; gap: 0.625rem; min-width: 0; }
+      .yd-icon { width: 1.25rem; height: 1.25rem; object-fit: contain; flex-shrink: 0; }
+      .yd-name { font-weight: 600; font-size: var(--font-size-h4); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--color-primary); }
+      .yd-dot { width: 0.5625rem; height: 0.5625rem; border-radius: 50%; flex-shrink: 0; }
+      .yd-up { background-color: var(--color-positive); box-shadow: 0 0 0.375rem var(--color-positive); }
+      .yd-down { background-color: var(--color-negative); box-shadow: 0 0 0.375rem var(--color-negative); }
+      .yd-detail { font-family: monospace; font-size: var(--font-size-h6); opacity: 0.45; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 0.125rem; }
+      .yd-ok { padding: 0.75rem; color: var(--color-positive); border-radius: var(--border-radius); background: var(--color-widget-background-highlight); }
+      .yd-error { padding: 0.75rem; color: var(--color-negative); border-radius: var(--border-radius); background: var(--color-widget-background-highlight); }
+    </style>
+    {{ $icon := "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/proxmox.svg" }}
+
+    {{ if eq .Response.StatusCode 200 }}
+      <div class="yd-section">🔁 Çoğaltma</div>
+      <div class="yd-grid">
+        {{ range (.Subrequest "cogaltma").JSON.Array "data" }}
+          {{ $fail := .Int "fail_count" }}
+          <div class="yd-card">
+            <div class="yd-header">
+              <div class="yd-icon-name"><img class="yd-icon" src="{{ $icon }}"><span class="yd-name">{{ .String "id" }}</span></div>
+              <span class="yd-dot {{ if eq $fail 0 }}yd-up{{ else }}yd-down{{ end }}"></span>
+            </div>
+            <div class="yd-detail">➔ {{ .String "target" }} · {{ .String "schedule" }} · {{ if eq $fail 0 }}<span {{ .Int "last_sync" | printf "%d" | parseTime "unix" | toRelativeTime }}></span>{{ else }}{{ $fail }} hata{{ end }}</div>
+          </div>
+        {{ end }}
+      </div>
+
+      <div class="yd-section">💾 Son yedek (node başına)</div>
+      <div class="yd-grid">
+        {{ $seen := "" }}
+        {{ range .JSON.Array "data" }}
+          {{ $node := .String "node" }}
+          {{ if and (eq (.String "type") "vzdump") (not (findMatch (concat "," $node ",") $seen)) }}
+            {{ $seen = concat $seen "," $node "," }}
+            {{ $ok := eq (.String "status") "OK" }}
+            <div class="yd-card">
+              <div class="yd-header">
+                <div class="yd-icon-name"><img class="yd-icon" src="{{ $icon }}"><span class="yd-name">{{ $node }}</span></div>
+                <span class="yd-dot {{ if $ok }}yd-up{{ else }}yd-down{{ end }}"></span>
+              </div>
+              <div class="yd-detail">➔ {{ if $ok }}tamam{{ else }}{{ .String "status" }}{{ end }} · <span {{ .Int "starttime" | printf "%d" | parseTime "unix" | toRelativeTime }}></span></div>
+            </div>
+          {{ end }}
+        {{ end }}
+      </div>
+
+      <div class="yd-section">⚠️ Hatalı görevler</div>
+      {{ $hata := 0 }}
+      <div class="yd-grid">
+        {{ range .JSON.Array "data" }}
+          {{ $s := .String "status" }}
+          {{ if and (ne $s "OK") (ne $s "") (not (findMatch "^WARNINGS" $s)) }}
+            {{ $hata = 1 }}
+            <div class="yd-card" title="{{ $s }}">
+              <div class="yd-header">
+                <div class="yd-icon-name"><img class="yd-icon" src="{{ $icon }}"><span class="yd-name">{{ .String "type" }} {{ .String "id" }}</span></div>
+                <span class="yd-dot yd-down"></span>
+              </div>
+              <div class="yd-detail">➔ {{ .String "node" }} · <span {{ .Int "starttime" | printf "%d" | parseTime "unix" | toRelativeTime }}></span></div>
+            </div>
+          {{ end }}
+        {{ end }}
+      </div>
+      {{ if eq $hata 0 }}<div class="yd-ok">Son görevlerde hata yok.</div>{{ end }}
+    {{ else }}
+      <div class="yd-error">Proxmox Error: Could not retrieve data.</div>
+    {{ end }}

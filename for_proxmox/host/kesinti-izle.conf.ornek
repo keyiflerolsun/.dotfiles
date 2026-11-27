@@ -1,0 +1,8 @@
+# /etc/kesinti-izle.conf (chmod 600, root). Gerçek değerler yalnız makinede durur.
+ROUTER=http://<router IP'si>
+KULLANICI=admin
+PAROLA=<router parolası>
+# UPS'e bağlı olmayan, şebekede sürekli açık iki cihazın MAC'i (router'ın istemci listesinden)
+HEDEFLER=<mac-1> <mac-2>
+# Kaç dakika kesintide kapanılır (UPS süresinin yarısından az)
+SURE=300

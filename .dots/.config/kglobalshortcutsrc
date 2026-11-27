@@ -1,0 +1,14 @@
+[kwin]
+Window Maximize=Meta+Return\tMeta+PgUp,Meta+PgUp,Pencere Ekranı Kaplasın
+Window Move Center=Meta+C,none,Pencereyi Merkeze Taşı
+_k_friendly_name=KWin
+view_zoom_in=Meta++\tMeta+=,Meta++\tMeta+=,Yakınlaştır
+
+[plasmashell]
+_k_friendly_name=plasmashell
+next activity=Meta+A,none,Etkinlikler arasında gezin
+previous activity=Meta+Shift+A,none,Etkinlikler arasında gezin (Tersine)
+
+[yakuake]
+_k_friendly_name=Yakuake
+toggle-window-state=Ctrl+Space,F12,Yakuake Uygulamasını Aç/Geri Çek

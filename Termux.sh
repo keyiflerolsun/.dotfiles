@@ -1,50 +1,54 @@
-#!/bin/sh
+#!/data/data/com.termux/files/usr/bin/bash
 # Bu araç @keyiflerolsun tarafından | @KekikAkademi için yazılmıştır.
 
 # Termux Kurulum Paketi
 
 # ! F-Droid üzerinden indirdikten sonra elle yükseltin ve kurulum komutunu girin!
 
-apt update -y && apt upgrade -y
-
 # Yüklemek İçin: `curl https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/Termux.sh | bash`
 
-# temel
-apt update -y && apt upgrade -y
-apt install wget curl git zsh htop micro -y
+# ? Güncelleme
+pkg update -y && pkg upgrade -y
+
+# ? Paketler
+# * Temel: ağ, git, kabuk, SSH
+apt install wget curl git zsh htop -y
 apt install openssl openssh -y
-apt install ruby rust python -y
-gem install colorls
-pip3 install --upgrade pip
-pip3 install -U setuptools
-pip3 install -U wheel
 pkg install proot resolv-conf -y
+# * Kabuk araçları (.zshrc ve tmux bunları bekler)
+apt install fastfetch tmux fzf fd bat zoxide jq ffmpeg -y
+# * Editörler
+apt install vim ripgrep micro -y
+# * Diller
+apt install ruby rust python uv -y
+# * Derleme araç zinciri ve yerel kütüphaneler (Termux'ta tekerleği olmayan Python paketleri kaynaktan derlenir)
 pkg install build-essential clang make pkg-config -y
 pkg install libffi libxslt libxml2 libcrypt -y
 pkg install libgmp libmpc libmpfr -y
 pkg install libjpeg-turbo libpng -y
+# * Hazır derlenmiş Python paketleri (Termux deposundan)
 pkg install python-numpy opencv-python python-cryptography -y
-pip3 install -U Kekik
+# * Android köprüsü (termux-* komutları)
+apt install termux-api -y
+
+# ? uv araçları
+# Kütüphaneler (Kekik, KekikSpatula, pandas) projede uv ile; burada yalnız komut satırı araçları
 export CFLAGS="-Wno-deprecated-declarations -Wno-unreachable-code"
-pip install pandas
-pip3 install -U KekikSpatula
 export CARGO_BUILD_TARGET=aarch64-linux-android
-pip3 install -U scrapy yt-dlp bpython
+uv tool install scrapy
+uv tool install bpython
 
-# zsh
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-git clone https://github.com/zsh-users/zsh-completions ${ZSH_CUSTOM:=~/.oh-my-zsh/custom}/plugins/zsh-completions
-git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+# ? Ruby: colorls
+gem install colorls
 
-# keyiflerolsun
-rm -rf ~/.zshrc && wget https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/.dots/.zshrc
-apt install screenfetch tmux -y
-wget https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/.dots/.tmux.conf
-apt install jq ffmpeg -y
-git config --global user.email "keyiflerolsun@gmail.com"
-git config --global user.name "keyiflerolsun"
-git config --global credential.helper "cache --timeout=36000"
+# ? Kabuk ortamı: Oh My Zsh, zsh/tmux/Vim dotfile'ları, Vim eklentileri, git (ortak betik)
+curl -fsSL https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/Kabuk.sh | bash
 
-apt install termux-api
+# ? Nerd Font (depodaki JetBrainsMono, Termux'un tek yazı tipi dosyası)
+mkdir -p ~/.termux && curl -fL "https://raw.githubusercontent.com/keyiflerolsun/.dotfiles/main/.dots/.fonts/JetBrains%20Mono%20Regular%20Nerd%20Font%20Complete%20Mono.ttf" -o ~/.termux/font.ttf && termux-reload-settings
+
+# ? Varsayılan kabuk zsh (Termux'ta sudo yok, kullanıcı kendi kabuğunu seçer)
+chsh -s zsh
+
+# ? Depolama izni en sonda: Android izin penceresi açar
 termux-setup-storage

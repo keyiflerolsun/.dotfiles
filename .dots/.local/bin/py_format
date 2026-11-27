@@ -1,0 +1,1068 @@
+#!/usr/bin/env python3
+# Bu araç @keyiflerolsun tarafından | @KekikAkademi için yazılmıştır.
+
+import os, re, ast, argparse, subprocess, io, tokenize
+
+# f-string (3.12+) ve t-string (3.14+) tek STRING token'ı değil, START…END arası parçalı gelir
+STRING_STARTS = {getattr(tokenize, ad) for ad in ("FSTRING_START", "TSTRING_START") if hasattr(tokenize, ad)}
+STRING_ENDS   = {getattr(tokenize, ad) for ad in ("FSTRING_END", "TSTRING_END") if hasattr(tokenize, ad)}
+# Satır sınırı: hiza bu sütunu aşan satır üretmez
+LIMIT         = 160
+
+
+def line_context(lines):
+    """Her satır için (satır başındaki parantez derinliği, satır bir string literal'in içinde mi başlıyor) listelerini döner.
+
+    Satır satır regex, çok satırlı string'in içini koddan ayıramıyordu: docstring'deki `a=b` atama, metindeki
+    `(` açık parantez sanılıyordu. tokenize string ve yorumu kesin ayırır. Kaynak tokenize edilemezse
+    (yarım/bozuk dosya) eski üçlü tırnak sayımına düşülür ki formatlayıcı yine çalışsın.
+    """
+    n         = len(lines)
+    depths    = [0] * n
+    in_string = [False] * n
+    try:
+        deltas = [0] * (n + 2)
+        spans  = []  # (başlangıç satırı, bitiş satırı) — 1 tabanlı
+        fdepth = 0
+        fstart = 0
+        for tok in tokenize.generate_tokens(io.StringIO("".join(lines)).readline):
+            if tok.type in STRING_STARTS:
+                if fdepth == 0:
+                    fstart = tok.start[0]
+                fdepth += 1
+            elif tok.type in STRING_ENDS:
+                fdepth -= 1
+                if fdepth == 0:
+                    spans.append((fstart, tok.end[0]))
+            elif fdepth:
+                continue  # f-string içindeki { } yer tutucuları kod parantezi değildir
+            elif tok.type == tokenize.STRING:
+                spans.append((tok.start[0], tok.end[0]))
+            elif tok.type == tokenize.OP and tok.string in ("(", "[", "{"):
+                deltas[tok.start[0]] += 1
+            elif tok.type == tokenize.OP and tok.string in (")", "]", "}"):
+                deltas[tok.start[0]] -= 1
+        for srow, erow in spans:
+            for row in range(srow + 1, erow + 1):
+                in_string[row - 1] = True
+        for k in range(1, n):
+            depths[k] = depths[k - 1] + deltas[k]
+    except (tokenize.TokenError, SyntaxError):
+        depth, inside = 0, False
+        for k, line in enumerate(lines):
+            depths[k], in_string[k] = depth, inside
+            if not inside:
+                depth += _bracket_delta(line)
+            if (line.count('"""') + line.count("'''")) % 2:
+                inside = not inside
+    return depths, in_string
+
+
+def _find_comment_start(line):
+    """Satırdaki string literal dışındaki ilk # karakterinin indeksini döner, yoksa -1."""
+    in_single = False
+    in_double = False
+    i         = 0
+    while i < len(line):
+        ch = line[i]
+        if ch == "\\" and (in_single or in_double):
+            i += 2
+            continue
+        if ch == '"' and not in_single:
+            in_double = not in_double
+        elif ch == "'" and not in_double:
+            in_single = not in_single
+        elif ch == "#" and not in_single and not in_double:
+            return i
+        i += 1
+    return -1
+
+def _bracket_delta(line):
+    """String literal ve yorum dışındaki ( ) [ ] { } denge farkını döner."""
+    depth = 0
+    in_s  = False
+    in_d  = False
+    i     = 0
+    while i < len(line):
+        ch = line[i]
+        if (in_s or in_d) and ch == "\\":
+            i += 2
+            continue
+        if in_s:
+            if ch == "'":
+                in_s = False
+        elif in_d:
+            if ch == '"':
+                in_d = False
+        elif ch == "'":
+            in_s = True
+        elif ch == '"':
+            in_d = True
+        elif ch == "#":
+            break
+        elif ch in "([{":
+            depth += 1
+        elif ch in ")]}":
+            depth -= 1
+        i += 1
+    return depth
+
+
+def expand_single_line_blocks(lines):
+    """Tek satırlık if, for, except vb. blokları yayar."""
+    new_lines = []
+    keywords  = ["if", "elif", "else", "for", "while", "except", "finally", "with"]
+    _, in_str = line_context(lines)
+
+    for k, line in enumerate(lines):
+        rline = line.rstrip()
+        if in_str[k] or not rline.strip() or rline.strip().startswith("#"):
+            new_lines.append(line)
+            continue
+
+        # Yorumları ayır
+        cpos = _find_comment_start(rline)
+        if cpos >= 0:
+            code_part = rline[:cpos].rstrip()
+            comment   = rline[cpos:]
+        else:
+            code_part = rline
+            comment   = ""
+
+        stripped_code = code_part.lstrip()
+        indent        = code_part[:len(code_part) - len(stripped_code)]
+
+        # Sadece belirli keywordlerle başlayan satırlara bak
+        found_kw = None
+        for kw in keywords:
+            if stripped_code.startswith(kw + " ") or stripped_code.startswith(kw + ":"):
+                found_kw = kw
+                break
+
+        if not found_kw:
+            new_lines.append(line)
+            continue
+
+        # Keyword sonrası fazla boşlukları her durumda temizle (if   cond: -> if cond:)
+        if stripped_code.startswith(found_kw + " "):
+            code_part     = indent + found_kw + " " + stripped_code[len(found_kw):].lstrip()
+            stripped_code = code_part.lstrip()
+
+        # Bloğu ayıran kolonun yerini bul
+        colon_pos     = -1
+        paren_level   = 0
+        brace_level   = 0
+        bracket_level = 0
+        in_single     = False
+        in_double     = False
+
+        i = 0
+        while i < len(code_part):
+            ch = code_part[i]
+            if ch == "\\" and (in_single or in_double):
+                i += 2
+                continue
+            if ch == '"' and not in_single:
+                in_double = not in_double
+            elif ch == "'" and not in_double:
+                in_single = not in_single
+            elif not in_single and not in_double:
+                if ch == '(':
+                    paren_level += 1
+                elif ch == ')':
+                    paren_level -= 1
+                elif ch == '[':
+                    bracket_level += 1
+                elif ch == ']':
+                    bracket_level -= 1
+                elif ch == '{':
+                    brace_level += 1
+                elif ch == '}':
+                    brace_level -= 1
+                elif ch == ':' and paren_level == 0 and brace_level == 0 and bracket_level == 0:
+                    # Walrus kontrolü: :=
+                    if i + 1 < len(code_part) and code_part[i+1] == '=':
+                        i += 1  # Atla
+                    elif i > 0 and code_part[i-1] == ':':
+                        pass  # ::
+                    else:
+                        # Bu muhtemelen blok kolonu.
+                        # Eğer sonrasında bir şey varsa (tek satır blok) yay.
+                        statement_part = code_part[i+1:].strip()
+                        if statement_part:
+                            colon_pos = i
+                            break
+            i += 1
+
+        if colon_pos != -1:
+            condition = code_part[:colon_pos].strip()
+            statement = code_part[colon_pos+1:].strip()
+
+            # Basit atama ifadelerindeki fazla boşlukları temizle (x     = y -> x = y)
+            if statement.count("=") == 1:
+                eq_pos = -1
+                p_lvl, b_lvl, br_lvl = 0, 0, 0
+                in_s, in_d = False, False
+                for idx, ch in enumerate(statement):
+                    if ch == "\\" and (in_s or in_d):
+                        continue
+                    if ch == '"' and not in_s:
+                        in_d = not in_d
+                    elif ch == "'" and not in_d:
+                        in_s = not in_s
+                    elif not in_s and not in_d:
+                        if ch == '(':
+                            p_lvl += 1
+                        elif ch == ')':
+                            p_lvl -= 1
+                        elif ch == '[':
+                            b_lvl += 1
+                        elif ch == ']':
+                            b_lvl -= 1
+                        elif ch == '{':
+                            br_lvl += 1
+                        elif ch == '}':
+                            br_lvl -= 1
+                        elif ch == '=' and p_lvl == 0 and b_lvl == 0 and br_lvl == 0:
+                            eq_pos = idx
+                            break
+
+                if eq_pos != -1:
+                    left  = statement[:eq_pos].strip()
+                    right = statement[eq_pos+1:].strip()
+
+                    # Bileşik atama operatörlerini bul (+, -, *, /, //, **, %, &, |, ^, <<, >>)
+                    op_match = re.search(r'([-+*/%&|^<>]+)$', left)
+                    if op_match:
+                        op        = op_match.group(1)
+                        left      = left[:-len(op)].strip()
+                        statement = f"{left} {op}= {right}"
+                    else:
+                        statement = f"{left} = {right}"
+
+            new_lines.append(f"{indent}{condition}:\n")
+            new_lines.append(f"{indent}    {statement}{('  ' + comment.strip() if comment else '')}\n")
+        else:
+            # Yayılmasa bile normalize edilmiş code_part'ı ekle (keyword spacing fix için)
+            new_lines.append(f"{code_part}{('  ' + comment.strip() if comment else '')}\n")
+
+    return new_lines
+
+def align_imports(lines):
+    """Import bloklarını (from ... import ...) hizalar."""
+    new_lines = []
+    block     = []
+
+    def flush_import_block(current_block):
+        if len(current_block) < 2:
+            return current_block
+        max_from_len = 0
+        parsed       = []
+        for line in current_block:
+            match = re.match(r"^(\s*from\s+[\w\.]+)\s+import\s+(.*)$", line.rstrip())
+            if match:
+                from_part, import_part = match.groups()
+                max_from_len = max(max_from_len, len(from_part.rstrip()))
+                parsed.append((from_part.rstrip(), import_part.strip()))
+            else:
+                return current_block
+
+        return [f"{f:<{max_from_len}} import {i}\n" for f, i in parsed]
+
+    _, in_str = line_context(lines)
+    for k, line in enumerate(lines):
+        if not in_str[k] and "from " in line and " import " in line and not line.strip().startswith("#"):
+            block.append(line)
+        else:
+            new_lines.extend(flush_import_block(block))
+            block = []
+            new_lines.append(line)
+    new_lines.extend(flush_import_block(block))
+    return new_lines
+
+
+def align_assignments_and_types(lines):
+    """Değişken : Tip = Değer bloklarını hizalar."""
+    new_lines = []
+    block     = []
+
+    def flush_block(current_block):
+        if sum(not isinstance(ln, tuple) and not ln.strip().startswith("#") for ln in current_block) < 2:
+            return [ln[1] if isinstance(ln, tuple) else ln for ln in current_block]
+        data = []
+        max_name, max_type = 0, 0
+        has_type, has_val = False, False
+
+        for line in current_block:
+            # Çok satırlı atamanın devam satırı (paren içi) bir önceki atamaya bağlıdır; hizası değişince onunla kayar
+            if isinstance(line, tuple):
+                data.append({"cont" : line[1], "owner" : max(i for i, d in enumerate(data) if "name" in d)})
+                continue
+            rline = line.rstrip()
+            # Grubun arasındaki yorum satırı hizaya girmez, yerinde aynen kalır
+            if rline.strip().startswith("#"):
+                data.append({"raw" : line})
+                continue
+
+            # String-aware yorum ayırma
+            cpos = _find_comment_start(rline)
+            if cpos >= 0:
+                code_part = rline[:cpos].rstrip()
+                comment   = rline[cpos:]
+            else:
+                code_part = rline
+                comment   = ""
+
+            # indent + name + [ : type ] + [ = value ]
+            match = re.match(
+                r"^(\s*)([\w\d_\.]+)\s*(?::\s*([^=]+?))?\s*(?:=\s*(.+))?$",
+                code_part,
+            )
+            # Tip kısmında tırnak varsa regex'in yakaladığı = string'in içinde olabilir (Literal["a=b"])
+            if match and match.group(3) and ('"' in match.group(3) or "'" in match.group(3)):
+                return [ln[1] if isinstance(ln, tuple) else ln for ln in current_block]
+            if match:
+                indent, name, t_hint, val = match.groups()
+                name   = name.strip() if name else None
+                t_hint = t_hint.strip() if t_hint else None
+                val    = val.strip() if val else None
+                max_name = max(max_name, len(name))
+                if t_hint:
+                    max_type = max(max_type, len(t_hint))
+                    has_type = True
+                if val:
+                    has_val = True
+                data.append(
+                    {
+                        "indent"  : indent,
+                        "name"    : name,
+                        "t_hint"  : t_hint,
+                        "val"     : val,
+                        "comment" : comment,
+                        "column"  : match.start(4) if val else match.start(3) if t_hint else None,
+                    }
+                )
+            else:
+                return [ln[1] if isinstance(ln, tuple) else ln for ln in current_block]  # Blok bozulduysa orijinali dön
+
+        flushed, shifts = [], {}
+        for index, d in enumerate(data):
+            if "raw" in d:
+                flushed.append(d["raw"])
+                continue
+            if "cont" in d:
+                shift = shifts.get(d["owner"], 0)
+                line  = d["cont"]
+                lead  = len(line) - len(line.lstrip(" "))
+                flushed.append(" " * shift + line if shift >= 0 else line[min(-shift, lead):])
+                continue
+            row = f"{d['indent']}{d['name']:<{max_name}}"
+
+            # Tip varsa : ekle ve hizala
+            if d["t_hint"]:
+                row += f" : {d['t_hint']:<{max_type}}"
+            elif has_type:
+                # Blokta başka satırlarda tip var ama bunda yoksa colon EKLEME (Syntax error önlemi)
+                # Sadece değer hizasına kadar boşluk bırakalım
+                row += " " * (max_type + 3) if max_type > 0 else "   "
+
+            # Değer varsa = ekle ve hizala
+            if has_val:
+                if d["val"]:
+                    row += f" = {d['val']}"
+                elif has_type and not d["t_hint"]:
+                    pass
+
+            if d["column"] is not None:
+                shifts[index] = (row.rfind(d["val"]) if d["val"] else row.rfind(d["t_hint"])) - d["column"]
+            if d["comment"]:
+                row = row.rstrip() + "  " + d["comment"].strip()
+
+            flushed.append(row.rstrip() + "\n")
+        return flushed
+
+    def flush(current_block):
+        # Devam satırıyla birleşen blok ortak hizada 160 sütunu aşarsa o devam satırında eskisi gibi bölünür: geniş hiza uzun
+        # satırları sınırın dışına itiyordu (KararWeb'de 23 dosyada 176 satır). Bölüm başına, sınıra sığdığı kadar birleşir.
+        def fits(group):
+            plain = {ln[1] if isinstance(ln, tuple) else ln for ln in group}
+            return all(len(ln.rstrip("\n")) <= LIMIT or ln in plain for ln in flush_block(group))
+
+        segments, segment = [], []
+        for ln in current_block:
+            if segment and isinstance(segment[-1], tuple) and not isinstance(ln, tuple):
+                segments.append(segment)
+                segment = []
+            segment.append(ln)
+        segments.append(segment)
+        flushed, group = [], []
+        for segment in segments:
+            if group and not fits(group + segment):
+                flushed.extend(flush_block(group))
+                group = []
+            group += segment
+        return flushed + flush_block(group)
+
+    depths, in_str = line_context(lines)
+    for k, line in enumerate(lines):
+        stripped            = line.strip()
+        current_paren_level = depths[k]
+
+        # Üç tırnaklı metnin (docstring) satırları atama değildir: "söylenir : ..." gibi bir satır tip ipucu sanılıp bloğun
+        # hizasını bozuyordu. Tırnağı açan/kapatan satır da metindir.
+        inside_string = in_str[k] or '"""' in stripped or "'''" in stripped
+
+        # Grup içindeki yorum satırı grubu bölmez; flush_block onu yerinde bırakır
+        if block and not inside_string and current_paren_level == 0 and stripped.startswith("#"):
+            block.append(line)
+            continue
+        # Çok satırlı atamanın devam satırı bloğu bitirmez: bir önceki atamaya bağlanır, hizası değişince onunla kayar.
+        # Bitiriyordu: sonraki atamalar kendi genişliğine hizalanıp komşu bloktan kopuyordu (patterns.py CLOSING → NORM_VERDICT).
+        if block and current_paren_level > 0 and not in_str[k] and any(not isinstance(ln, tuple) for ln in block):
+            block.append(("cont", line))
+            continue
+
+        # Sadece root level (paren_level == 0) atamaları toplu hizaya sok
+        is_assign = (
+            not inside_string
+            and current_paren_level == 0
+            and ("=" in line or ":" in line)
+            and not stripped.startswith("#")
+            and not any(
+                stripped.startswith(x)
+                for x in [
+                    "def ",
+                    "class ",
+                    "async ",
+                    "if ",
+                    "elif ",
+                    "else:",
+                    "else :",
+                    "while ",
+                    "for ",
+                    "return ",
+                    "yield ",
+                    "try:",
+                    "try :",
+                    "except",
+                    "finally",
+                    "with ",
+                    "case ",
+                    "raise ",
+                    "@",
+                ]
+            )
+        )
+
+        if is_assign:
+            # Farklı indent seviyesindeyse mevcut bloğu kapat
+            current_indent = len(line) - len(line.lstrip())
+            if block and (len(block[0]) - len(block[0].lstrip())) != current_indent:
+                new_lines.extend(flush(block))
+                block = []
+            block.append(line)
+        else:
+            new_lines.extend(flush(block))
+            block = []
+            new_lines.append(line)
+
+    new_lines.extend(flush(block))
+    return new_lines
+
+
+def align_kwargs(lines):
+    """Fonksiyon/constructor çağrılarındaki keyword argument'ları (key=value) hizalar."""
+    new_lines = []
+    block     = []
+
+    def flush_block(current_block):
+        if not current_block:
+            return current_block
+        rows = []
+        for line in current_block:
+            if line.strip().startswith("#"):
+                rows.append(None)
+                continue
+            match = re.match(r"^(\s+)(\w+)\s*=(?!=)\s*(.+)$", line.rstrip())
+            if not match:
+                return current_block
+            rows.append(match.groups())
+        # Girinti seviyesi aynı olan ardışık satırları kendi içlerinde hizala; yorum satırı ardışıklığı bozmaz
+        groups, widths, prev = [], [], None
+        for row in rows:
+            if row is None:
+                groups.append(None)
+                continue
+            if row[0] != prev:
+                widths.append(0)
+                prev = row[0]
+            widths[-1] = max(widths[-1], len(row[1]))
+            groups.append(len(widths) - 1)
+        out = []
+        for line, row, g in zip(current_block, rows, groups):
+            if row is None:
+                out.append(line)
+            else:
+                ind, key, val = row
+                out.append(f"{ind}{key:<{widths[g]}} = {val}\n")
+        return out
+
+    depths, in_str = line_context(lines)
+    for k, line in enumerate(lines):
+        stripped  = line.strip()
+        in_parens = depths[k] > 0
+
+        # Argümanların arasındaki yorum satırı grubu bölmez
+        if block and in_parens and not in_str[k] and stripped.startswith("#"):
+            block.append(line)
+            continue
+
+        is_kwarg = False
+        if in_parens and not in_str[k] and stripped and not stripped.startswith(("#", "*")):
+            if re.match(r"^\s+\w+\s*=(?!=)\s*\S", line):
+                is_kwarg = True
+
+        if is_kwarg:
+            block.append(line)
+        else:
+            new_lines.extend(flush_block(block))
+            block = []
+            new_lines.append(line)
+
+    new_lines.extend(flush_block(block))
+    return new_lines
+
+
+def align_dictionaries(lines):
+    """Sözlük anahtarlarını ("key" : "value") ve f-string anahtarlarını hizalar."""
+    new_lines = []
+    block     = []
+
+    # indent + "key"/'key'/f"key" (herhangi bir karakter içerebilir) + : + value
+    key_re = re.compile(r'^(\s*)(f?"[^"]*"|f?\'[^\']*\')\s*:\s*(.+)$')
+
+    def flush_dict(current_block):
+        if len(current_block) < 2:
+            return current_block
+        parsed  = []
+        max_key = 0
+        matched = 0
+        for line in current_block:
+            rline = line.rstrip()
+
+            # String-aware yorum ayırma
+            cpos = _find_comment_start(rline)
+            if cpos >= 0:
+                code_part = rline[:cpos].rstrip()
+                comment   = rline[cpos:]
+            else:
+                code_part = rline
+                comment   = ""
+
+            match = key_re.match(code_part)
+            if match:
+                indent, key, val = match.groups()
+                max_key = max(max_key, len(key.strip()))
+                matched += 1
+                parsed.append(
+                    {
+                        "raw"     : None,
+                        "indent"  : indent,
+                        "key"     : key.strip(),
+                        "val"     : val.strip(),
+                        "comment" : comment,
+                    }
+                )
+            else:
+                # Eşleşmeyen satırı olduğu gibi bırak, bloğu bozma
+                parsed.append({"raw" : line})
+
+        if matched < 2:
+            return current_block
+
+        return [
+            d["raw"] if d["raw"] is not None else
+            f"{d['indent']}{d['key']:<{max_key}} : {d['val']}{('  ' + d['comment'].strip() if d['comment'] else '')}\n"
+            for d in parsed
+        ]
+
+    _, in_str = line_context(lines)
+    for k, line in enumerate(lines):
+        stripped = line.strip()
+        is_dict  = not in_str[k] and bool(re.match(
+            r'^\s*(?:f?"[^"]*"|f?\'[^\']*\')\s*:', line
+        ))
+        # Anahtarların arasındaki yorum satırı grubu bölmez; flush_dict onu ham satır olarak yerinde bırakır
+        if is_dict or (block and not in_str[k] and stripped.startswith("#")):
+            block.append(line)
+        else:
+            new_lines.extend(flush_dict(block))
+            block = []
+            new_lines.append(line)
+    new_lines.extend(flush_dict(block))
+    return new_lines
+
+
+def space_inline_dict_colons(lines):
+    """Aynı satırda açılıp kapanan { } sözlüklerindeki : işaretlerini ' : ' yapar.
+
+    Yalnızca sözlük iç içe yapı içeriyorsa (değer olarak dict/list/çağrı)
+    uygulanır; düz `{"x": y}` dokunulmaz. Dilim (a[1:2]) ve f-string format
+    belirteçleri (f"{v:>10}") etkilenmez.
+    """
+    new_lines = []
+    in_triple = None
+    for line in lines:
+        rl   = line.rstrip("\n")
+        cpos = _find_comment_start(rl)
+        if cpos >= 0:
+            code    = rl[:cpos]
+            comment = rl[cpos:]
+        else:
+            code    = rl
+            comment = ""
+
+        # Çok satırlı string / docstring (f\"\"\"...\"\"\") içindeki satırları atla
+        if in_triple:
+            if in_triple in code:
+                in_triple = None
+            new_lines.append(line)
+            continue
+        else:
+            t3_double = code.count('"""')
+            t3_single = code.count("'''")
+            if t3_double % 2 == 1:
+                in_triple = '"""'
+                new_lines.append(line)
+                continue
+            elif t3_single % 2 == 1:
+                in_triple = "'''"
+                new_lines.append(line)
+                continue
+
+        if "{" not in code:
+            new_lines.append(line)
+            continue
+
+        res    = []
+        stack  = []
+        nested = False
+        in_s   = False
+        in_d   = False
+        i      = 0
+        n      = len(code)
+        while i < n:
+            ch = code[i]
+            if in_s or in_d:
+                res.append(ch)
+                if ch == "\\" and i + 1 < n:
+                    res.append(code[i + 1])
+                    i += 2
+                    continue
+                if ch == '"' and in_d:
+                    in_d = False
+                elif ch == "'" and in_s:
+                    in_s = False
+                i += 1
+                continue
+            if ch == '"':
+                in_d = True
+                res.append(ch)
+            elif ch == "'":
+                in_s = True
+                res.append(ch)
+            elif ch in "([{":
+                if "{" in stack:  # bir sözlük değerinin içinde açılan kap
+                    nested = True
+                stack.append(ch)
+                res.append(ch)
+            elif ch in ")]}":
+                if stack:
+                    stack.pop()
+                res.append(ch)
+            elif ch == ":" and stack and stack[-1] == "{" and not (i + 1 < n and code[i + 1] == "="):
+                while res and res[-1] == " ":
+                    res.pop()
+                j = i + 1
+                while j < n and code[j] == " ":
+                    j += 1
+                res.append(" : ")
+                i = j
+                continue
+            else:
+                res.append(ch)
+            i += 1
+
+        new_code = "".join(res)
+        if not nested or new_code == code:
+            new_lines.append(line)
+        else:
+            new_lines.append(new_code.rstrip() + (("  " + comment.strip()) if comment else "") + "\n")
+    return new_lines
+
+
+def align_wrapper_dicts(lines):
+    """Ardışık tek-anahtarlı sarmalayıcı sözlük satırlarını hizalar.
+
+    {"nickname" : {...}},
+    {"name"     : {...}},
+    """
+    new_lines = []
+    block     = []
+    pat       = re.compile(r'^(\s*)\{\s*("[^"]*"|\'[^\']*\')\s*:\s*(.*?)\s*\}(,?)\s*$')
+
+    def flush(current_block):
+        if len(current_block) < 2:
+            return current_block
+        rows = []
+        for ln in current_block:
+            m = pat.match(ln.rstrip())
+            if not m:
+                return current_block
+            rows.append(m.groups())
+        if len({r[0] for r in rows}) > 1:
+            return current_block
+        # Yalnızca değeri iç içe kap olan sarmalayıcıları hizala (düz {"a": 1} atlanır)
+        if not any(("{" in r[2] or "[" in r[2]) for r in rows):
+            return current_block
+        width = max(len(r[1]) for r in rows)
+        return [f"{ind}{{{key:<{width}} : {val}}}{comma}\n" for ind, key, val, comma in rows]
+
+    _, in_str = line_context(lines)
+    for k, line in enumerate(lines):
+        if not in_str[k] and pat.match(line.rstrip()):
+            block.append(line)
+        else:
+            new_lines.extend(flush(block))
+            block = []
+            new_lines.append(line)
+    new_lines.extend(flush(block))
+    return new_lines
+
+
+def collapse_paren_imports(lines):
+    """Çok satırlı parantezli import'ları tek satıra indirger (kural 5.1).
+
+    from x import (\n    a,\n    b,\n) -> from x import a, b
+    """
+    new_lines = []
+    buf       = None
+    depth     = 0
+    _, in_str = line_context(lines)
+    for k, line in enumerate(lines):
+        if buf is None:
+            head = line.rstrip()
+            if not in_str[k] and re.match(r"^\s*(?:from\s+\S+\s+import|import)\b.*\(", head) and head.count("(") > head.count(")"):
+                buf   = [line]
+                depth = head.count("(") - head.count(")")
+                continue
+            new_lines.append(line)
+        else:
+            buf.append(line)
+            depth += line.count("(") - line.count(")")
+            if depth <= 0:
+                indent = re.match(r"^(\s*)", buf[0]).group(1)
+                joined = " ".join(re.sub(r"#.*", "", l).strip() for l in buf)
+                m      = re.match(r"^(from\s+\S+\s+import|import)\s*\((.*)\)\s*$", joined)
+                if m:
+                    head, names = m.groups()
+                    names = ", ".join(x.strip() for x in names.split(",") if x.strip())
+                    new_lines.append(f"{indent}{head.strip()} {names}\n")
+                else:
+                    new_lines.extend(buf)
+                buf = None
+    if buf:
+        new_lines.extend(buf)
+    return new_lines
+
+
+def collapse_blank_lines(lines):
+    """Üst üste 2'den fazla boş satırı 2'ye indirger."""
+    new_lines = []
+    blanks    = 0
+    for line in lines:
+        if line.strip() == "":
+            blanks += 1
+            if blanks <= 2:
+                new_lines.append(line)
+        else:
+            blanks = 0
+            new_lines.append(line)
+    return new_lines
+
+
+def _unused_import_warnings(source, offset):
+    """AST ile kullanılmayan import tespiti (yalnızca uyarı, silme yok)."""
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:
+        return []
+
+    imported  = {}  # yerel ad -> satır no
+    noqa_lnos = {i + 1 for i, ln in enumerate(source.splitlines()) if "noqa" in ln}
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom):
+            if node.module == "__future__":
+                continue
+            for a in node.names:
+                if a.name != "*":
+                    imported[a.asname or a.name] = node.lineno
+        elif isinstance(node, ast.Import):
+            for a in node.names:
+                imported[a.asname or a.name.split(".")[0]] = node.lineno
+    if not imported:
+        return []
+
+    used = {n.id for n in ast.walk(tree) if isinstance(n, ast.Name)}
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Assign) and any(
+            isinstance(t, ast.Name) and t.id == "__all__" for t in node.targets
+        ):
+            used |= {c.value for c in ast.walk(node.value) if isinstance(c, ast.Constant) and isinstance(c.value, str)}
+
+    # Ham kaynak taraması için import satırlarını çıkar (string annotation / f-string yakalamak amacıyla)
+    scan_src = re.sub(r"(?m)^[ \t]*(?:import\s|from\s+\S+\s+import\s).*$", "", source)
+
+    unused = []  # (satır no, ad)
+    for name, lineno in sorted(imported.items(), key=lambda kv: kv[1]):
+        if lineno in noqa_lnos or name in used:
+            continue
+        if re.search(rf"\b{re.escape(name)}\b", scan_src):
+            continue
+        unused.append((lineno + offset, name))
+    return unused
+
+
+def _pyflakes_batch(file_paths):
+    """`uvx pyflakes` ile undefined name, f-string boş placeholder, unused variable vb. yakalar.
+
+    TÜM dosyalar TEK çağrıda denetlenir — `uvx` her seferinde ortam çözümlemesi yaptığı için
+    dosya başına ayrı süreç açmak (yüzlerce dosyada) fark edilir yavaşlığa yol açıyordu.
+    Kullanılmayan import zaten `_unused_import_warnings` ile ayrı ele alınıyor (barrel/noqa
+    farkındalığı orada) → çakışmasın diye buradan filtrelenir. `uvx` yoksa sessizce atlanır.
+    Döner: {dosya_yolu : [mesaj, ...]}
+    """
+    by_file = {fp : [] for fp in file_paths}
+    if not file_paths:
+        return by_file
+
+    try:
+        proc = subprocess.run(
+            ["uvx", "pyflakes", *file_paths],
+            capture_output = True,
+            text           = True,
+            timeout        = 60,
+        )
+    except (FileNotFoundError, OSError, subprocess.TimeoutExpired):
+        return by_file
+
+    for ln in proc.stdout.splitlines():
+        if "imported but unused" in ln or "unable to detect undefined names" in ln:
+            continue
+        for fp in file_paths:
+            prefix = f"{fp}:"
+            if ln.startswith(prefix):
+                by_file[fp].append(ln[len(prefix):].strip())
+                break
+    return by_file
+
+
+def lint_warnings(file_path, lines, pyflakes_msgs=None):
+    """Formatlayıcının otomatik düzeltmediği stil ihlallerini gruplayıp basar."""
+    # Kural 8 hedefi ~250/300; formatter yalnızca "artık gerçekten böl" seviyesinde uyarır.
+    # Aradaki denetim kural 8'deki `find | wc -l | awk` tek satırlığına bırakılmıştır.
+    total    = len(lines)
+    oversize = total if total > 600 else 0
+
+    # Barrel __init__.py dosyaları re-export amaçlıdır, import kullanım analizi yapılmaz
+    unused        = [] if os.path.basename(file_path) == "__init__.py" else _unused_import_warnings("".join(lines), 2)
+    pyflakes_msgs = pyflakes_msgs or []
+
+    typing_lnos = []
+    lazy_lnos   = []
+    in_def      = 0
+    _, in_str   = line_context(lines)
+    for k, line in enumerate(lines):
+        no       = k + 3  # +2: başlık satırı ve ardındaki boşluk
+        stripped = line.strip()
+        indent   = len(line) - len(line.lstrip())
+
+        # Çok satırlı string / docstring'i açan satır ve içi atlanır; ''' içindeki """ sayımı durumu ters çeviriyordu
+        if in_str[k] or (line.count('"""') + line.count("'''")) % 2:
+            continue
+
+        if re.match(r"^(async\s+def|def|class)\b", stripped):
+            in_def = indent + 4
+        elif stripped and indent < in_def and not stripped.startswith(("#", '"', "'", ")", "]", "}")):
+            in_def = 0
+
+        if re.match(r"^from\s+typing\s+import\b", stripped):
+            typing_lnos.append(no)
+        if in_def and re.match(r"^(import|from)\s+\S", stripped):
+            m = re.search(r"noqa:\s*lazy\b(.*)$", line)
+            # `# noqa: lazy` tek başına yetmez — ardında en az birkaç harflik gerekçe şart
+            if not (m and len(re.sub(r"[\s—:().,\-]", "", m.group(1))) >= 3):
+                lazy_lnos.append(no)
+
+    if not (oversize or unused or typing_lnos or lazy_lnos or pyflakes_msgs):
+        return
+
+    print(f"  ⚠️  {file_path}")
+    if oversize:
+        print(f"      {oversize} satır → çok büyük, parçalanması gerekebilir (nasıl bölüneceğini gözden geçir)")
+    if unused:
+        by_line = {}
+        for no, name in unused:
+            by_line.setdefault(no, []).append(name)
+        detay = "   ".join(f"satır {no}: {', '.join(names)}" for no, names in sorted(by_line.items()))
+        print(f"      kullanılmayan import (kontrol et; side-effect/dinamik olabilir) → {detay}")
+    if lazy_lnos:
+        print(f"      fonksiyon içi (lazy) import → dosya başına taşı; kasıtlıysa satıra `# noqa: lazy — <neden>` ekle (gerekçe zorunlu) → satır {', '.join(map(str, lazy_lnos))}")
+    if typing_lnos:
+        print(f"      `from typing import` → modern sözdizimi (str | None, list[dict]) → satır {', '.join(map(str, typing_lnos))}")
+    if pyflakes_msgs:
+        by_text = {}
+        for msg in pyflakes_msgs:
+            m = re.match(r"^(\d+):\d+:\s*(.+)$", msg)
+            lineno, text = m.groups() if m else (None, msg)
+            by_text.setdefault(text, []).append(lineno)
+        for text, linenos in by_text.items():
+            if all(linenos):
+                print(f"      pyflakes → {text} → satır {', '.join(linenos)}")
+            else:
+                print(f"      pyflakes → {text}")
+
+
+def clean_whitespace(lines):
+    """Satır sonlarındaki ve dosya sonundaki whitespace'leri temizle."""
+    # Satır sonlarındaki whitespace'leri temizle
+    lines = [line.rstrip() + '\n' if line.strip() else '\n' for line in lines]
+
+    # Dosya sonundaki ekstra newline'ları kaldır
+    while lines and lines[-1].strip() == '':
+        lines.pop()
+
+    if lines:
+        # Son satırın newline ile bittiğinden emin ol
+        if not lines[-1].endswith('\n'):
+            lines[-1] += '\n'
+
+    return lines
+
+
+def format_python_file(file_path):
+    """Dosyayı formatlar, değiştiyse diske yazar; lint için işlenmiş satırları döner (lint_warnings çağrısı caller'da)."""
+    with open(file_path, "r", encoding="utf-8") as f:
+        lines = f.readlines()
+
+    # Shebang yalnız 1. satırda çalışır; başlık onun altına girer.
+    shebang       = lines.pop(0).rstrip() + "\n" if lines and lines[0].startswith("#!") else ""
+    header        = shebang + "# Bu araç @keyiflerolsun tarafından | @KekikAkademi için yazılmıştır.\n"
+    content_start = 0
+    if lines and "@keyiflerolsun" in lines[0]:
+        content_start = 1
+        if len(lines) > 1 and lines[1].strip() == "":
+            content_start = 2
+
+    # Eski sürümün başlığın altına ittiği shebang 1. satıra geri alınır.
+    if not shebang and len(lines) > content_start and lines[content_start].startswith("#!"):
+        shebang = lines.pop(content_start).rstrip() + "\n"
+        header  = shebang + header
+
+    processed = [
+        line.replace("\t", "    ").rstrip() + "\n" for line in lines[content_start:]
+    ]
+
+    # Whitespace temizleme
+    processed = clean_whitespace(processed)
+
+    # Sırasıyla hizalamaları uygula
+    processed = expand_single_line_blocks(processed)
+    processed = collapse_paren_imports(processed)
+    processed = align_imports(processed)
+    processed = align_dictionaries(processed)
+    processed = space_inline_dict_colons(processed)
+    processed = align_wrapper_dicts(processed)
+    processed = align_assignments_and_types(processed)
+    processed = align_kwargs(processed)
+
+    # Final whitespace pass (hizalamalardan sonra)
+    processed = clean_whitespace(processed)
+    processed = collapse_blank_lines(processed)
+
+    new_content = header + "\n" + "".join(processed)
+    with open(file_path, "r", encoding="utf-8") as f:
+        old_content = f.read()
+
+    if new_content != old_content:
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write(new_content)
+        print(f"Formatted: {file_path}")
+
+    return processed
+
+
+def _git_ignored(paths):
+    """git check-ignore ile yok sayılan yolları küme olarak döndürür (git yok / repo değilse boş)."""
+    if not paths:
+        return set()
+    try:
+        proc = subprocess.run(
+            ["git", "-c", "core.quotePath=false", "check-ignore", "--stdin"],
+            input          = "\n".join(paths),
+            capture_output = True,
+            text           = True,
+        )
+    except (FileNotFoundError, OSError):
+        return set()
+    return set(proc.stdout.split("\n")) - {""}
+
+
+def process_path(path):
+    """Verilen yolu dosya mı dizin mi otomatik algılayıp formatlar.
+
+    Önce tüm hedef dosyalar formatlanır, ardından pyflakes TEK toplu çağrıyla (dosya başına
+    ayrı `uvx` süreci açmak yerine) çalıştırılır — çok dosyalı dizinlerde asıl yavaşlık kaynağı buydu.
+    """
+    path = os.path.abspath(path)
+    if os.path.isfile(path):
+        if path.endswith(".py"):
+            processed = format_python_file(path)
+            pf        = _pyflakes_batch([path])
+            lint_warnings(path, processed, pf.get(path))
+        else:
+            print(f"Python dosyası değil, atlanıyor: {path}")
+    elif os.path.isdir(path):
+        EXCLUDE_DIRS = {".env", "venv", ".venv", "__pycache__", ".git"}
+        contents     = {}
+        for root, dirs, files in os.walk(path):
+            kalan   = [d for d in dirs if d not in EXCLUDE_DIRS]
+            ignored = _git_ignored([os.path.join(root, d) for d in kalan] + [os.path.join(root, f) for f in files if f.endswith(".py")])
+            dirs[:] = [d for d in kalan if os.path.join(root, d) not in ignored]
+            for f in sorted(files):
+                if f.endswith(".py") and os.path.join(root, f) not in ignored:
+                    fp             = os.path.join(root, f)
+                    contents[fp]   = format_python_file(fp)
+
+        pf_results = _pyflakes_batch(list(contents))
+        for fp, processed in contents.items():
+            lint_warnings(fp, processed, pf_results.get(fp))
+    else:
+        print(f"Hatalı yol: {path}")
+
+
+def main():
+    parser = argparse.ArgumentParser(description="KekikStyle Python Formatter")
+    parser.add_argument(
+        "paths",
+        nargs   = "*",
+        default = ["."],
+        help    = "Formatlanacak dosya veya dizin yolları (varsayılan: mevcut dizin)",
+    )
+    args = parser.parse_args()
+    for path in args.paths:
+        process_path(path)
+
+
+if __name__ == "__main__":
+    main()
